@@ -74,7 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.Async\Core.Async.csproj">
-      <Project>{3a81aedb-c496-4736-81ae-7145064b5894}</Project>
+      <Project>{34eacd97-c7c9-455d-b091-77dc4d37c42e}</Project>
       <Name>Core.Async</Name>
     </ProjectReference>
   </ItemGroup>
