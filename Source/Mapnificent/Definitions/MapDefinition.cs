@@ -28,7 +28,7 @@ namespace KodeKandy.Mapnificent.Definitions
     {
         // User defined definitions. Does not include automatic definitions - those are composed separately so as to avoid
         // confusion when inheriting maps.
-        private readonly Dictionary<string, MemberBindingDefinition> definedBindings = new Dictionary<string, MemberBindingDefinition>();
+        private readonly Dictionary<string, MemberBindingDefinition> explicitBindings = new Dictionary<string, MemberBindingDefinition>();
 
         public MappingType MappingType { get; private set; }
 
@@ -43,79 +43,26 @@ namespace KodeKandy.Mapnificent.Definitions
         public MemberBindingDefinition GetMemberBindingDefinition(MemberInfo toMemberInfo)
         {
             MemberBindingDefinition memberBindingDefinition;
-            if (!definedBindings.TryGetValue(toMemberInfo.Name, out memberBindingDefinition))
-                definedBindings[toMemberInfo.Name] = new MemberBindingDefinition(toMemberInfo, MemberBindingDefinitionType.Explicit);
+            if (!explicitBindings.TryGetValue(toMemberInfo.Name, out memberBindingDefinition))
+                explicitBindings[toMemberInfo.Name] = MemberBindingDefinition.Create(toMemberInfo, MemberBindingDefinitionType.Explicit);
 
             return memberBindingDefinition;
         }
 
-        //public ConversionDefinition<TFromDeclaring, TToDeclaring> For<TToMember>(Expression<Func<TToDeclaring, TToMember>> toMember,
-        //    Action<MemberBindingDefinitionBuilder<TFromDeclaring, TToMember>> options)
-        //{
-        //    Require.NotNull(toMember, "toMember");
-        //    Require.IsTrue(ExpressionHelpers.IsMemberExpression(toMember), "Parameter 'toMember' must be a simple expression.");
 
-        //    // Obtain a bindingDefinition.
-        //    var memberName = ExpressionHelpers.GetMemberName(toMember);
-        //    MemberBindingDefinition bindingDefinition;
-        //    if (!definedBindings.TryGetValue(memberName, out bindingDefinition))
-        //        definedBindings[memberName] = MemberBindingDefinition.Create(toMember);
+        public ReadOnlyCollection<MemberBindingDefinition> Bindings
+        {
+            get
+            {
+                var autoMemberBindingsResult = GenerateAutoMemberBindings();
 
-        //    // Apply the builder options.
-        //    var builder = new MemberBindingDefinitionBuilder<TFromDeclaring, TToMember>(bindingDefinition);
-        //    options(builder);
+                var combined = new List<MemberBindingDefinition>(explicitBindings.Values);
+                combined.AddRange(autoMemberBindingsResult.Item1);
 
-        //    return this;
-        //}
+                return new ReadOnlyCollection<MemberBindingDefinition>(combined);
+            }
+        }
 
-        //public ConversionDefinition<TFromDeclaring, TToDeclaring> ConstructUsing(Func<ConstructionContext, TToDeclaring> factory)
-        //{
-        //    return this;
-        //}
-
-        /// <summary>
-        ///     Indicates that this type is a collection type and it's entities should be mapped.
-        /// </summary>
-        /// <returns></returns>
-        //public ConversionDefinition<TFromDeclaring, TToDeclaring> AsCollection()
-        //{
-        //    return this;
-        //}
-        //public ConversionDefinition<TFromDeclaring, TToDeclaring> Inherits<TFromBase, TToBase>(ConversionDefinition<TFromDeclaring, TToDeclaring> definition)
-        //{
-        //    Require.IsTrue(typeof(TFromBase).IsAssignableFrom(typeof(TFromDeclaring)));
-        //    Require.IsTrue(typeof(TToBase).IsAssignableFrom(typeof(TToDeclaring)));
-        //    return this;
-        //}
-        //public Map CreateMap()
-        //{
-        //    var map = new Map(typeof(TFromDeclaring), typeof(TToDeclaring));
-        //    // Discover which to class members do not have explicit definitions,
-        //    // and try to automap them.
-        //    var allMembers = ReflectionHelpers.GetMemberInfos(typeof(TToDeclaring));
-        //    var undefined = allMembers.Where(m => !definedBindings.ContainsKey(m.Name));
-        //    var unmatched = new List<string>();
-        //    var newDefinitions = new Dictionary<string, MemberBindingDefinition>();
-        //    // Iterate all the undefined members on the 'to' class and try to automatically create matches from
-        //    // inspecting fields on the 'from' class.
-        //    foreach (var toMemberInfo in undefined)
-        //    {
-        //        var toMemberName = toMemberInfo.Name;
-        //        var unflattenedMemberInfos = ExpressionHelpers.UnflattenMemberNamesToMemberInfos(typeof(TFromDeclaring), toMemberName);
-        //        if (unflattenedMemberInfos.Any())
-        //        {
-        //            var getter = ReflectionHelpers.CreateSafeWeakMemberChainGetter(new[] {toMemberInfo});
-        //            newDefinitions[toMemberName] = MemberBindingDefinition.Create(toMemberInfo).SetFrom(typeof(TFromDeclaring), toMemberName,
-        //                toMemberInfo.GetMemberType(), getter);
-        //        }
-        //        else
-        //        {
-        //            unmatched.Add(toMemberInfo.Name);
-        //        }
-        //    }
-        //    // TODO use the definitions to create the map.
-        //    return map;
-        //}
         public void AssertValid(MapperSchema mapperSchema)
         {
             var mapDefinitionErrors = Validate(mapperSchema);
@@ -132,8 +79,8 @@ namespace KodeKandy.Mapnificent.Definitions
 
             var autoMemberBindingsResult = GenerateAutoMemberBindings();
 
-            var combined = new List<MemberBindingDefinition>(definedBindings.Values);
-            combined.AddRange(GenerateAutoMemberBindings().Item1);
+            var combined = new List<MemberBindingDefinition>(explicitBindings.Values);
+            combined.AddRange(autoMemberBindingsResult.Item1);
 
             throw new NotImplementedException();
         }
@@ -144,7 +91,7 @@ namespace KodeKandy.Mapnificent.Definitions
             var memberDefinitionErrors = new List<MemberDefinitionError>();
 
             // Discover which 'to' class members do not have explicit definitions, so that they can be automapped.
-            var undefinedToMemberInfos = ReflectionHelpers.GetMemberInfos(MappingType.ToType).Where(m => !definedBindings.ContainsKey(m.Name));
+            var undefinedToMemberInfos = ReflectionHelpers.GetMemberInfos(MappingType.ToType).Where(m => !explicitBindings.ContainsKey(m.Name));
 
             // Iterate all the undefined members on the 'to' class and try to automatically create matches from
             // inspecting members on the 'from' class.
@@ -154,14 +101,15 @@ namespace KodeKandy.Mapnificent.Definitions
 
                 if (unflattenedMemberInfos.Any())
                 {
-                    var memberBindingDefinition = new MemberBindingDefinition(toMemberInfo, MemberBindingDefinitionType.Auto);
 
                     var fromMemberType = unflattenedMemberInfos.Last().GetMemberType();
                     var fromMemberName = String.Join(".", unflattenedMemberInfos.GetMemberNames());
                     var fromMemberGetter = ReflectionHelpers.CreateSafeWeakMemberChainGetter(unflattenedMemberInfos);
 
-                    memberBindingDefinition.MemberGetterDefinition = new MemberGetterDefinition(MappingType.FromType, fromMemberName, fromMemberType,
+                    var memberGetterDefinition = new MemberGetterDefinition(MappingType.FromType, fromMemberName, fromMemberType,
                         fromMemberGetter);
+
+                    var memberBindingDefinition = MemberBindingDefinition.Create(toMemberInfo, MemberBindingDefinitionType.Auto, memberGetterDefinition);
 
                     autoMemberBindings.Add(memberBindingDefinition);
                 }
@@ -178,11 +126,13 @@ namespace KodeKandy.Mapnificent.Definitions
 
         public ReadOnlyCollection<MemberDefinitionError> Validate(MapperSchema mapperSchema)
         {
+            Require.NotNull(mapperSchema, "mapperSchema");
+
             var memberDefinitionErrors = new List<MemberDefinitionError>();
 
             var generateAutoMemberBindingsResult = GenerateAutoMemberBindings(); //.ToDictionary(x => x.MemberSetterDefinition.MemberName);
 
-            memberDefinitionErrors.AddRange(ValidateMemberBindingDefinitions(mapperSchema, definedBindings.Values));
+            memberDefinitionErrors.AddRange(ValidateMemberBindingDefinitions(mapperSchema, explicitBindings.Values));
             memberDefinitionErrors.AddRange(ValidateMemberBindingDefinitions(mapperSchema, generateAutoMemberBindingsResult.Item1));
             memberDefinitionErrors.AddRange(generateAutoMemberBindingsResult.Item2);
 

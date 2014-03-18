@@ -64,6 +64,12 @@ namespace KodeKandy.Threading
             return tcs.Task;
         }
 
+        /// <summary>
+        ///     Creates a faulted task without performing any async work.
+        /// </summary>
+        /// <typeparam name="T">The task type.</typeparam>
+        /// <param name="exception">The exception that faults the task.</param>
+        /// <returns>A task faulted with exception.</returns>
         public static Task<T> FromException<T>(Exception exception)
         {
             var tcs = new TaskCompletionSource<T>();

@@ -25,7 +25,7 @@ namespace KodeKandy.Mapnificent.Definitions
     /// <typeparam name="TToMember">Type of the 'to' member being set.</typeparam>
     public class MemberBindingDefinitionBuilder<TFromDeclaring, TToMember>
     {
-        private readonly MemberBindingDefinition memberBindingDefinition;
+        private MemberBindingDefinition memberBindingDefinition;
 
         public MemberBindingDefinitionBuilder(MemberBindingDefinition memberBindingDefinition)
         {
@@ -52,8 +52,8 @@ namespace KodeKandy.Mapnificent.Definitions
             var fromMemberName = String.Join(".", memberInfos.Select(x => x.Name));
             var fromMemberGetter = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
 
-            memberBindingDefinition.MemberGetterDefinition = new MemberGetterDefinition(typeof(TFromDeclaring), fromMemberName, typeof(TFromMember),
-                fromMemberGetter);
+            memberBindingDefinition = memberBindingDefinition.WithMemberGetterDefinition(new MemberGetterDefinition(typeof(TFromDeclaring), fromMemberName, typeof(TFromMember),
+                fromMemberGetter));
 
             return this;
         }
@@ -66,7 +66,7 @@ namespace KodeKandy.Mapnificent.Definitions
         /// <returns></returns>
         public MemberBindingDefinitionBuilder<TFromDeclaring, TToMember> Ignore()
         {
-            memberBindingDefinition.MemberGetterDefinition = null;
+            memberBindingDefinition = memberBindingDefinition.WithIgnore();
 
             return this;
         }
