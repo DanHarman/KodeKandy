@@ -53,6 +53,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Given_MapDefinition.cs" />
+    <Compile Include="TestEntities\FlatteningFrom.cs" />
+    <Compile Include="TestEntities\FlatteningTo.cs" />
     <Compile Include="TestEntities\NestedFrom.cs" />
     <Compile Include="TestEntities\NestedTo.cs" />
     <Compile Include="TestEntities\SimpleFrom.cs" />

@@ -15,7 +15,7 @@
 using System;
 using System.Reflection;
 
-namespace KodeKandy.Mapnificent.Definitions
+namespace KodeKandy.Mapnificent
 {
     public class MemberDefinitionError
     {

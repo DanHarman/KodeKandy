@@ -1,4 +1,4 @@
-// <copyright file="MappingType.cs" company="million miles per hour ltd">
+// <copyright file="ProjectionType.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -16,12 +16,25 @@ using System;
 
 namespace KodeKandy.Mapnificent
 {
-    public class MappingType
+    /// <summary>
+    /// Defines the types projected in a map or conversion.
+    /// </summary>
+    public class ProjectionType
     {
         public Type FromType { get; set; }
         public Type ToType { get; set; }
 
-        public MappingType(Type fromType, Type toType)
+        public bool IsMap
+        {
+            get { return ToType.IsClass; }
+        }
+
+        public bool IsIdentity
+        {
+            get { return ToType == FromType; }
+        }
+
+        public ProjectionType(Type fromType, Type toType)
         {
             Require.NotNull(fromType, "fromType");
             Require.NotNull(toType, "toType");
@@ -30,12 +43,12 @@ namespace KodeKandy.Mapnificent
             ToType = toType;
         }
 
-        public static MappingType Create<TFrom, TTo>()
+        public static ProjectionType Create<TFrom, TTo>()
         {
-            return new MappingType(typeof(TFrom), typeof(TTo));
+            return new ProjectionType(typeof(TFrom), typeof(TTo));
         }
 
-        protected bool Equals(MappingType other)
+        protected bool Equals(ProjectionType other)
         {
             return FromType == other.FromType && ToType == other.ToType;
         }
@@ -45,7 +58,7 @@ namespace KodeKandy.Mapnificent
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((MappingType) obj);
+            return Equals((ProjectionType) obj);
         }
 
         public override int GetHashCode()
@@ -53,12 +66,12 @@ namespace KodeKandy.Mapnificent
             return FromType.GetHashCode() ^ ToType.GetHashCode();
         }
 
-        public static bool operator ==(MappingType left, MappingType right)
+        public static bool operator ==(ProjectionType left, ProjectionType right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(MappingType left, MappingType right)
+        public static bool operator !=(ProjectionType left, ProjectionType right)
         {
             return !Equals(left, right);
         }

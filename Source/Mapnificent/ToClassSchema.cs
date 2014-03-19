@@ -18,49 +18,49 @@ using System.Reflection;
 
 namespace KodeKandy.Mapnificent
 {
-    public class ToClassSchema
-    {
-        private readonly Type classType;
-        private readonly Dictionary<string, Action<object, object>> members = new Dictionary<string, Action<object, object>>();
-
-        public ToClassSchema(Type classType)
-        {
-            this.classType = classType;
-
-            EnumeratePropertyMembers();
-            EnumerateFieldMembers();
-        }
-
-        public Dictionary<string, Action<object, object>> Members
-        {
-            get { return members; }
-        }
-
-        private void EnumeratePropertyMembers()
-        {
-            const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public;
-
-            var props = classType.GetProperties(flags);
-
-            foreach (var prop in props)
-            {
-                if (!prop.CanWrite)
-                    continue;
-
-                members.Add(prop.Name, ReflectionHelpers.CreateWeakPropertySetter(prop));
-            }
-        }
-
-        private void EnumerateFieldMembers()
-        {
-            const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public;
-
-            var fields = classType.GetFields(flags);
-
-            foreach (var field in fields)
-            {
-                members.Add(field.Name, ReflectionHelpers.CreateWeakFieldSetter(field));
-            }
-        }
-    }
+//    public class ToClassSchema
+//    {
+//        private readonly Type classType;
+//        private readonly Dictionary<string, Action<object, object>> members = new Dictionary<string, Action<object, object>>();
+//
+//        public ToClassSchema(Type classType)
+//        {
+//            this.classType = classType;
+//
+//            EnumeratePropertyMembers();
+//            EnumerateFieldMembers();
+//        }
+//
+//        public Dictionary<string, Action<object, object>> Members
+//        {
+//            get { return members; }
+//        }
+//
+//        private void EnumeratePropertyMembers()
+//        {
+//            const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public;
+//
+//            var props = classType.GetProperties(flags);
+//
+//            foreach (var prop in props)
+//            {
+//                if (!prop.CanWrite)
+//                    continue;
+//
+//                members.Add(prop.Name, ReflectionHelpers.CreateWeakPropertySetter(prop));
+//            }
+//        }
+//
+//        private void EnumerateFieldMembers()
+//        {
+//            const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public;
+//
+//            var fields = classType.GetFields(flags);
+//
+//            foreach (var field in fields)
+//            {
+//                members.Add(field.Name, ReflectionHelpers.CreateWeakFieldSetter(field));
+//            }
+//        }
+//    }
 }

@@ -1,4 +1,4 @@
-// <copyright file="ConstructionContext.cs" company="million miles per hour ltd">
+﻿// <copyright file="Mapper.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -12,18 +12,18 @@
 // 
 // </copyright>
 
-namespace KodeKandy.Mapnificent.Definitions
+using System;
+
+namespace KodeKandy.Mapnificent
 {
-    public class ConstructionContext
+    public class MappingException : Exception
     {
-        public ConstructionContext(Mapper mapper, object parent)
+        public MappingException(string message) : base(message)
         {
-            Mapper = mapper;
-            Parent = parent;
         }
 
-        public Mapper Mapper { get; private set; }
-
-        public object Parent { get; private set; }
+        public MappingException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }

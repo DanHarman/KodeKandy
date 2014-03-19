@@ -15,7 +15,7 @@
 using System;
 using System.Linq.Expressions;
 
-namespace KodeKandy.Mapnificent.Definitions
+namespace KodeKandy.Mapnificent
 {
     /// <summary>
     ///     Type safe ConversionDefinition builder.
@@ -25,14 +25,14 @@ namespace KodeKandy.Mapnificent.Definitions
     public class MapDefinitionBuilder<TFromDeclaring, TToDeclaring>
         where TToDeclaring : class
     {
-        public MapDefinition MapDefinition { get; private set; }
+        public Map Map { get; private set; }
 
-        public MapDefinitionBuilder(MapDefinition mapDefinition)
+        public MapDefinitionBuilder(Map map)
         {
-            Require.IsTrue(mapDefinition.MappingType.FromType == typeof(TFromDeclaring));
-            Require.IsTrue(mapDefinition.MappingType.ToType == typeof(TToDeclaring));
+            Require.IsTrue(map.ProjectionType.FromType == typeof(TFromDeclaring));
+            Require.IsTrue(map.ProjectionType.ToType == typeof(TToDeclaring));
 
-            MapDefinition = mapDefinition;
+            Map = map;
         }
 
         public MapDefinitionBuilder<TFromDeclaring, TToDeclaring> For<TToMember>(Expression<Func<TToDeclaring, TToMember>> toMember,
@@ -43,7 +43,7 @@ namespace KodeKandy.Mapnificent.Definitions
 
             // Obtain a bindingDefinition.
             var toMemberInfo = ExpressionHelpers.GetMemberInfo(toMember);
-            var memberBindingDefinition = MapDefinition.GetMemberBindingDefinition(toMemberInfo);
+            var memberBindingDefinition = Map.GetMemberBindingDefinition(toMemberInfo);
 
             // Apply the builder options.
             var builder = new MemberBindingDefinitionBuilder<TFromDeclaring, TToMember>(memberBindingDefinition);

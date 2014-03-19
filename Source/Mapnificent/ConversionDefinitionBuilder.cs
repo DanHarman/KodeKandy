@@ -14,7 +14,7 @@
 
 using System;
 
-namespace KodeKandy.Mapnificent.Definitions
+namespace KodeKandy.Mapnificent
 {
     /// <summary>
     ///     Type safe ConversionDefinition builder.
@@ -28,8 +28,8 @@ namespace KodeKandy.Mapnificent.Definitions
 
         public ConversionDefinitionBuilder(ConversionDefinition conversionDefinition)
         {
-            Require.IsTrue(conversionDefinition.MappingType.FromType == typeof(TFrom));
-            Require.IsTrue(conversionDefinition.MappingType.ToType == typeof(TTo));
+            Require.IsTrue(conversionDefinition.ProjectionType.FromType == typeof(TFrom));
+            Require.IsTrue(conversionDefinition.ProjectionType.ToType == typeof(TTo));
 
             ConversionDefinition = conversionDefinition;
         }

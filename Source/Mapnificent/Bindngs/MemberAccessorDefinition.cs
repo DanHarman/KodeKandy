@@ -14,7 +14,7 @@
 
 using System;
 
-namespace KodeKandy.Mapnificent.Definitions
+namespace KodeKandy.Mapnificent
 {
     /// <summary>
     ///     Base class for member access definitions that capture memberName, GetMemberType and appropritate delegate to

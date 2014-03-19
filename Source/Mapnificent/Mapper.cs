@@ -1,4 +1,4 @@
-﻿// <copyright file="Mapper.cs" company="million miles per hour ltd">
+// <copyright file="Mapper.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -13,39 +13,88 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 
 namespace KodeKandy.Mapnificent
 {
-    public class MappingException : Exception
-    {
-        public MappingException(string message) : base(message)
-        {
-        }
-
-        public MappingException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-    }
-
-    public interface IMapDefinition
-    {
-    }
-
+    /// <summary>
+    ///     A mapper that can copy values between two class based on defined and implied relationships.
+    /// A projection from a class to a class is called a 'map'.
+    /// A projection from a class to a value type is called a 'conversion'.
+    /// </summary>
     public class Mapper
     {
-        public TTo Map<TTo>(object from)
+        /// <summary>
+        ///     Map definitions encompass all mappings into a reference type.
+        /// </summary>
+        private readonly Dictionary<ProjectionType, Map> mapDefinitions = new Dictionary<ProjectionType, Map>();
+
+        /// <summary>
+        ///     Conversion definitions encompass all mappings into a value type.
+        /// </summary>
+        private readonly Dictionary<ProjectionType, ConversionDefinition> conversionDefinitions = new Dictionary<ProjectionType, ConversionDefinition>();
+
+        public MapDefinitionBuilder<TFrom, TTo> DefineMap<TFrom, TTo>()
             where TTo : class
         {
-            return (TTo) Map(from, typeof(TTo));
+            var mappingType = new ProjectionType(typeof(TFrom), typeof(TTo));
+            Map definition;
+
+            if (!mapDefinitions.TryGetValue(mappingType, out definition))
+            {
+                definition = new Map(mappingType);
+                mapDefinitions.Add(mappingType, definition);
+            }
+
+            return new MapDefinitionBuilder<TFrom, TTo>(definition);
         }
 
-        public object Map(object from, Type toType)
+        public void DefineConversion<TFrom, TTo>()
+            where TTo : struct
         {
-            return null;
+            var mappingType = new ProjectionType(typeof(TFrom), typeof(TTo));
+            ConversionDefinition definition;
+
+            if (!conversionDefinitions.TryGetValue(mappingType, out definition))
+            {
+                definition = new ConversionDefinition(mappingType);
+                conversionDefinitions.Add(mappingType, definition);
+            }
         }
 
-        public void AssertValid()
+        public bool HasMap(Type fromType, Type toType)
         {
+            Require.NotNull(fromType, "fromType");
+            Require.NotNull(toType, "toType");
+            Require.IsTrue(toType.IsClass, "toType must be a class.");
+
+            return mapDefinitions.ContainsKey(new ProjectionType(fromType, toType));
         }
+
+        public bool HasConversion(Type fromType, Type toType)
+        {
+            Require.NotNull(fromType, "fromType");
+            Require.NotNull(toType, "toType");
+            Require.IsTrue(toType.IsValueType, "toType must be a value type.");
+
+            // If we decide to allow automatic type conversion look at:
+            // Convert.ChangeType
+            // & System.ComponentModel.TypeDescriptor.GetConverter(typeof(int))
+
+            return conversionDefinitions.ContainsKey(new ProjectionType(fromType, toType));
+        }
+
+        public bool HasMapOrConversion(Type fromType, Type toType)
+        {
+            Require.NotNull(fromType, "fromType");
+            Require.NotNull(toType, "toType");
+
+            if (toType.IsClass)
+                return HasMap(fromType, toType);
+            else
+                return HasConversion(fromType, toType);
+        }
+
+        // TODO Add Import(Mapper mapperSchema) method.
     }
 }

@@ -16,7 +16,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace KodeKandy.Mapnificent.Definitions
+namespace KodeKandy.Mapnificent
 {
     /// <summary>
     ///     Builder class to provide convenient type safe definition of member bindings.
@@ -25,11 +25,11 @@ namespace KodeKandy.Mapnificent.Definitions
     /// <typeparam name="TToMember">Type of the 'to' member being set.</typeparam>
     public class MemberBindingDefinitionBuilder<TFromDeclaring, TToMember>
     {
-        private MemberBindingDefinition memberBindingDefinition;
+        public MemberBindingDefinition MemberBindingDefinition { get; private set; }
 
         public MemberBindingDefinitionBuilder(MemberBindingDefinition memberBindingDefinition)
         {
-            this.memberBindingDefinition = memberBindingDefinition;
+            this.MemberBindingDefinition = memberBindingDefinition;
         }
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace KodeKandy.Mapnificent.Definitions
             var fromMemberName = String.Join(".", memberInfos.Select(x => x.Name));
             var fromMemberGetter = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
 
-            memberBindingDefinition = memberBindingDefinition.WithMemberGetterDefinition(new MemberGetterDefinition(typeof(TFromDeclaring), fromMemberName, typeof(TFromMember),
-                fromMemberGetter));
+            MemberBindingDefinition.MemberGetterDefinition = new MemberGetterDefinition(typeof(TFromDeclaring), fromMemberName, typeof(TFromMember),
+                fromMemberGetter);
 
             return this;
         }
@@ -66,7 +66,7 @@ namespace KodeKandy.Mapnificent.Definitions
         /// <returns></returns>
         public MemberBindingDefinitionBuilder<TFromDeclaring, TToMember> Ignore()
         {
-            memberBindingDefinition = memberBindingDefinition.WithIgnore();
+            MemberBindingDefinition.Ignore = true;
 
             return this;
         }

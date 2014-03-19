@@ -17,18 +17,18 @@ using NUnit.Framework;
 
 namespace KodeKandy.Mapnificent.Tests
 {
-    [TestFixture]
-    public class TargetClassSchemaTests
-    {
-        [Test]
-        public void When_Creating_Schema_Then_Schema_Is_Correct()
-        {
-            // Arrange
-            var sut = new ToClassSchema(typeof(Circle));
-
-            // Assert
-            Assert.IsTrue(sut.Members.ContainsKey("memberName"));
-            Assert.IsTrue(sut.Members.ContainsKey("Radius"));
-        }
-    }
+//    [TestFixture]
+//    public class TargetClassSchemaTests
+//    {
+//        [Test]
+//        public void When_Creating_Schema_Then_Schema_Is_Correct()
+//        {
+//            // Arrange
+//            var sut = new ToClassSchema(typeof(Circle));
+//
+//            // Assert
+//            Assert.IsTrue(sut.Members.ContainsKey("memberName"));
+//            Assert.IsTrue(sut.Members.ContainsKey("Radius"));
+//        }
+//    }
 }

@@ -14,7 +14,7 @@
 
 using System;
 
-namespace KodeKandy.Mapnificent.Definitions
+namespace KodeKandy.Mapnificent
 {
     /// <summary>
     ///     A definition for from members that are being mapped from.

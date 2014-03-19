@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace KodeKandy.Mapnificent.Definitions
+namespace KodeKandy.Mapnificent
 {
     public class MapDefinitionUndefinedMembersException : Exception
     {

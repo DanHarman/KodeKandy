@@ -14,14 +14,14 @@
 
 using System;
 
-namespace KodeKandy.Mapnificent.Definitions
+namespace KodeKandy.Mapnificent
 {
     /// <summary>
     ///     Conversion definitions encompass all mappings into a value type.
     /// </summary>
     public class ConversionDefinition
     {
-        public MappingType MappingType { get; private set; }
+        public ProjectionType ProjectionType { get; private set; }
 
         private Func<object, object> conversionFunc;
         public Func<object, object> ConversionFunc
@@ -34,17 +34,17 @@ namespace KodeKandy.Mapnificent.Definitions
             }
         }
 
-        public ConversionDefinition(MappingType mappingType)
+        public ConversionDefinition(ProjectionType projectionType)
         {
-            Require.NotNull(mappingType);
-            Require.IsTrue(mappingType.ToType.IsClass);
+            Require.NotNull(projectionType);
+            Require.IsTrue(projectionType.ToType.IsClass);
 
-            MappingType = mappingType;
+            ProjectionType = projectionType;
         }
 
         public override string ToString()
         {
-            return String.Format("Conversion: {0}", MappingType);
+            return String.Format("Conversion: {0}", ProjectionType);
         }
     }
 }

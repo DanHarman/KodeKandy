@@ -1,10 +1,10 @@
 ﻿namespace KodeKandy.Mapnificent.Tests.TestEntities
 {
-    public class NestedTo
+    public class FlatteningFrom
     {
-        public NestedChildTo Child { get; set; }
+        public FlatteningChildFrom Child { get; set; }
 
-        public class NestedChildTo
+        public class FlatteningChildFrom
         {
             public string Name { get; set; }
         }
