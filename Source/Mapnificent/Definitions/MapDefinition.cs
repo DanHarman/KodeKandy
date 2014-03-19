@@ -73,18 +73,6 @@ namespace KodeKandy.Mapnificent.Definitions
             }
         }
 
-        public Map ToMap(MapperSchema mapperSchema)
-        {
-            AssertValid(mapperSchema);
-
-            var autoMemberBindingsResult = GenerateAutoMemberBindings();
-
-            var combined = new List<MemberBindingDefinition>(explicitBindings.Values);
-            combined.AddRange(autoMemberBindingsResult.Item1);
-
-            throw new NotImplementedException();
-        }
-
         private Tuple<ReadOnlyCollection<MemberBindingDefinition>, ReadOnlyCollection<MemberDefinitionError>> GenerateAutoMemberBindings()
         {
             var autoMemberBindings = new List<MemberBindingDefinition>();
@@ -101,7 +89,6 @@ namespace KodeKandy.Mapnificent.Definitions
 
                 if (unflattenedMemberInfos.Any())
                 {
-
                     var fromMemberType = unflattenedMemberInfos.Last().GetMemberType();
                     var fromMemberName = String.Join(".", unflattenedMemberInfos.GetMemberNames());
                     var fromMemberGetter = ReflectionHelpers.CreateSafeWeakMemberChainGetter(unflattenedMemberInfos);
@@ -110,6 +97,8 @@ namespace KodeKandy.Mapnificent.Definitions
                         fromMemberGetter);
 
                     var memberBindingDefinition = MemberBindingDefinition.Create(toMemberInfo, MemberBindingDefinitionType.Auto, memberGetterDefinition);
+                    
+                    // TODO need to find conversion here if one is needed.
 
                     autoMemberBindings.Add(memberBindingDefinition);
                 }
@@ -128,23 +117,9 @@ namespace KodeKandy.Mapnificent.Definitions
         {
             Require.NotNull(mapperSchema, "mapperSchema");
 
-            var memberDefinitionErrors = new List<MemberDefinitionError>();
-
-            var generateAutoMemberBindingsResult = GenerateAutoMemberBindings(); //.ToDictionary(x => x.MemberSetterDefinition.MemberName);
-
-            memberDefinitionErrors.AddRange(ValidateMemberBindingDefinitions(mapperSchema, explicitBindings.Values));
-            memberDefinitionErrors.AddRange(ValidateMemberBindingDefinitions(mapperSchema, generateAutoMemberBindingsResult.Item1));
-            memberDefinitionErrors.AddRange(generateAutoMemberBindingsResult.Item2);
-
-            return new ReadOnlyCollection<MemberDefinitionError>(memberDefinitionErrors);
-        }
-
-        private static IEnumerable<MemberDefinitionError> ValidateMemberBindingDefinitions(MapperSchema mapperSchema,
-            IEnumerable<MemberBindingDefinition> memberBindingDefinitions)
-        {
-            var errors = memberBindingDefinitions.SelectMany(md => md.Validate(mapperSchema)).ToList();
-
-            return errors;
+            var errors = Bindings.SelectMany(b => MemberBindingDefinitionValidator.Validate(b, mapperSchema)).ToList();
+        
+            return new ReadOnlyCollection<MemberDefinitionError>(errors);
         }
     }
 }
