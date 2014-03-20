@@ -1,4 +1,4 @@
-// <copyright file="ConversionDefinition.cs" company="million miles per hour ltd">
+// <copyright file="Conversion.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -19,7 +19,7 @@ namespace KodeKandy.Mapnificent
     /// <summary>
     ///     Conversion definitions encompass all mappings into a value type.
     /// </summary>
-    public class ConversionDefinition
+    public class Conversion
     {
         public ProjectionType ProjectionType { get; private set; }
 
@@ -34,7 +34,7 @@ namespace KodeKandy.Mapnificent
             }
         }
 
-        public ConversionDefinition(ProjectionType projectionType)
+        public Conversion(ProjectionType projectionType)
         {
             Require.NotNull(projectionType);
             Require.IsTrue(projectionType.ToType.IsClass);
@@ -45,6 +45,11 @@ namespace KodeKandy.Mapnificent
         public override string ToString()
         {
             return String.Format("Conversion: {0}", ProjectionType);
+        }
+
+        public object Apply(object fromValue)
+        {
+            return conversionFunc(fromValue);
         }
     }
 }

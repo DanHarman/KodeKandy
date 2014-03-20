@@ -51,7 +51,15 @@ namespace KodeKandy.Mapnificent
         /// <summary>
         ///     Conversion used to map between the 'from' member to the 'to' member.
         /// </summary>
-        public ConversionDefinition ConversionDefinition { get; set; }
+        public Conversion Conversion { get; set; }
+
+        /// <summary>
+        /// A projection tye reflecting the type of the 'from' and 'to' members.
+        /// </summary>
+        public ProjectionType ProjectionType
+        {
+            get { return new ProjectionType(MemberGetterDefinition.MemberType, MemberSetterDefinition.MemberType); }
+        }
 
         private bool ignore;
         public bool Ignore
@@ -63,25 +71,25 @@ namespace KodeKandy.Mapnificent
                 if (ignore)
                 {
                     MemberSetterDefinition = null;
-                    ConversionDefinition = null;
+                    Conversion = null;
                 }
             }
         }
 
         private MemberBindingDefinition(MemberSetterDefinition memberSetterDefinition, MemberBindingDefinitionType memberBindingDefinitionType,
-            MemberGetterDefinition memberGetterDefinition = null, ConversionDefinition conversionDefinition = null)
+            MemberGetterDefinition memberGetterDefinition = null, Conversion conversion = null)
         {
             Require.NotNull(memberSetterDefinition, "memberSetterDefinition");
 
             MemberBindingDefinitionType = memberBindingDefinitionType;
             MemberSetterDefinition = memberSetterDefinition;
             MemberGetterDefinition = memberGetterDefinition;
-            ConversionDefinition = conversionDefinition;
+            Conversion = conversion;
         }
 
-        public static MemberBindingDefinition Create(MemberInfo toMemberInfo, MemberBindingDefinitionType memberBindingDefinitionType, MemberGetterDefinition memberGetterDefinition = null, ConversionDefinition conversionDefinition = null)
+        public static MemberBindingDefinition Create(MemberInfo toMemberInfo, MemberBindingDefinitionType memberBindingDefinitionType, MemberGetterDefinition memberGetterDefinition = null, Conversion conversion = null)
         {
-            return new MemberBindingDefinition(new MemberSetterDefinition(toMemberInfo), memberBindingDefinitionType, memberGetterDefinition, conversionDefinition);
+            return new MemberBindingDefinition(new MemberSetterDefinition(toMemberInfo), memberBindingDefinitionType, memberGetterDefinition, conversion);
         }
 
         /// <summary>
@@ -91,7 +99,7 @@ namespace KodeKandy.Mapnificent
         {
             get
             {
-                if (MemberGetterDefinition == null || ConversionDefinition != null)
+                if (MemberGetterDefinition == null || Conversion != null)
                     return false;
 
                 var fromMemberType = MemberGetterDefinition.MemberType;

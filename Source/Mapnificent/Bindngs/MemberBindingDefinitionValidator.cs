@@ -15,7 +15,7 @@ namespace KodeKandy.Mapnificent
             if (definition.MemberGetterDefinition == null)
                 memberDefinitionErrors.Add(MemberDefinitionError.Create(definition.MemberSetterDefinition, "Binding definition does not define 'From' binding."));
 
-            if (definition.MemberGetterDefinition != null && definition.ConversionDefinition == null)
+            if (definition.MemberGetterDefinition != null && definition.Conversion == null)
             {
                 var fromMemberType = definition.MemberGetterDefinition.MemberType;
                 var toMemberType = definition.MemberSetterDefinition.MemberType;
@@ -30,19 +30,19 @@ namespace KodeKandy.Mapnificent
                 }
             }
 
-            if (definition.MemberGetterDefinition != null && definition.ConversionDefinition != null)
+            if (definition.MemberGetterDefinition != null && definition.Conversion != null)
             {
                 // TODO validate conversion or make it so instantiation implies validity.
 
-                if (definition.MemberSetterDefinition.MemberType != definition.ConversionDefinition.ProjectionType.ToType)
+                if (definition.MemberSetterDefinition.MemberType != definition.Conversion.ProjectionType.ToType)
                     memberDefinitionErrors.Add(MemberDefinitionError.Create(definition.MemberSetterDefinition,
                         "To member type {0} does not match the defined conversion output type ({1})", definition.MemberGetterDefinition.MemberType,
-                        definition.ConversionDefinition));
+                        definition.Conversion));
 
-                if (definition.MemberGetterDefinition.MemberType != definition.ConversionDefinition.ProjectionType.FromType)
+                if (definition.MemberGetterDefinition.MemberType != definition.Conversion.ProjectionType.FromType)
                     memberDefinitionErrors.Add(MemberDefinitionError.Create(definition.MemberSetterDefinition,
                         "From member type {0} does not match the defined conversion input type ({1})", definition.MemberGetterDefinition.MemberType,
-                        definition.ConversionDefinition));
+                        definition.Conversion));
             }
 
             return new ReadOnlyCollection<MemberDefinitionError>(memberDefinitionErrors);

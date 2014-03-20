@@ -17,21 +17,21 @@ using System;
 namespace KodeKandy.Mapnificent
 {
     /// <summary>
-    ///     Type safe ConversionDefinition builder.
+    ///     Type safe Conversion builder.
     /// </summary>
     /// <typeparam name="TFrom">The type being mapped from.</typeparam>
     /// <typeparam name="TTo">The type being mapped to.</typeparam>
     public class ConversionDefinitionBuilder<TFrom, TTo>
         where TTo : struct
     {
-        public ConversionDefinition ConversionDefinition { get; private set; }
+        public Conversion Conversion { get; private set; }
 
-        public ConversionDefinitionBuilder(ConversionDefinition conversionDefinition)
+        public ConversionDefinitionBuilder(Conversion conversion)
         {
-            Require.IsTrue(conversionDefinition.ProjectionType.FromType == typeof(TFrom));
-            Require.IsTrue(conversionDefinition.ProjectionType.ToType == typeof(TTo));
+            Require.IsTrue(conversion.ProjectionType.FromType == typeof(TFrom));
+            Require.IsTrue(conversion.ProjectionType.ToType == typeof(TTo));
 
-            ConversionDefinition = conversionDefinition;
+            Conversion = conversion;
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace KodeKandy.Mapnificent
             // Need to remove the type specificity to be able to store these in a general way.
             Func<object, object> weakConversionFunc = from => conversionFunc((TFrom) from);
 
-            ConversionDefinition.ConversionFunc = weakConversionFunc;
+            Conversion.ConversionFunc = weakConversionFunc;
 
             return this;
         }

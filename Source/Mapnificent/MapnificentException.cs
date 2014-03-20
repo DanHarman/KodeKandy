@@ -16,13 +16,13 @@ using System;
 
 namespace KodeKandy.Mapnificent
 {
-    public class MappingException : Exception
+    public class MapnificentException : Exception
     {
-        public MappingException(string message) : base(message)
+        public MapnificentException(string message) : base(message)
         {
         }
 
-        public MappingException(string message, Exception innerException) : base(message, innerException)
+        public MapnificentException(string message, Exception innerException) : base(message, innerException)
         {
         }
     }

@@ -41,12 +41,13 @@ namespace KodeKandy.Mapnificent.Tests
         public void When_Mapping_Simple_Class_Then_Maps()
         {
             // Arrange
-            var sut = new Map(ProjectionType.Create<SimpleFrom, SimpleTo>());
+            var sut = new Mapper();
+            sut.DefineMap<SimpleFrom, SimpleTo>();
             var from = new SimpleFrom() {Name = "Bob", Age = 20};
             var to = new SimpleTo();
 
             // Act
-            sut.Apply(from, to, new Mapper());
+            sut.Map(from, to);
 
             // Assert
             Assert.AreEqual(from.Name, to.Name);
@@ -57,12 +58,13 @@ namespace KodeKandy.Mapnificent.Tests
         public void When_Mapping_Flattening_Class_Then_Maps()
         {
             // Arrange
-            var sut = new Map(ProjectionType.Create<FlatteningFrom, FlatteningTo>());
+            var sut = new Mapper();
+            sut.DefineMap<FlatteningFrom, FlatteningTo>();
             var from = new FlatteningFrom { Child = new FlatteningFrom.FlatteningChildFrom { Name = "Bob" } };
             var to = new FlatteningTo();
 
             // Act
-            sut.Apply(from, to, new Mapper());
+            sut.Map(from, to);
 
             // Assert
             Assert.AreEqual(from.Child.Name, to.ChildName);
@@ -72,12 +74,14 @@ namespace KodeKandy.Mapnificent.Tests
         public void When_Mapping_Nested_Class_Then_Maps()
         {
             // Arrange
-            var sut = new Map(ProjectionType.Create<NestedFrom, NestedTo>());
+            var sut = new Mapper();
+            sut.DefineMap<NestedFrom, NestedTo>();
+            sut.DefineMap<NestedFrom.NestedChildFrom, NestedTo.NestedChildTo>();
             var from = new NestedFrom { Child = new NestedFrom.NestedChildFrom { Name = "Bob" } };
             var to = new NestedTo { Child = new NestedTo.NestedChildTo() };
 
             // Act
-            sut.Apply(from, to, new Mapper());
+            sut.Map(from, to);
 
             // Assert
             Assert.AreEqual(from.Child.Name, to.Child.Name);

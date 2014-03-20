@@ -47,7 +47,8 @@ namespace KodeKandy.Mapnificent
             MemberBindingDefinition memberBindingDefinition;
             if (!explicitBindings.TryGetValue(toMemberInfo.Name, out memberBindingDefinition))
             {
-                explicitBindings[toMemberInfo.Name] = MemberBindingDefinition.Create(toMemberInfo, MemberBindingDefinitionType.Explicit);
+                memberBindingDefinition = MemberBindingDefinition.Create(toMemberInfo, MemberBindingDefinitionType.Explicit);
+                explicitBindings[toMemberInfo.Name] = memberBindingDefinition;
                 bindingsDirty = true;
             }
 
@@ -145,7 +146,7 @@ namespace KodeKandy.Mapnificent
 
             foreach (var binding in Bindings)
             {
-                ApplyBinding(from, to, binding);
+                ApplyBinding(from, to, binding, mapper);
             }
         }
 
@@ -155,21 +156,43 @@ namespace KodeKandy.Mapnificent
         /// <param name="fromDeclaring">An instance of the from class.</param>
         /// <param name="toDeclaring">An instance of the to class.</param>
         /// <param name="binding"></param>
-        private void ApplyBinding(object fromDeclaring, object toDeclaring, MemberBindingDefinition binding)
+        private void ApplyBinding(object fromDeclaring, object toDeclaring, MemberBindingDefinition binding, Mapper mapper)
         {
             Require.NotNull(fromDeclaring, "fromDeclaring");
             Require.NotNull(toDeclaring, "toDeclaring");
 
-            object value;
-            var hasValue = binding.MemberGetterDefinition.MemberGetter(fromDeclaring, out value);
+            object fromValue, toValue;
+            var hasValue = binding.MemberGetterDefinition.MemberGetter(fromDeclaring, out fromValue);
             if (hasValue)
             {
-                if (binding.ConversionDefinition != null)
-                    value = binding.ConversionDefinition.ConversionFunc(value);
+                if (binding.Conversion != null)
+                {
+                    toValue = binding.Conversion.ConversionFunc(fromValue);
+                }
+                else
+                {
+                    var projectionType = binding.ProjectionType;
+                    if (!projectionType.IsIdentity)
+                    {
+                        if (projectionType.IsMap)
+                        {
+                            toValue = Activator.CreateInstance(binding.MemberSetterDefinition.MemberType);
+                            mapper.GetMap(projectionType).Apply(fromValue, toValue, mapper);
+                        }
+                        else
+                        {
+                            toValue = mapper.GetConversion(projectionType).Apply(fromValue);
+                        }
+                    }
+                    else
+                    {
+                        toValue = fromValue;
+                    }
+                }
 
                 // TODO need to handle non explicit conversions.
 
-                binding.MemberSetterDefinition.MemberSetter(toDeclaring, value);
+                binding.MemberSetterDefinition.MemberSetter(toDeclaring, toValue);
             }
         }
     }

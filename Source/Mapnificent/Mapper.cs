@@ -32,7 +32,7 @@ namespace KodeKandy.Mapnificent
         /// <summary>
         ///     Conversion definitions encompass all mappings into a value type.
         /// </summary>
-        private readonly Dictionary<ProjectionType, ConversionDefinition> conversionDefinitions = new Dictionary<ProjectionType, ConversionDefinition>();
+        private readonly Dictionary<ProjectionType, Conversion> conversionDefinitions = new Dictionary<ProjectionType, Conversion>();
 
         public MapDefinitionBuilder<TFrom, TTo> DefineMap<TFrom, TTo>()
             where TTo : class
@@ -53,11 +53,11 @@ namespace KodeKandy.Mapnificent
             where TTo : struct
         {
             var mappingType = new ProjectionType(typeof(TFrom), typeof(TTo));
-            ConversionDefinition definition;
+            Conversion definition;
 
             if (!conversionDefinitions.TryGetValue(mappingType, out definition))
             {
-                definition = new ConversionDefinition(mappingType);
+                definition = new Conversion(mappingType);
                 conversionDefinitions.Add(mappingType, definition);
             }
         }
@@ -93,6 +93,58 @@ namespace KodeKandy.Mapnificent
                 return HasMap(fromType, toType);
             else
                 return HasConversion(fromType, toType);
+        }
+
+        public Map GetMap(ProjectionType projectionType)
+        {
+            Map map;
+            if (!mapDefinitions.TryGetValue(projectionType, out map))
+            {
+                var msg = string.Format("Unable to get map of type {0}, as no map defined.", projectionType);
+                throw new MapnificentException(msg);
+            }
+            return map;
+        }
+
+        public Map GetMap(Type fromType, Type toType)
+        {
+            return GetMap(new ProjectionType(fromType, toType));
+        }
+
+        public Conversion GetConversion(ProjectionType projectionType)
+        {
+            Conversion conversion;
+            if (conversionDefinitions.TryGetValue(projectionType, out conversion))
+            {
+                var msg = string.Format("Unable to get converesion of type {0}, as no conversion defined.", projectionType);
+                throw new MapnificentException(msg);
+            }
+            return conversion;
+        }
+
+        public void Map(object from, object to)
+        {
+            try
+            {
+                Require.NotNull(from, "from");
+                Require.NotNull(to, "to");
+
+                var map = GetMap(from.GetType(), to.GetType());
+                map.Apply(from, to, this);
+            }
+            catch (Exception ex)
+            {
+                var msg = string.Format("Error mapping between object of type '{0}' -> '{1}'", from.SafeGetTypeName(), to.SafeGetTypeName()); 
+                throw new MapnificentException(msg, ex);
+            }
+            
+        }
+
+        public void AddMap(Map map)
+        {
+            Require.NotNull(map, "map");
+
+            mapDefinitions.Add(map.ProjectionType, map);
         }
 
         // TODO Add Import(Mapper mapperSchema) method.

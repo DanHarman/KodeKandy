@@ -25,7 +25,7 @@ namespace KodeKandy.Mapnificent.Tests
         {
             var sut = new Mapper();
 
-            //Assert.Throws<MappingException>(() => sut.Map<Circle>(new Object()));
+            //Assert.Throws<MapnificentException>(() => sut.Map<Circle>(new Object()));
         }
 
         [Test]

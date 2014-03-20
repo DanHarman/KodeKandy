@@ -34,11 +34,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ConstructionContext.cs" />
-    <Compile Include="ConversionDefinition.cs" />
+    <Compile Include="Conversion.cs" />
     <Compile Include="ConversionDefinitionBuilder.cs" />
     <Compile Include="Bindngs\MemberBindingDefinitionValidator.cs" />
     <Compile Include="Bindngs\MemberDefinitionError.cs" />
     <Compile Include="Bindngs\MemberGetterDefinition.cs" />
+    <Compile Include="Helpers.cs" />
     <Compile Include="MapDefinitionBuilder.cs" />
     <Compile Include="MapDefinitionUndefinedMembersException.cs" />
     <Compile Include="Mapper.cs" />
@@ -47,7 +48,7 @@
     <Compile Include="Bindngs\MemberBindingDefinitionBuilder.cs" />
     <Compile Include="Bindngs\MemberSetterDefinition.cs" />
     <Compile Include="Map.cs" />
-    <Compile Include="MappingException.cs" />
+    <Compile Include="MapnificentException.cs" />
     <Compile Include="ProjectionType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ToClassSchema.cs" />
