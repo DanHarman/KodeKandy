@@ -29,10 +29,26 @@ namespace KodeKandy.Mapnificent
         // confusion when inheriting maps.
         private readonly Dictionary<string, MemberBindingDefinition> explicitBindings = new Dictionary<string, MemberBindingDefinition>();
 
-        // Flag indicating if the bindings need to be re-evaluated due to a change.
-        private bool bindingsDirty = true;
+        public ProjectionType InheritsFrom { get; set; }
+
+        private readonly List<ProjectionType> polymorphicFor = new List<ProjectionType>();
+        public ReadOnlyCollection<ProjectionType> PolymoprhicFor { get { return new ReadOnlyCollection<ProjectionType>(polymorphicFor); } }
 
         public ProjectionType ProjectionType { get; private set; }
+
+        // Flag indicating if the bindings need to be re-evaluated due to a change.
+        private bool bindingsDirty = true;
+        private ReadOnlyCollection<MemberBindingDefinition> bindings;
+        public ReadOnlyCollection<MemberBindingDefinition> Bindings
+        {
+            get
+            {
+                if (bindingsDirty || bindings == null)
+                    RefreshBindings();
+
+                return bindings;
+            }
+        }
 
         public Map(ProjectionType projectionType)
         {
@@ -55,16 +71,9 @@ namespace KodeKandy.Mapnificent
             return memberBindingDefinition;
         }
 
-        private ReadOnlyCollection<MemberBindingDefinition> bindings;
-        public ReadOnlyCollection<MemberBindingDefinition> Bindings
+        public void AddPolymorphic(ProjectionType projectionType)
         {
-            get
-            {
-                if (bindingsDirty || bindings == null)
-                    RefreshBindings();
-
-                return bindings;
-            }
+            polymorphicFor.Add(projectionType);
         }
 
         /// <summary>

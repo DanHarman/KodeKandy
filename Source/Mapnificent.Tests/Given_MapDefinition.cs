@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using KodeKandy.Mapnificent.Tests.TestEntities;
 using NUnit.Framework;
 
@@ -86,5 +87,24 @@ namespace KodeKandy.Mapnificent.Tests
             // Assert
             Assert.AreEqual(from.Child.Name, to.Child.Name);
         }
+
+        [Test]
+        public void When_Mapping_With_Conversion_Then_Maps()
+        {
+            // Arrange
+            var sut = new Mapper();
+            sut.DefineMap<ConversionFrom, ConversionTo>();
+            sut.DefineConversion<string, int>().Explictly(x => x.Count());
+            var from = new ConversionFrom { Age = "Twelve" };
+            var to = new ConversionTo { Age = 6 };
+
+            // Act
+            sut.Map(from, to);
+
+            // Assert
+            Assert.AreEqual(from.Age.Count(), to.Age);
+        }
+
+        // TODO Map from a value type to a ref type.
     }
 }

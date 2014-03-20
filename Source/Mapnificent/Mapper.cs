@@ -49,17 +49,19 @@ namespace KodeKandy.Mapnificent
             return new MapDefinitionBuilder<TFrom, TTo>(definition);
         }
 
-        public void DefineConversion<TFrom, TTo>()
+        public ConversionDefinitionBuilder<TFrom, TTo> DefineConversion<TFrom, TTo>()
             where TTo : struct
         {
-            var mappingType = new ProjectionType(typeof(TFrom), typeof(TTo));
+            var projectionType = new ProjectionType(typeof(TFrom), typeof(TTo));
             Conversion definition;
 
-            if (!conversionDefinitions.TryGetValue(mappingType, out definition))
+            if (!conversionDefinitions.TryGetValue(projectionType, out definition))
             {
-                definition = new Conversion(mappingType);
-                conversionDefinitions.Add(mappingType, definition);
+                definition = new Conversion(projectionType);
+                conversionDefinitions.Add(projectionType, definition);
             }
+
+            return new ConversionDefinitionBuilder<TFrom, TTo>(definition);
         }
 
         public bool HasMap(Type fromType, Type toType)
@@ -114,7 +116,7 @@ namespace KodeKandy.Mapnificent
         public Conversion GetConversion(ProjectionType projectionType)
         {
             Conversion conversion;
-            if (conversionDefinitions.TryGetValue(projectionType, out conversion))
+            if (!conversionDefinitions.TryGetValue(projectionType, out conversion))
             {
                 var msg = string.Format("Unable to get converesion of type {0}, as no conversion defined.", projectionType);
                 throw new MapnificentException(msg);
