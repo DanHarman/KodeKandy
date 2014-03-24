@@ -14,6 +14,18 @@
 
 namespace KodeKandy.Mapnificent
 {
+    public class MappingContext
+    {
+        public Mapper Mapper { get; private set; }
+
+
+        public MappingContext(Mapper mapper)
+        {
+            Mapper = mapper;
+        }
+    }
+
+
     public class ConstructionContext
     {
         public ConstructionContext(Mapper mapper, object parent)

@@ -12,6 +12,7 @@
 // 
 // </copyright>
 
+using System;
 using System.Reflection;
 
 namespace KodeKandy.Mapnificent
@@ -60,6 +61,8 @@ namespace KodeKandy.Mapnificent
         {
             get { return new ProjectionType(MemberGetterDefinition.MemberType, MemberSetterDefinition.MemberType); }
         }
+
+       // public Func<> 
 
         private bool ignore;
         public bool Ignore

@@ -33,7 +33,7 @@ namespace KodeKandy.Mapnificent
         }
 
         /// <summary>
-        ///     Map from a, nested if needed, member of the 'from' class to the specified 'to' class member. When using nested
+        ///     MapInto from a, nested if needed, member of the 'from' class to the specified 'to' class member. When using nested
         ///     and/or reference types, if there is a null in the expression chain, then no mapping will take place for that member
         ///     and the default value for that member will be set if it has been defined.
         /// 
@@ -77,7 +77,7 @@ namespace KodeKandy.Mapnificent
         /// <typeparam name="TFrom"></typeparam>
         /// <param name="fromFunc"></param>
         /// <returns></returns>
-        public MemberBindingDefinitionBuilder<TFromDeclaring, TToMember> Explictly<TFrom>(Func<TFrom, TToMember> fromFunc)
+        public MemberBindingDefinitionBuilder<TFromDeclaring, TToMember> Explictly(Func<MappingContext, TToMember> fromFunc)
         {
             return this;
         }

@@ -25,7 +25,7 @@ namespace KodeKandy.Mapnificent.Tests
         {
             var sut = new Mapper();
 
-            //Assert.Throws<MapnificentException>(() => sut.Map<Circle>(new Object()));
+            //Assert.Throws<MapnificentException>(() => sut.MapInto<Circle>(new Object()));
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace KodeKandy.Mapnificent.Tests
             var dto = new CircleDto {Name = "Circle", Radius = 15.0};
 
             // When Mapping
-//            var result = sut.Map<Circle>(dto);
+//            var result = sut.MapInto<Circle>(dto);
 
             // Assert
         }

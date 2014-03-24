@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace KodeKandy.Mapnificent
 {
@@ -25,7 +26,7 @@ namespace KodeKandy.Mapnificent
     public class Mapper
     {
         /// <summary>
-        ///     Map definitions encompass all mappings into a reference type.
+        ///     MapInto definitions encompass all mappings into a reference type.
         /// </summary>
         private readonly Dictionary<ProjectionType, Map> mapDefinitions = new Dictionary<ProjectionType, Map>();
 
@@ -42,7 +43,7 @@ namespace KodeKandy.Mapnificent
 
             if (!mapDefinitions.TryGetValue(mappingType, out definition))
             {
-                definition = new Map(mappingType);
+                definition = new Map(mappingType, this);
                 mapDefinitions.Add(mappingType, definition);
             }
 
@@ -124,7 +125,7 @@ namespace KodeKandy.Mapnificent
             return conversion;
         }
 
-        public void Map(object from, object to)
+        public void MapInto(object from, object to)
         {
             try
             {
@@ -132,7 +133,7 @@ namespace KodeKandy.Mapnificent
                 Require.NotNull(to, "to");
 
                 var map = GetMap(from.GetType(), to.GetType());
-                map.Apply(from, to, this);
+                map.Apply(from, to);
             }
             catch (Exception ex)
             {
