@@ -52,9 +52,11 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Given_Mapper.cs" />
+    <Compile Include="MapperTests\Given_Auto_Generated_Map.cs" />
+    <Compile Include="MapperTests\Given_Inherited_Map.cs" />
+    <Compile Include="MapperTests\Given_Mapper.cs" />
     <Compile Include="MemberBindingDefinitionTests\Given_Creating_MemberBindingDefinition.cs" />
-    <Compile Include="Given_MapDefinition.cs" />
+    <Compile Include="MapperTests\Given_Auto_Generated_MapDefinition.cs" />
     <Compile Include="MemberBindingDefinitionTests\Given_Validating_MemberBindingDefinition.cs" />
     <Compile Include="TestEntities\ConversionFrom.cs" />
     <Compile Include="TestEntities\ConversionTo.cs" />
@@ -67,7 +69,6 @@
     <Compile Include="TargetClassSchemaTests.cs" />
     <Compile Include="TestEntities\Inheritance\Circle.cs" />
     <Compile Include="TestEntities\Inheritance\CircleDto.cs" />
-    <Compile Include="MapperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestEntities\Inheritance\Rectangle.cs" />
     <Compile Include="TestEntities\Inheritance\RectangleDto.cs" />

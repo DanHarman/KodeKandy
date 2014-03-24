@@ -1,6 +1,6 @@
 using NUnit.Framework;
 
-namespace KodeKandy.Mapnificent.Tests
+namespace KodeKandy.Mapnificent.Tests.MapperTests
 {
     [TestFixture]
     public class Given_Mapper

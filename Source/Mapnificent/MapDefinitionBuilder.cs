@@ -79,9 +79,9 @@ namespace KodeKandy.Mapnificent
         {
             Require.NotNull(projectionType, "projectionType");
             Require.IsTrue(projectionType.FromType.IsAssignableFrom(Map.ProjectionType.FromType), 
-                String.Format("Cannot inherit a map who's from type '{0}' is not a supertype of this maps 'From' type '{1}", projectionType.FromType.Name, Map.ProjectionType.FromType.Name));
+                String.Format("Cannot inherit from a map whose 'From' type '{0}' is not a supertype of this maps 'From' type '{1}'.", projectionType.FromType.Name, Map.ProjectionType.FromType.Name));
             Require.IsTrue(projectionType.ToType.IsAssignableFrom(Map.ProjectionType.ToType),
-                String.Format("Cannot inherit a map who's 'To' type '{0}' is not a supertype of this maps 'To' type '{1}", projectionType.FromType.Name, Map.ProjectionType.FromType.Name));
+                String.Format("Cannot inherit from a map whose 'To' type '{0}' is not a supertype of this maps 'To' type '{1}'.", projectionType.FromType.Name, Map.ProjectionType.FromType.Name));
 
             Map.InheritsFrom = projectionType;
 
