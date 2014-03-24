@@ -1,4 +1,4 @@
-// <copyright file="MemberGetterDefinition.cs" company="million miles per hour ltd">
+// <copyright file="FromMemberDefinition.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -14,7 +14,7 @@
 
 using System;
 
-namespace KodeKandy.Mapnificent
+namespace KodeKandy.Mapnificent.Bindngs
 {
     /// <summary>
     ///     A definition for from members that are being mapped from.
@@ -26,6 +26,7 @@ namespace KodeKandy.Mapnificent
         public MemberGetterDefinition(Type declaringType, string memberName, Type memberType, ReflectionHelpers.SafeGetterFunc memberGetter)
             : base(declaringType, memberName, memberType)
         {
+            Require.NotNull(memberName, "memberName");
             Require.NotNull(memberGetter, "fromMemberSafeGetterFunc");
 
             MemberGetter = memberGetter;

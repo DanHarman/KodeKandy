@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using KodeKandy.Mapnificent.Bindngs;
 
 namespace KodeKandy.Mapnificent
 {
@@ -52,7 +53,7 @@ namespace KodeKandy.Mapnificent
             var fromMemberName = String.Join(".", memberInfos.Select(x => x.Name));
             var fromMemberGetter = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
 
-            MemberBindingDefinition.MemberGetterDefinition = new MemberGetterDefinition(typeof(TFromDeclaring), fromMemberName, typeof(TFromMember),
+            MemberBindingDefinition.FromMemberDefinition = new MemberGetterDefinition(typeof(TFromDeclaring), fromMemberName, typeof(TFromMember),
                 fromMemberGetter);
 
             return this;
@@ -79,6 +80,8 @@ namespace KodeKandy.Mapnificent
         /// <returns></returns>
         public MemberBindingDefinitionBuilder<TFromDeclaring, TToMember> Explictly(Func<MappingContext, TToMember> fromFunc)
         {
+            MemberBindingDefinition.FromCustomDefinition = ctx => (object) fromFunc(ctx);
+
             return this;
         }
 

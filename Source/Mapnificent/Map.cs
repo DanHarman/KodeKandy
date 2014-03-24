@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using KodeKandy.Mapnificent.Bindngs;
 
 namespace KodeKandy.Mapnificent
 {
@@ -26,9 +27,16 @@ namespace KodeKandy.Mapnificent
     public class Map
     {
         /// <summary>
-        /// The mapper this map is associated with.
+        /// The Mapper this map is associated with.
         /// </summary>
-        private readonly Mapper mapper;
+        public Mapper Mapper { get; private set; }
+            
+        public Func<ConstructionContext, object> ConstructedBy { get; set; }
+
+        /// <summary>
+        /// Action applied to the mapping target after mapping has been performed.
+        /// </summary>
+        public Action<object, object> PostMapStep { get; set; }
 
         // User defined definitions. Does not include automatic definitions - those are composed separately so as to avoid
         // confusion when inheriting maps.
@@ -36,7 +44,7 @@ namespace KodeKandy.Mapnificent
 
 
         /// <summary>
-        /// Cached bindings for a given mapper. This is required since a map may be placed into more than one mapper.
+        /// Cached bindings for a given Mapper. This is required since a map may be placed into more than one Mapper.
         /// </summary>
         private ReadOnlyCollection<MemberBindingDefinition> cachedBindings;
 
@@ -54,7 +62,7 @@ namespace KodeKandy.Mapnificent
   
         public Map(ProjectionType projectionType, Mapper mapper)
         {
-            this.mapper = mapper;
+            this.Mapper = mapper;
             Require.NotNull(projectionType);
             Require.IsTrue(projectionType.ToType.IsClass);
 
@@ -85,7 +93,7 @@ namespace KodeKandy.Mapnificent
         {
             // Get any inherited bindings.
             var newBindingsDict = InheritsFrom != null
-                ? mapper.GetMap(InheritsFrom).Bindings.ToDictionary(x => x.MemberSetterDefinition.MemberName)
+                ? Mapper.GetMap(InheritsFrom).Bindings.ToDictionary(x => x.ToMemberDefinition.MemberName)
                 : new Dictionary<string, MemberBindingDefinition>();
 
             // Merge in the explicit bindings in this map overridings inherited ones.
@@ -120,7 +128,7 @@ namespace KodeKandy.Mapnificent
 
             // Discover which 'to' class members do not already have definitions so that they can be automapped.
             var undefinedToMemberInfos = ReflectionHelpers.GetMemberInfos(ProjectionType.ToType)
-                .Where(m => excludedBindings.All(b => b.MemberSetterDefinition.MemberName != m.Name));
+                .Where(m => excludedBindings.All(b => b.ToMemberDefinition.MemberName != m.Name));
 
             // Iterate all the undefined members on the 'to' class and try to automatically create matches from
             // inspecting members on the 'from' class.
@@ -154,11 +162,11 @@ namespace KodeKandy.Mapnificent
 
         public ReadOnlyCollection<MemberDefinitionError> Validate()
         {
-            Require.NotNull(mapper, "Mapper");
+            Require.NotNull(Mapper, "Mapper");
 
-            // TODO Validate inheritance type is available in mapper.
+            // TODO Validate inheritance type is available in Mapper.
 
-            var errors = Bindings.SelectMany(b => MemberBindingDefinitionValidator.Validate(b, mapper)).ToList();
+            var errors = Bindings.SelectMany(b => MemberBindingDefinitionValidator.Validate(b, Mapper)).ToList();
 
             return new ReadOnlyCollection<MemberDefinitionError>(errors);
         }
@@ -167,12 +175,24 @@ namespace KodeKandy.Mapnificent
         {
             Require.NotNull(from, "from");
             Require.NotNull(to, "to");
-            Require.NotNull(mapper, "mapper");
+            Require.NotNull(Mapper, "Mapper");
 
             foreach (var binding in Bindings)
             {
                 ApplyBinding(from, to, binding);
             }
+
+            if (PostMapStep != null)
+                PostMapStep(from, to);
+        }
+
+        public object CreateInstanceOfTo(object fromInstance)
+        {
+            var instance = ConstructedBy != null
+                     ? ConstructedBy(new ConstructionContext(this.Mapper, fromInstance, null))
+                     : Activator.CreateInstance(ProjectionType.ToType);
+
+            return instance;
         }
 
         /// <summary>
@@ -187,9 +207,20 @@ namespace KodeKandy.Mapnificent
             Require.NotNull(toDeclaring, "toDeclaring");
 
             object fromValue, toValue;
-            var hasValue = binding.MemberGetterDefinition.MemberGetter(fromDeclaring, out fromValue);
+            bool hasValue;
+
+            // Get the from value.
+            if (binding.IsFromCustom)
+            {
+                fromValue = binding.FromCustomDefinition(new MappingContext(Mapper));
+                hasValue = true;
+            } else {
+                hasValue = binding.FromMemberDefinition.MemberGetter(fromDeclaring, out fromValue);
+            }
+
             if (hasValue)
             {
+                // If there is an explicit conversion apply it, otherwise see if one is necessary and try to perform automatically if it is.
                 if (binding.Conversion != null)
                 {
                     toValue = binding.Conversion.ConversionFunc(fromValue);
@@ -197,16 +228,20 @@ namespace KodeKandy.Mapnificent
                 else
                 {
                     var projectionType = binding.ProjectionType;
-                    if (!projectionType.IsIdentity)
+
+                    // Custom bindings do not require conversion as they should be of the correct type.
+                    if (!projectionType.IsByValue && !binding.IsFromCustom)
                     {
                         if (projectionType.IsMap)
                         {
-                            toValue = Activator.CreateInstance(binding.MemberSetterDefinition.MemberType);
-                            mapper.GetMap(projectionType).Apply(fromValue, toValue);
+                            var map = Mapper.GetMap(projectionType);
+                            toValue = map.CreateInstanceOfTo(fromValue);
+                           // toValue = Activator.CreateInstance(binding.ToMemberDefinition.MemberType);
+                            map.Apply(fromValue, toValue);
                         }
                         else
                         {
-                            toValue = mapper.GetConversion(projectionType).Apply(fromValue);
+                            toValue = Mapper.GetConversion(projectionType).Apply(fromValue);
                         }
                     }
                     else
@@ -215,9 +250,7 @@ namespace KodeKandy.Mapnificent
                     }
                 }
 
-                // TODO need to handle non explicit conversions.
-
-                binding.MemberSetterDefinition.MemberSetter(toDeclaring, toValue);
+                binding.ToMemberDefinition.MemberSetter(toDeclaring, toValue);
             }
         }
     }

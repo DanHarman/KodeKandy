@@ -35,6 +35,12 @@ namespace KodeKandy.Mapnificent
         /// </summary>
         private readonly Dictionary<ProjectionType, Conversion> conversionDefinitions = new Dictionary<ProjectionType, Conversion>();
 
+        public Mapper()
+        {
+            // Default map for string which just copies the instance by using a custom 'ConstructedBy' which simply returns the from instance.
+            DefineMap<string, string>().ConstructedBy(ctx => (string) ctx.FromInstance);
+        }
+
         public MapDefinitionBuilder<TFrom, TTo> DefineMap<TFrom, TTo>()
             where TTo : class
         {
@@ -137,10 +143,9 @@ namespace KodeKandy.Mapnificent
             }
             catch (Exception ex)
             {
-                var msg = string.Format("Error mapping between object of type '{0}' -> '{1}'", from.SafeGetTypeName(), to.SafeGetTypeName()); 
+                var msg = string.Format("Error mapping between object of type '{0}' -> '{1}'", from.SafeGetTypeName(), to.SafeGetTypeName());
                 throw new MapnificentException(msg, ex);
             }
-            
         }
 
         public void AddMap(Map map)

@@ -21,12 +21,7 @@ namespace KodeKandy.Mapnificent.Tests
     [TestFixture]
     public class MapperTests
     {
-        public void When_Mapping_Undefined_Class_Then_Throws()
-        {
-            var sut = new Mapper();
 
-            //Assert.Throws<MapnificentException>(() => sut.MapInto<Circle>(new Object()));
-        }
 
         [Test]
         public void Mapping()

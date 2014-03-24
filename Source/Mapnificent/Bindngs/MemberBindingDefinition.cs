@@ -14,6 +14,7 @@
 
 using System;
 using System.Reflection;
+using KodeKandy.Mapnificent.Bindngs;
 
 namespace KodeKandy.Mapnificent
 {
@@ -42,12 +43,40 @@ namespace KodeKandy.Mapnificent
         /// <summary>
         ///     Defines the 'to' member setter details.
         /// </summary>
-        public MemberSetterDefinition MemberSetterDefinition { get; private set; }
+        public MemberSetterDefinition ToMemberDefinition { get; private set; }
 
+        private MemberGetterDefinition fromMemberDefinition;
         /// <summary>
-        ///     Defines the 'from' member getter details.
+        ///     Defines the 'from' provider when it is a member on the 'from' class.
         /// </summary>
-        public MemberGetterDefinition MemberGetterDefinition { get; set; }
+        public MemberGetterDefinition FromMemberDefinition
+        {
+            get { return fromMemberDefinition; }
+            set
+            {
+                fromCustomDefinition = null;
+                fromMemberDefinition = value;
+            }
+        }
+
+        private Func<MappingContext, object> fromCustomDefinition;
+        /// <summary>
+        /// Defines the 'from' provider when it is a custom delegate.
+        /// </summary>
+        public Func<MappingContext, object> FromCustomDefinition
+        {
+            get { return fromCustomDefinition; }
+            set
+            {
+                fromMemberDefinition = null;
+                fromCustomDefinition = value;
+            }
+        }
+
+        public bool IsFromCustom
+        {
+            get { return FromCustomDefinition != null; }
+        }
 
         /// <summary>
         ///     Conversion used to map between the 'from' member to the 'to' member.
@@ -59,7 +88,7 @@ namespace KodeKandy.Mapnificent
         /// </summary>
         public ProjectionType ProjectionType
         {
-            get { return new ProjectionType(MemberGetterDefinition.MemberType, MemberSetterDefinition.MemberType); }
+            get { return new ProjectionType(FromMemberDefinition == null ? null : FromMemberDefinition.MemberType, ToMemberDefinition.MemberType); }
         }
 
        // public Func<> 
@@ -73,25 +102,27 @@ namespace KodeKandy.Mapnificent
                 ignore = value;
                 if (ignore)
                 {
-                    MemberSetterDefinition = null;
+                    ToMemberDefinition = null;
                     Conversion = null;
                 }
             }
         }
 
-        private MemberBindingDefinition(MemberSetterDefinition memberSetterDefinition, MemberBindingDefinitionType memberBindingDefinitionType,
-            MemberGetterDefinition memberGetterDefinition = null, Conversion conversion = null)
+        private MemberBindingDefinition(MemberSetterDefinition toMemberDefinition, MemberBindingDefinitionType memberBindingDefinitionType,
+            MemberGetterDefinition fromMemberDefinition = null, Conversion conversion = null)
         {
-            Require.NotNull(memberSetterDefinition, "memberSetterDefinition");
+            Require.NotNull(toMemberDefinition, "ToMemberDefinition");
 
             MemberBindingDefinitionType = memberBindingDefinitionType;
-            MemberSetterDefinition = memberSetterDefinition;
-            MemberGetterDefinition = memberGetterDefinition;
+            ToMemberDefinition = toMemberDefinition;
+            FromMemberDefinition = fromMemberDefinition;
             Conversion = conversion;
         }
 
         public static MemberBindingDefinition Create(MemberInfo toMemberInfo, MemberBindingDefinitionType memberBindingDefinitionType, MemberGetterDefinition memberGetterDefinition = null, Conversion conversion = null)
         {
+            Require.NotNull(toMemberInfo, "toMemberInfo");
+
             return new MemberBindingDefinition(new MemberSetterDefinition(toMemberInfo), memberBindingDefinitionType, memberGetterDefinition, conversion);
         }
 
@@ -102,11 +133,11 @@ namespace KodeKandy.Mapnificent
         {
             get
             {
-                if (MemberGetterDefinition == null || Conversion != null)
+                if (FromMemberDefinition == null || Conversion != null)
                     return false;
 
-                var fromMemberType = MemberGetterDefinition.MemberType;
-                var toMemberType = MemberSetterDefinition.MemberType;
+                var fromMemberType = FromMemberDefinition.MemberType;
+                var toMemberType = ToMemberDefinition.MemberType;
 
                 return fromMemberType != toMemberType;
             }

@@ -12,36 +12,36 @@ namespace KodeKandy.Mapnificent
             if (definition.Ignore)
                 return new ReadOnlyCollection<MemberDefinitionError>(memberDefinitionErrors);
 
-            if (definition.MemberGetterDefinition == null)
-                memberDefinitionErrors.Add(MemberDefinitionError.Create(definition.MemberSetterDefinition, "Binding definition does not define 'From' binding."));
+            if (definition.FromMemberDefinition == null && definition.FromCustomDefinition == null)
+                memberDefinitionErrors.Add(MemberDefinitionError.Create(definition.ToMemberDefinition, "Binding definition does not define a 'from' source."));
 
-            if (definition.MemberGetterDefinition != null && definition.Conversion == null)
+            if (definition.FromMemberDefinition != null && definition.Conversion == null)
             {
-                var fromMemberType = definition.MemberGetterDefinition.MemberType;
-                var toMemberType = definition.MemberSetterDefinition.MemberType;
+                var fromMemberType = definition.FromMemberDefinition.MemberType;
+                var toMemberType = definition.ToMemberDefinition.MemberType;
 
                 if (!mapper.HasMapOrConversion(fromMemberType, toMemberType))
                 {
                     memberDefinitionErrors.Add(
-                        MemberDefinitionError.Create(definition.MemberSetterDefinition, "Mapped from '{0}' but no {1} defined between '{2}'->'{3}'.",
-                            definition.MemberGetterDefinition.MemberName,
+                        MemberDefinitionError.Create(definition.ToMemberDefinition, "Mapped from '{0}' but no {1} defined between '{2}'->'{3}'.",
+                            definition.FromMemberDefinition.MemberName,
                             toMemberType.IsClass ? "map" : "conversion",
                             fromMemberType.Name, toMemberType.Name));
                 }
             }
 
-            if (definition.MemberGetterDefinition != null && definition.Conversion != null)
+            if (definition.FromMemberDefinition != null && definition.Conversion != null)
             {
                 // TODO validate conversion or make it so instantiation implies validity.
 
-                if (definition.MemberSetterDefinition.MemberType != definition.Conversion.ProjectionType.ToType)
-                    memberDefinitionErrors.Add(MemberDefinitionError.Create(definition.MemberSetterDefinition,
-                        "To member type {0} does not match the defined conversion output type ({1})", definition.MemberGetterDefinition.MemberType,
+                if (definition.ToMemberDefinition.MemberType != definition.Conversion.ProjectionType.ToType)
+                    memberDefinitionErrors.Add(MemberDefinitionError.Create(definition.ToMemberDefinition,
+                        "To member type {0} does not match the defined conversion output type ({1})", definition.FromMemberDefinition.MemberType,
                         definition.Conversion));
 
-                if (definition.MemberGetterDefinition.MemberType != definition.Conversion.ProjectionType.FromType)
-                    memberDefinitionErrors.Add(MemberDefinitionError.Create(definition.MemberSetterDefinition,
-                        "From member type {0} does not match the defined conversion input type ({1})", definition.MemberGetterDefinition.MemberType,
+                if (definition.FromMemberDefinition.MemberType != definition.Conversion.ProjectionType.FromType)
+                    memberDefinitionErrors.Add(MemberDefinitionError.Create(definition.ToMemberDefinition,
+                        "From member type {0} does not match the defined conversion input type ({1})", definition.FromMemberDefinition.MemberType,
                         definition.Conversion));
             }
 

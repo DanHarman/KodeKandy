@@ -52,7 +52,10 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Given_Mapper.cs" />
+    <Compile Include="MemberBindingDefinitionTests\Given_Creating_MemberBindingDefinition.cs" />
     <Compile Include="Given_MapDefinition.cs" />
+    <Compile Include="MemberBindingDefinitionTests\Given_Validating_MemberBindingDefinition.cs" />
     <Compile Include="TestEntities\ConversionFrom.cs" />
     <Compile Include="TestEntities\ConversionTo.cs" />
     <Compile Include="TestEntities\FlatteningFrom.cs" />
@@ -75,6 +78,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{8C39CCA4-F76C-4EE8-B27D-A0A1CCB91300}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Mapnificent\Mapnificent.csproj">
       <Project>{57109029-cb11-4cac-ac9c-ee0cc008a5ce}</Project>
       <Name>Mapnificent</Name>

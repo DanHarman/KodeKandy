@@ -12,6 +12,8 @@
 // 
 // </copyright>
 
+using System;
+
 namespace KodeKandy.Mapnificent
 {
     public class MappingContext
@@ -28,14 +30,16 @@ namespace KodeKandy.Mapnificent
 
     public class ConstructionContext
     {
-        public ConstructionContext(Mapper mapper, object parent)
+        public ConstructionContext(Mapper mapper, object fromInstance, object parent)
         {
             Mapper = mapper;
+            FromInstance = fromInstance;
             Parent = parent;
         }
 
         public Mapper Mapper { get; private set; }
-
+        public Type TypeOfTarget { get; private set; }
+        public object FromInstance { get; private set; }
         public object Parent { get; private set; }
     }
 }

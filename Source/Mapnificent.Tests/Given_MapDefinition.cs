@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Policy;
 using KodeKandy.Mapnificent.Tests.TestEntities;
 using NUnit.Framework;
 
@@ -46,8 +47,6 @@ namespace KodeKandy.Mapnificent.Tests
             // Arrange
             var sut = new Mapper();
 
-
-            // TODO Need to define explicitly to have it take in a mapping context as its param.
             sut.DefineMap<VehicleFrom, VehicleTo>()
                 .For(x => x.Name, o => o.Explictly(_ => "Ferrari"));
             sut.DefineMap<CarFrom, CarTo>()
@@ -60,7 +59,7 @@ namespace KodeKandy.Mapnificent.Tests
             sut.MapInto(from, to);
 
             // Assert
-            Assert.AreEqual(from.Name, to.Name);
+            Assert.AreEqual("Ferrari", to.Name);
             Assert.AreEqual(from.NoSeats, to.NoSeats);
         }
 
@@ -118,6 +117,7 @@ namespace KodeKandy.Mapnificent.Tests
 
             // Assert
             Assert.AreEqual(from.Child.Name, to.Child.Name);
+            Assert.AreNotEqual(from.Child, to.Child); // Ensure mapping of class not ref copying!
         }
 
         [Test]

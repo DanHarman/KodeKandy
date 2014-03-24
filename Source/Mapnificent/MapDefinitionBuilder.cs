@@ -38,8 +38,8 @@ namespace KodeKandy.Mapnificent
         public MapDefinitionBuilder<TFromDeclaring, TToDeclaring> For<TToMember>(Expression<Func<TToDeclaring, TToMember>> toMember,
             Action<MemberBindingDefinitionBuilder<TFromDeclaring, TToMember>> options)
         {
-            Require.NotNull(toMember, "toMember");
-            Require.IsTrue(ExpressionHelpers.IsMemberExpression(toMember), "Parameter 'toMember' must be a simple expression.");
+            Require.NotNull(toMember, "afterMappingAction");
+            Require.IsTrue(ExpressionHelpers.IsMemberExpression(toMember), "Parameter 'afterMappingAction' must be a simple expression.");
 
             // Obtain a bindingDefinition.
             var toMemberInfo = ExpressionHelpers.GetMemberInfo(toMember);
@@ -48,6 +48,24 @@ namespace KodeKandy.Mapnificent
             // Apply the builder options.
             var builder = new MemberBindingDefinitionBuilder<TFromDeclaring, TToMember>(memberBindingDefinition);
             options(builder);
+
+            return this;
+        }
+
+        public MapDefinitionBuilder<TFromDeclaring, TToDeclaring> AfterMapping(Action<TFromDeclaring, TToDeclaring> afterMappingAction)
+        {
+            Require.NotNull(afterMappingAction, "afterMappingAction");
+
+            Map.PostMapStep = (f, t) => afterMappingAction((TFromDeclaring) f, (TToDeclaring) t);
+            
+            return this;
+        }
+
+        public MapDefinitionBuilder<TFromDeclaring, TToDeclaring> ConstructedBy(Func<ConstructionContext, TToDeclaring> constructedBy)
+        {
+            Require.NotNull(constructedBy, "constructedBy");
+
+            Map.ConstructedBy = (ctx) => (object) constructedBy(ctx);
 
             return this;
         }

@@ -29,16 +29,13 @@ namespace KodeKandy.Mapnificent
             get { return ToType.IsClass; }
         }
 
-        public bool IsIdentity
+        public bool IsByValue
         {
-            get { return ToType == FromType; }
+            get { return !ToType.IsClass && ToType == FromType; }
         }
 
         public ProjectionType(Type fromType, Type toType)
         {
-            Require.NotNull(fromType, "fromType");
-            Require.NotNull(toType, "toType");
-
             FromType = fromType;
             ToType = toType;
         }
