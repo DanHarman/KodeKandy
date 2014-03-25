@@ -20,6 +20,7 @@ namespace KodeKandy.Mapnificent
     public class MemberSetterDefinition : MemberAccessorDefinition
     {
         public Action<object, object> MemberSetter { get; private set; }
+        public Func<object, object> MemberGetter { get; private set; }
 
         public MemberSetterDefinition(MemberInfo memberInfo)
             : base(memberInfo.DeclaringType, memberInfo.Name, memberInfo.GetMemberType())
@@ -27,6 +28,10 @@ namespace KodeKandy.Mapnificent
             Require.NotNull(memberInfo, "memberInfo");
 
             MemberSetter = ReflectionHelpers.CreateWeakMemberSetter(memberInfo);
+
+            // We need a getter as well for situations where we are mapping into an existing object and need to merge into
+            // 'child' members, rather than just creating new instances of them.
+            MemberGetter = ReflectionHelpers.CreateWeakMemberGetter(memberInfo);
         }
     }
 }

@@ -79,9 +79,18 @@ namespace KodeKandy.Mapnificent
         }
 
         /// <summary>
-        ///     Conversion used to map between the 'from' member to the 'to' member.
+        ///     ConversionOverride used to map between the 'from' member to the 'to' member.
+        /// This is an override as by default the Mapper is queried for conversions.
         /// </summary>
-        public Conversion Conversion { get; set; }
+        public Conversion ConversionOverride { get; set; }
+
+        /// <summary>
+        /// Indicates if the binding is map based, or conversely Conversion based.
+        /// </summary>
+        public bool IsMap
+        {
+            get { return ProjectionType.IsMap; }
+        }
 
         /// <summary>
         /// A projection tye reflecting the type of the 'from' and 'to' members.
@@ -102,21 +111,21 @@ namespace KodeKandy.Mapnificent
                 ignore = value;
                 if (ignore)
                 {
-                    ToMemberDefinition = null;
-                    Conversion = null;
+                    FromMemberDefinition = null;
+                    ConversionOverride = null;
                 }
             }
         }
 
         private MemberBindingDefinition(MemberSetterDefinition toMemberDefinition, MemberBindingDefinitionType memberBindingDefinitionType,
-            MemberGetterDefinition fromMemberDefinition = null, Conversion conversion = null)
+            MemberGetterDefinition fromMemberDefinition = null, Conversion conversionOverride = null)
         {
             Require.NotNull(toMemberDefinition, "ToMemberDefinition");
 
             MemberBindingDefinitionType = memberBindingDefinitionType;
             ToMemberDefinition = toMemberDefinition;
             FromMemberDefinition = fromMemberDefinition;
-            Conversion = conversion;
+            ConversionOverride = conversionOverride;
         }
 
         public static MemberBindingDefinition Create(MemberInfo toMemberInfo, MemberBindingDefinitionType memberBindingDefinitionType, MemberGetterDefinition memberGetterDefinition = null, Conversion conversion = null)
@@ -127,13 +136,13 @@ namespace KodeKandy.Mapnificent
         }
 
         /// <summary>
-        /// Indicates if this binding is reliant on a map or conversion in able to project the type of the 'from' value to the type of the 'to' value.
+        /// Indicates if this binding is reliant on a map or ConversionOverride in able to project the type of the 'from' value to the type of the 'to' value.
         /// </summary>
         public bool RequiresMapOrConversion
         {
             get
             {
-                if (FromMemberDefinition == null || Conversion != null)
+                if (FromMemberDefinition == null || ConversionOverride != null)
                     return false;
 
                 var fromMemberType = FromMemberDefinition.MemberType;
@@ -141,6 +150,31 @@ namespace KodeKandy.Mapnificent
 
                 return fromMemberType != toMemberType;
             }
+        }
+
+        /// <summary>
+        /// Attempts to get a member value from a 'from' instance.
+        /// </summary>
+        /// <param name="fromDeclaringInstance">The class instance from which the member should be fetched.</param>
+        /// <param name="mapper">The current mapper (required to provide context to custom From definitions).</param>
+        /// <param name="fromValue">The out value set if anything is a value can be retrieved.</param>
+        /// <returns>True if a value was retrieved, otherwise false.</returns>
+        public bool TryGetFromValue(object fromDeclaringInstance, Mapper mapper, out object fromValue)
+        {
+            // TODO if we add support for Default values, then this would be the place to provide it.
+
+            bool hasValue;
+            // 1. Get the 'from' value.
+            if (IsFromCustom)
+            {
+                fromValue = FromCustomDefinition(new MappingContext(mapper, fromDeclaringInstance));
+                hasValue = true;
+            }
+            else
+            {
+                hasValue = FromMemberDefinition.MemberGetter(fromDeclaringInstance, out fromValue);
+            }
+            return hasValue;
         }
     }
 }

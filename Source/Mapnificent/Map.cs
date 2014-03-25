@@ -171,7 +171,13 @@ namespace KodeKandy.Mapnificent
             return new ReadOnlyCollection<MemberDefinitionError>(errors);
         }
 
-        public void Apply(object from, object to)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="mapInto">If true, attemps to map into an existing object graph rather than recreating all children.</param>
+        public void Apply(object from, object to, bool mapInto = false)
         {
             Require.NotNull(from, "from");
             Require.NotNull(to, "to");
@@ -179,7 +185,7 @@ namespace KodeKandy.Mapnificent
 
             foreach (var binding in Bindings)
             {
-                ApplyBinding(from, to, binding);
+                ApplyBinding(from, to, binding, mapInto);
             }
 
             if (PostMapStep != null)
@@ -201,29 +207,30 @@ namespace KodeKandy.Mapnificent
         /// <param name="fromDeclaring">An instance of the from class.</param>
         /// <param name="toDeclaring">An instance of the to class.</param>
         /// <param name="binding"></param>
-        private void ApplyBinding(object fromDeclaring, object toDeclaring, MemberBindingDefinition binding)
+        /// <param name="mapInto"></param>
+        private void ApplyBinding(object fromDeclaring, object toDeclaring, MemberBindingDefinition binding, bool mapInto)
         {
             Require.NotNull(fromDeclaring, "fromDeclaring");
             Require.NotNull(toDeclaring, "toDeclaring");
 
-            object fromValue, toValue;
-            bool hasValue;
+            object fromValue;
 
-            // Get the from value.
-            if (binding.IsFromCustom)
-            {
-                fromValue = binding.FromCustomDefinition(new MappingContext(Mapper));
-                hasValue = true;
-            } else {
-                hasValue = binding.FromMemberDefinition.MemberGetter(fromDeclaring, out fromValue);
-            }
+            if (binding.Ignore)
+                return;
+
+            // 1. Get the 'from' value.
+            var hasValue = binding.TryGetFromValue(fromDeclaring, Mapper, out fromValue);
 
             if (hasValue)
             {
+                // Project the 'from' value.
+                object toValue;
+
                 // If there is an explicit conversion apply it, otherwise see if one is necessary and try to perform automatically if it is.
-                if (binding.Conversion != null)
+                // TODO Need to apply custom map here if that is defined on the binding.
+                if (binding.ConversionOverride != null)
                 {
-                    toValue = binding.Conversion.ConversionFunc(fromValue);
+                    toValue = binding.ConversionOverride.ConversionFunc(fromValue);
                 }
                 else
                 {
@@ -235,8 +242,13 @@ namespace KodeKandy.Mapnificent
                         if (projectionType.IsMap)
                         {
                             var map = Mapper.GetMap(projectionType);
-                            toValue = map.CreateInstanceOfTo(fromValue);
-                           // toValue = Activator.CreateInstance(binding.ToMemberDefinition.MemberType);
+
+                            // If we are mapping into then attempt to get a value to map into.
+                            if (mapInto)
+                                toValue = binding.ToMemberDefinition.MemberGetter(toDeclaring) ?? map.CreateInstanceOfTo(fromValue);
+                            else
+                                toValue = map.CreateInstanceOfTo(fromValue);
+
                             map.Apply(fromValue, toValue);
                         }
                         else
@@ -250,8 +262,10 @@ namespace KodeKandy.Mapnificent
                     }
                 }
 
+                // Set the value.
                 binding.ToMemberDefinition.MemberSetter(toDeclaring, toValue);
             }
         }
+
     }
 }

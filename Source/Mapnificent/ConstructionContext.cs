@@ -19,11 +19,13 @@ namespace KodeKandy.Mapnificent
     public class MappingContext
     {
         public Mapper Mapper { get; private set; }
+        public object FromInstance { get; private set; }
 
 
-        public MappingContext(Mapper mapper)
+        public MappingContext(Mapper mapper, object fromInstance)
         {
             Mapper = mapper;
+            FromInstance = fromInstance;
         }
     }
 

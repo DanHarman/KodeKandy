@@ -14,7 +14,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
             var sut = new Mapper();
 
             sut.DefineMap<VehicleFrom, VehicleTo>()
-               .For(x => x.Name, o => o.Explictly(_ => "Ferrari"));
+               .For(x => x.Name, o => o.Custom(_ => "Ferrari"));
             sut.DefineMap<CarFrom, CarTo>()
                .InheritsFrom<VehicleFrom, VehicleTo>();
 

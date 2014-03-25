@@ -10,10 +10,10 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
     public class Given_Validating_MemberBindingDefinition
     {
         [Test]
-        public void When_No_From_Defintion_Then_Invalid()
+        public void When_No_From_Definition_Then_Invalid()
         {
             // Arrange
-            var memberInfo = typeof(SimpleTo).GetMember("Name").Single();
+            var memberInfo = typeof(SimpleTo).GetMember("StringProp").Single();
             var sut = MemberBindingDefinition.Create(memberInfo, MemberBindingDefinitionType.Explicit);
 
             // Act
@@ -24,12 +24,12 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
         }
 
         [Test]
-        public void When_Bound_From_Defintion_Then_Valid()
+        public void When_Bound_From_Definition_Then_Valid()
         {
             // Arrange
-            var memberInfo = typeof(SimpleTo).GetMember("Name").Single();
+            var memberInfo = typeof(SimpleTo).GetMember("StringProp").Single();
             var sut = MemberBindingDefinition.Create(memberInfo, MemberBindingDefinitionType.Explicit);
-            sut.FromMemberDefinition = new MemberGetterDefinition(typeof(SimpleFrom), "Name", typeof(string), ReflectionHelpers.CreateSafeWeakMemberChainGetter(new [] {memberInfo}));
+            sut.FromMemberDefinition = new MemberGetterDefinition(typeof(SimpleFrom), "StringProp", typeof(string), ReflectionHelpers.CreateSafeWeakMemberChainGetter(new [] {memberInfo}));
 
             // Act
             var res = MemberBindingDefinitionValidator.Validate(sut, new Mapper());
@@ -39,10 +39,10 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
         }
 
         [Test]
-        public void When_Explicit_From_Defintion_Then_Valid()
+        public void When_Explicit_From_Definition_Then_Valid()
         {
             // Arrange
-            var memberInfo = typeof(SimpleTo).GetMember("Name").Single();
+            var memberInfo = typeof(SimpleTo).GetMember("StringProp").Single();
             var sut = MemberBindingDefinition.Create(memberInfo, MemberBindingDefinitionType.Explicit);
             sut.FromCustomDefinition = context => "Wow";
 

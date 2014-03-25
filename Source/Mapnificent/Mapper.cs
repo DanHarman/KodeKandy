@@ -31,7 +31,7 @@ namespace KodeKandy.Mapnificent
         private readonly Dictionary<ProjectionType, Map> mapDefinitions = new Dictionary<ProjectionType, Map>();
 
         /// <summary>
-        ///     Conversion definitions encompass all mappings into a value type.
+        ///     ConversionOverride definitions encompass all mappings into a value type.
         /// </summary>
         private readonly Dictionary<ProjectionType, Conversion> conversionDefinitions = new Dictionary<ProjectionType, Conversion>();
 

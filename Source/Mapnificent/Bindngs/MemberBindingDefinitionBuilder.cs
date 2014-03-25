@@ -39,7 +39,7 @@ namespace KodeKandy.Mapnificent
         ///     and the default value for that member will be set if it has been defined.
         /// 
         ///     This expression must be member chain expression, not a plain delegate doing adhoc work to create the value. If you
-        ///     wish to fully customise rather than use a member chain use the <see cref="Explictly{TFrom}" /> method.
+        ///     wish to fully customise rather than use a member chain use the <see cref="Custom" /> method.
         /// </summary>
         /// <typeparam name="TFromMember"></typeparam>
         /// <param name="fromMember"></param>
@@ -78,7 +78,7 @@ namespace KodeKandy.Mapnificent
         /// <typeparam name="TFrom"></typeparam>
         /// <param name="fromFunc"></param>
         /// <returns></returns>
-        public MemberBindingDefinitionBuilder<TFromDeclaring, TToMember> Explictly(Func<MappingContext, TToMember> fromFunc)
+        public MemberBindingDefinitionBuilder<TFromDeclaring, TToMember> Custom(Func<MappingContext, TToMember> fromFunc)
         {
             MemberBindingDefinition.FromCustomDefinition = ctx => (object) fromFunc(ctx);
 

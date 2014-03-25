@@ -18,7 +18,7 @@ using System.Linq.Expressions;
 namespace KodeKandy.Mapnificent
 {
     /// <summary>
-    ///     Type safe Conversion builder.
+    ///     Type safe ConversionOverride builder.
     /// </summary>
     /// <typeparam name="TFromDeclaring">The type being mapped from.</typeparam>
     /// <typeparam name="TToDeclaring">The type being mapped to.</typeparam>

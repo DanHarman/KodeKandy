@@ -68,12 +68,9 @@
     <Compile Include="TestEntities\SimpleTo.cs" />
     <Compile Include="TargetClassSchemaTests.cs" />
     <Compile Include="TestEntities\Inheritance\Circle.cs" />
-    <Compile Include="TestEntities\Inheritance\CircleDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestEntities\Inheritance\Rectangle.cs" />
-    <Compile Include="TestEntities\Inheritance\RectangleDto.cs" />
     <Compile Include="TestEntities\Inheritance\Shape.cs" />
-    <Compile Include="TestEntities\Inheritance\ShapeDto.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

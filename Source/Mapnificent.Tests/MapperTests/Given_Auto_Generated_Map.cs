@@ -27,15 +27,15 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
             // Arrange
             var sut = new Mapper();
             sut.DefineMap<SimpleFrom, SimpleTo>();
-            var from = new SimpleFrom() {Name = "Bob", Age = 20};
+            var from = new SimpleFrom() {StringProp = "Bob", IntField = 20};
             var to = new SimpleTo();
 
             // Act
             sut.MapInto(from, to);
 
             // Assert
-            Assert.AreEqual(from.Name, to.Name);
-            Assert.AreEqual(from.Age, to.Age);
+            Assert.AreEqual(from.StringProp, to.StringProp);
+            Assert.AreEqual(from.IntField, to.IntField);
         }
 
         [Test]
@@ -88,7 +88,28 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
             // Assert
             Assert.AreEqual(from.Age.Count(), to.Age);
         }
+    }
 
-        // TODO MapInto from a value type to a ref type.
+    [TestFixture]
+    public class Given_Customized_Map
+    {
+        [Test]
+        public void When_Mapping_Value_Type_To_Class_Then_Maps()
+        {
+            // Arrange
+            var sut = new Mapper();
+            sut.DefineMap<int, SimpleTo>()
+               .For(x => x.IntField, o => o.Custom(ctx => (int) ctx.FromInstance))
+               .For(x => x.StringProp, o => o.Custom(ctx => ((int) ctx.FromInstance).ToString()));
+            const int from = 12;
+            var to = new SimpleTo();
+
+            // Act
+            sut.MapInto(from, to);
+
+            // Assert
+            Assert.AreEqual(from, to.IntField);
+            Assert.AreEqual("12", to.StringProp);
+        }
     }
 }
