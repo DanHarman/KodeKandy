@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Serialization;
 using KodeKandy.Mapnificent.Bindngs;
 
 namespace KodeKandy.Mapnificent
@@ -210,62 +211,72 @@ namespace KodeKandy.Mapnificent
         /// <param name="mapInto"></param>
         private void ApplyBinding(object fromDeclaring, object toDeclaring, MemberBindingDefinition binding, bool mapInto)
         {
-            Require.NotNull(fromDeclaring, "fromDeclaring");
-            Require.NotNull(toDeclaring, "toDeclaring");
-
-            object fromValue;
-
-            if (binding.Ignore)
-                return;
-
-            // 1. Get the 'from' value.
-            var hasValue = binding.TryGetFromValue(fromDeclaring, Mapper, out fromValue);
-
-            if (hasValue)
+            try
             {
-                // Project the 'from' value.
-                object toValue;
+                Require.NotNull(fromDeclaring, "fromDeclaring");
+                Require.NotNull(toDeclaring, "toDeclaring");
 
-                // If there is an explicit conversion apply it, otherwise see if one is necessary and try to perform automatically if it is.
-                // TODO Need to apply custom map here if that is defined on the binding.
-                if (binding.ConversionOverride != null)
-                {
-                    toValue = binding.ConversionOverride.ConversionFunc(fromValue);
-                }
-                else
-                {
-                    var projectionType = binding.ProjectionType;
+                object fromValue;
 
-                    // Custom bindings do not require conversion as they should be of the correct type.
-                    if (!projectionType.IsByValue && !binding.IsFromCustom)
+                if (binding.Ignore)
+                    return;
+
+                // 1. Get the 'from' value.
+                var hasValue = binding.TryGetFromValue(fromDeclaring, Mapper, out fromValue);
+
+                if (hasValue)
+                {
+                    // Project the 'from' value.
+                    object toValue;
+
+                    if (binding.HasCustomFromDefintion)
                     {
-                        if (projectionType.IsMap)
-                        {
-                            var map = Mapper.GetMap(projectionType);
+                        // Custom 'from' methods must return the correct 'to' type so no need for conversion or mapping.
+                        toValue = fromValue;
+                    }
+                    else if (binding.IsMap)
+                    {
+                        // TODO support Map override here.
 
-                            // If we are mapping into then attempt to get a value to map into.
-                            if (mapInto)
-                                toValue = binding.ToMemberDefinition.MemberGetter(toDeclaring) ?? map.CreateInstanceOfTo(fromValue);
-                            else
-                                toValue = map.CreateInstanceOfTo(fromValue);
+                        var map = Mapper.GetMap(binding.ProjectionType);
 
-                            map.Apply(fromValue, toValue);
-                        }
+                        // If we are mapping into then attempt to get a value to map into.
+                        if (mapInto)
+                            toValue = binding.ToMemberDefinition.MemberGetter(toDeclaring) ?? map.CreateInstanceOfTo(fromValue);
                         else
-                        {
-                            toValue = Mapper.GetConversion(projectionType).Apply(fromValue);
-                        }
+                            toValue = map.CreateInstanceOfTo(fromValue);
+
+                        map.Apply(fromValue, toValue);
                     }
                     else
                     {
-                        toValue = fromValue;
-                    }
-                }
+                        // If this is a value type binding, then order of precedence is:
+                        // 1) Apply a conversion override if it is defined.
+                        // 2) If the projection is identity i.e. T -> T then do nothing.
+                        // 3) Ask the Mapper for a convereter.
 
-                // Set the value.
-                binding.ToMemberDefinition.MemberSetter(toDeclaring, toValue);
+                        Conversion conversion;
+
+                        if (binding.ConversionOverride != null)
+                            conversion = binding.ConversionOverride;
+                        else if (binding.ProjectionType.IsIdentity)
+                            conversion = null;
+                        else
+                            conversion = Mapper.GetConversion(binding.ProjectionType);
+
+                        toValue = conversion != null ? conversion.Apply(fromValue) : fromValue;
+
+                    }
+
+                    // Set the value.
+                    binding.ToMemberDefinition.MemberSetter(toDeclaring, toValue);
+                }
+            }
+            catch (Exception ex)
+            {
+                var msg = string.Format("Error applying binding '{0}'", binding);
+                throw new MapnificentException(msg, ex);
             }
         }
-
     }
 }

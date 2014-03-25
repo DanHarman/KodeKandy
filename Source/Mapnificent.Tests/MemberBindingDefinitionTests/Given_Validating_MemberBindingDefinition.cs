@@ -44,7 +44,7 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
             // Arrange
             var memberInfo = typeof(SimpleTo).GetMember("StringProp").Single();
             var sut = MemberBindingDefinition.Create(memberInfo, MemberBindingDefinitionType.Explicit);
-            sut.FromCustomDefinition = context => "Wow";
+            sut.CustomFromDefinition = context => "Wow";
 
             // Act
             var res = MemberBindingDefinitionValidator.Validate(sut, new Mapper());

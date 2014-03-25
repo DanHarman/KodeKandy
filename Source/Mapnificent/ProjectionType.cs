@@ -21,6 +21,26 @@ namespace KodeKandy.Mapnificent
     /// </summary>
     public class ProjectionType
     {
+        public class UndefinedType
+        {
+            private UndefinedType() {}
+        };
+
+        public class CustomType 
+        {
+            private CustomType() {}
+        };
+
+        /// <summary>
+        /// Type indicating that a from projection has not yet been defined.
+        /// </summary>
+        public static Type Undefined = typeof(UndefinedType);
+
+        /// <summary>
+        /// Type indicating that a projection has a custom from delegate so it is not a simple field binding projection.
+        /// </summary>
+        public static Type Custom = typeof(CustomType);
+
         public Type FromType { get; set; }
         public Type ToType { get; set; }
 
@@ -34,8 +54,16 @@ namespace KodeKandy.Mapnificent
             get { return !ToType.IsClass && ToType == FromType; }
         }
 
+        public bool IsIdentity
+        {
+            get { return ToType == FromType; }
+        }
+
         public ProjectionType(Type fromType, Type toType)
         {
+            Require.NotNull(fromType, "fromType");
+            Require.NotNull(toType, "toType");
+
             FromType = fromType;
             ToType = toType;
         }

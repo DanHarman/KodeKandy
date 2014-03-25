@@ -12,7 +12,7 @@ namespace KodeKandy.Mapnificent
             if (definition.Ignore)
                 return new ReadOnlyCollection<MemberDefinitionError>(memberDefinitionErrors);
 
-            if (definition.FromMemberDefinition == null && definition.FromCustomDefinition == null)
+            if (definition.FromMemberDefinition == null && definition.CustomFromDefinition == null)
                 memberDefinitionErrors.Add(MemberDefinitionError.Create(definition.ToMemberDefinition, "Binding definition does not define a 'from' source."));
 
             if (definition.FromMemberDefinition != null && definition.ConversionOverride == null)

@@ -14,6 +14,7 @@
 
 using System;
 using System.Reflection;
+using System.ServiceModel.Channels;
 using KodeKandy.Mapnificent.Bindngs;
 
 namespace KodeKandy.Mapnificent
@@ -54,28 +55,28 @@ namespace KodeKandy.Mapnificent
             get { return fromMemberDefinition; }
             set
             {
-                fromCustomDefinition = null;
+                customFromDefinition = null;
                 fromMemberDefinition = value;
             }
         }
 
-        private Func<MappingContext, object> fromCustomDefinition;
+        private Func<MappingContext, object> customFromDefinition;
         /// <summary>
-        /// Defines the 'from' provider when it is a custom delegate.
+        /// Defines that the 'from' value comes from a custom delegate rather than to a member on the 'from' type.
         /// </summary>
-        public Func<MappingContext, object> FromCustomDefinition
+        public Func<MappingContext, object> CustomFromDefinition
         {
-            get { return fromCustomDefinition; }
+            get { return customFromDefinition; }
             set
             {
                 fromMemberDefinition = null;
-                fromCustomDefinition = value;
+                customFromDefinition = value;
             }
         }
 
-        public bool IsFromCustom
+        public bool HasCustomFromDefintion
         {
-            get { return FromCustomDefinition != null; }
+            get { return CustomFromDefinition != null; }
         }
 
         /// <summary>
@@ -97,7 +98,10 @@ namespace KodeKandy.Mapnificent
         /// </summary>
         public ProjectionType ProjectionType
         {
-            get { return new ProjectionType(FromMemberDefinition == null ? null : FromMemberDefinition.MemberType, ToMemberDefinition.MemberType); }
+            get
+            {
+                return new ProjectionType(FromType, ToType);
+            }
         }
 
        // public Func<> 
@@ -165,9 +169,9 @@ namespace KodeKandy.Mapnificent
 
             bool hasValue;
             // 1. Get the 'from' value.
-            if (IsFromCustom)
+            if (HasCustomFromDefintion)
             {
-                fromValue = FromCustomDefinition(new MappingContext(mapper, fromDeclaringInstance));
+                fromValue = CustomFromDefinition(new MappingContext(mapper, fromDeclaringInstance));
                 hasValue = true;
             }
             else
@@ -175,6 +179,40 @@ namespace KodeKandy.Mapnificent
                 hasValue = FromMemberDefinition.MemberGetter(fromDeclaringInstance, out fromValue);
             }
             return hasValue;
+        }
+
+        public Type FromType
+        {
+            get
+            {
+                if (HasCustomFromDefintion)
+                    return ProjectionType.Custom;
+                if (FromMemberDefinition == null)
+                    return ProjectionType.Undefined;
+                return FromMemberDefinition.MemberType;
+            }
+        }
+
+        public Type ToType
+        {
+            get { return ToMemberDefinition.MemberType; }
+        }
+
+        public override string ToString()
+        {
+            string bindingDescription;
+            if (HasCustomFromDefintion)
+                bindingDescription = string.Format("'<Custom>'->'{0}'", ToMemberDefinition.MemberName);
+            else if (fromMemberDefinition != null)
+            {
+                bindingDescription = string.Format("'{0}'->'{1}'", FromMemberDefinition.MemberName, ToMemberDefinition.MemberName);
+            }
+            else
+            {
+                bindingDescription = string.Format("'<Undefined>'->'{0}'", ToMemberDefinition.MemberName); 
+            }
+
+            return string.Format("Binding: {0}, Type: {1}", bindingDescription, ProjectionType);
         }
     }
 }

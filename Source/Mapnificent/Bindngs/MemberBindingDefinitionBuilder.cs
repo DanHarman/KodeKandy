@@ -80,7 +80,7 @@ namespace KodeKandy.Mapnificent
         /// <returns></returns>
         public MemberBindingDefinitionBuilder<TFromDeclaring, TToMember> Custom(Func<MappingContext, TToMember> fromFunc)
         {
-            MemberBindingDefinition.FromCustomDefinition = ctx => (object) fromFunc(ctx);
+            MemberBindingDefinition.CustomFromDefinition = ctx => (object) fromFunc(ctx);
 
             return this;
         }
