@@ -267,5 +267,39 @@ namespace KodeKandy
 
             return weakSetter;
         }
+
+
+        /// <summary>
+        /// Discover if a type implements an open generic type.
+        /// </summary>
+        /// <param name="type">The type to inspect.</param>
+        /// <param name="genericType">The type to look for.</param>
+        /// <returns>True if the generic type is implemented, otherwise false.</returns>
+        public static bool DoesImplementsGenericType(this Type type, Type genericType)
+        {
+            Require.NotNull(type, "type");
+            Require.NotNull(genericType, "genericType");
+            Require.IsTrue(genericType.IsGenericType, "Must be a generic type.", "genericType");
+
+            return TryGetGenericTypeDefinitionOfType(type, genericType) != null;
+        }
+
+        /// <summary>
+        /// Try to get the generic definition of a type implemented on type.
+        /// </summary>
+        /// <param name="type">The type to inspect.</param>
+        /// <param name="genericType">The generic type to look for.</param>
+        /// <returns>The generic type definition if found, otherwise null.</returns>
+        public static Type TryGetGenericTypeDefinitionOfType(this Type type, Type genericType)
+        {
+            Require.NotNull(type, "type");
+            Require.NotNull(genericType, "genericType");
+            Require.IsTrue(genericType.IsGenericType, "Must be a generic type.", "genericType");
+
+            if (type.IsInterface)
+                return type.IsGenericType && type.GetGenericTypeDefinition() == genericType ? type.GetGenericTypeDefinition() : null;
+
+            return type.GetInterfaces().SingleOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == genericType);
+        }
     }
 }

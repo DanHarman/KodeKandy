@@ -58,6 +58,7 @@
     <Compile Include="ExpressionHelpersTests\When_Getting_MemberInfos.cs" />
     <Compile Include="ExpressionHelpersTests\When_Getting_MemberNames.cs" />
     <Compile Include="ExpressionHelpersTests\When_ReverseEnumeratingBinaryPartitions.cs" />
+    <Compile Include="ReflectionHelpersTests\Given_Inspecing_For_Generic_Types.cs" />
     <Compile Include="ReflectionHelpersTests\When_Creating_SafeWeakGetter.cs" />
     <Compile Include="ReflectionHelpersTests\Given_WeakGetter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
