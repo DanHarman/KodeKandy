@@ -38,7 +38,7 @@
     <Compile Include="ConversionDefinitionBuilder.cs" />
     <Compile Include="Bindngs\MemberBindingDefinitionValidator.cs" />
     <Compile Include="Bindngs\MemberDefinitionError.cs" />
-    <Compile Include="Bindngs\MemberGetterDefinition.cs" />
+    <Compile Include="Bindngs\FromMemberDefinition.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="MapDefinitionBuilder.cs" />
     <Compile Include="MapDefinitionUndefinedMembersException.cs" />
@@ -46,7 +46,7 @@
     <Compile Include="Bindngs\MemberAccessorDefinition.cs" />
     <Compile Include="Bindngs\MemberBindingDefinition.cs" />
     <Compile Include="Bindngs\MemberBindingDefinitionBuilder.cs" />
-    <Compile Include="Bindngs\MemberSetterDefinition.cs" />
+    <Compile Include="Bindngs\ToMemberDefinition.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="MapnificentException.cs" />
     <Compile Include="ProjectionType.cs" />

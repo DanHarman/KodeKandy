@@ -37,6 +37,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExpressionHelpers.cs" />
+    <Compile Include="MemberAccessor.cs" />
+    <Compile Include="MemberInfoExtensions.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ReflectionHelpers.cs" />
     <Compile Include="Require.cs" />

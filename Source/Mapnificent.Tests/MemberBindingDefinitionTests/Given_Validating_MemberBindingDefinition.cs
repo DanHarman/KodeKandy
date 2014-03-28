@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Resources;
 using KodeKandy.Mapnificent.Bindngs;
 using KodeKandy.Mapnificent.Tests.TestEntities;
 using NUnit.Framework;
@@ -14,7 +13,7 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
         {
             // Arrange
             var memberInfo = typeof(SimpleTo).GetMember("StringProp").Single();
-            var sut = MemberBindingDefinition.Create(memberInfo, MemberBindingDefinitionType.Explicit);
+            var sut = new MemberBindingDefinition(memberInfo, MemberBindingDefinitionType.Explicit);
 
             // Act
             var res = MemberBindingDefinitionValidator.Validate(sut, new Mapper());
@@ -28,8 +27,9 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
         {
             // Arrange
             var memberInfo = typeof(SimpleTo).GetMember("StringProp").Single();
-            var sut = MemberBindingDefinition.Create(memberInfo, MemberBindingDefinitionType.Explicit);
-            sut.FromMemberDefinition = new MemberGetterDefinition(typeof(SimpleFrom), "StringProp", typeof(string), ReflectionHelpers.CreateSafeWeakMemberChainGetter(new [] {memberInfo}));
+            var sut = new MemberBindingDefinition(memberInfo, MemberBindingDefinitionType.Explicit);
+            sut.FromDefinition = new FromMemberDefinition("StringProp", typeof(string),
+                ReflectionHelpers.CreateSafeWeakMemberChainGetter(new[] {memberInfo}));
 
             // Act
             var res = MemberBindingDefinitionValidator.Validate(sut, new Mapper());
@@ -43,8 +43,10 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
         {
             // Arrange
             var memberInfo = typeof(SimpleTo).GetMember("StringProp").Single();
-            var sut = MemberBindingDefinition.Create(memberInfo, MemberBindingDefinitionType.Explicit);
-            sut.CustomFromDefinition = context => "Wow";
+            var sut = new MemberBindingDefinition(memberInfo, MemberBindingDefinitionType.Explicit)
+            {
+                FromDefinition = new FromCustomDefinition(context => "Wow")
+            };
 
             // Act
             var res = MemberBindingDefinitionValidator.Validate(sut, new Mapper());

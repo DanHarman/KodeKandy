@@ -30,7 +30,7 @@ namespace KodeKandy.Mapnificent
 
         public MemberBindingDefinitionBuilder(MemberBindingDefinition memberBindingDefinition)
         {
-            this.MemberBindingDefinition = memberBindingDefinition;
+            MemberBindingDefinition = memberBindingDefinition;
         }
 
         /// <summary>
@@ -50,11 +50,10 @@ namespace KodeKandy.Mapnificent
             Require.NotNull(fromMember, "fromMember");
 
             var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos(fromMember);
-            var fromMemberName = String.Join(".", memberInfos.Select(x => x.Name));
+            var fromMemberPath = String.Join(".", memberInfos.Select(x => x.Name));
             var fromMemberGetter = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
 
-            MemberBindingDefinition.FromMemberDefinition = new MemberGetterDefinition(typeof(TFromDeclaring), fromMemberName, typeof(TFromMember),
-                fromMemberGetter);
+            MemberBindingDefinition.FromDefinition = new FromMemberDefinition(fromMemberPath, typeof(TFromMember), fromMemberGetter);
 
             return this;
         }
@@ -67,7 +66,7 @@ namespace KodeKandy.Mapnificent
         /// <returns></returns>
         public MemberBindingDefinitionBuilder<TFromDeclaring, TToMember> Ignore()
         {
-            MemberBindingDefinition.Ignore = true;
+            MemberBindingDefinition.IsIgnore = true;
 
             return this;
         }
@@ -80,7 +79,9 @@ namespace KodeKandy.Mapnificent
         /// <returns></returns>
         public MemberBindingDefinitionBuilder<TFromDeclaring, TToMember> Custom(Func<MappingContext, TToMember> fromFunc)
         {
-            MemberBindingDefinition.CustomFromDefinition = ctx => (object) fromFunc(ctx);
+            Require.NotNull(fromFunc, "fromFunc");
+
+            MemberBindingDefinition.FromDefinition = new FromCustomDefinition(ctx => (object) fromFunc(ctx));
 
             return this;
         }

@@ -15,7 +15,7 @@
 using KodeKandy.TestEntities;
 using NUnit.Framework;
 
-namespace KodeKandy.ReflectionHelpersTests
+namespace KodeKandy.MemberInfoExtensionsTests
 {
     [TestFixture]
     public class When_Getting_MemberInfo_MemberType

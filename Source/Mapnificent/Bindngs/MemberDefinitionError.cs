@@ -14,6 +14,7 @@
 
 using System;
 using System.Reflection;
+using KodeKandy.Mapnificent.Bindngs;
 
 namespace KodeKandy.Mapnificent
 {
@@ -51,15 +52,15 @@ namespace KodeKandy.Mapnificent
             return Create(toMemberInfo, reason);
         }
 
-        public static MemberDefinitionError Create(MemberSetterDefinition memberSetterDefinition, string reason)
+        public static MemberDefinitionError Create(ToMemberDefinition toMemberDefinition, string reason)
         {
-            return new MemberDefinitionError(memberSetterDefinition.DeclaringType, memberSetterDefinition.MemberType, memberSetterDefinition.MemberName, reason);
+            return new MemberDefinitionError(toMemberDefinition.DeclaringType, toMemberDefinition.MemberType, toMemberDefinition.MemberName, reason);
         }
 
-        public static MemberDefinitionError Create(MemberSetterDefinition memberSetterDefinition, string reasonFormat, params object[] reasonArgs)
+        public static MemberDefinitionError Create(ToMemberDefinition toMemberDefinition, string reasonFormat, params object[] reasonArgs)
         {
             var reason = string.Format(reasonFormat, reasonArgs);
-            return Create(memberSetterDefinition, reason);
+            return Create(toMemberDefinition, reason);
         }
     }
 }

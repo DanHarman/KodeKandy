@@ -21,6 +21,8 @@ using System.Reflection;
 
 namespace KodeKandy
 {
+    public delegate bool SafeGetterFunc(object instance, out object value);
+
     public static class ReflectionHelpers
     {
         public class SafeWeakMemberGetterResult
@@ -41,8 +43,6 @@ namespace KodeKandy
 
             public static readonly SafeWeakMemberGetterResult NoResult = new SafeWeakMemberGetterResult(false, null);
         }
-
-        public delegate bool SafeGetterFunc(object instance, out object value);
 
         public static SafeGetterFunc CreateSafeWeakMemberChainGetter(IEnumerable<MemberInfo> memberInfos)
         {
@@ -123,23 +123,6 @@ namespace KodeKandy
             return new ReadOnlyCollection<MemberInfo>(memberInfos);
         }
 
-        public static Type GetMemberType(this MemberInfo memberInfo)
-        {
-            Require.NotNull(memberInfo, "memberInfo");
-
-            var propertyInfo = memberInfo as PropertyInfo;
-
-            if (propertyInfo != null)
-                return propertyInfo.PropertyType;
-
-            var fieldInfo = memberInfo as FieldInfo;
-
-            if (fieldInfo != null)
-                return fieldInfo.FieldType;
-
-            throw new Exception(String.Format("Unknown MemberInfoType '{0}'", memberInfo.DeclaringType));
-        }
-
         /// <summary>
         ///     Create a weakly typed member getter delegate.
         /// </summary>
@@ -178,7 +161,8 @@ namespace KodeKandy
             var getterMethodInfo = propertyInfo.GetGetMethod(true);
 
             if (getterMethodInfo == null)
-                throw new Exception(string.Format("No get method defined for property '{0}' on class '{1}", propertyInfo.Name, propertyInfo.DeclaringType));
+                throw new Exception(string.Format("No get method defined for property '{0}' on class '{1}", propertyInfo.Name,
+                    propertyInfo.DeclaringType));
 
             // Parameters
             var weakInstanceParam = Expression.Parameter(typeof(object));
@@ -205,7 +189,8 @@ namespace KodeKandy
             var setterMethodInfo = propertyInfo.GetSetMethod(true);
 
             if (setterMethodInfo == null)
-                throw new Exception(string.Format("No set method defined for property '{0}' on class '{1}", propertyInfo.Name, propertyInfo.DeclaringType));
+                throw new Exception(string.Format("No set method defined for property '{0}' on class '{1}", propertyInfo.Name,
+                    propertyInfo.DeclaringType));
 
             // Parameters
             var weakInstanceParam = Expression.Parameter(typeof(object));
@@ -270,7 +255,7 @@ namespace KodeKandy
 
 
         /// <summary>
-        /// Discover if a type implements an open generic type.
+        ///     Discover if a type implements an open generic type.
         /// </summary>
         /// <param name="type">The type to inspect.</param>
         /// <param name="genericType">The type to look for.</param>
@@ -285,7 +270,7 @@ namespace KodeKandy
         }
 
         /// <summary>
-        /// Try to get the generic definition of a type implemented on type.
+        ///     Try to get the generic definition of a type implemented on type.
         /// </summary>
         /// <param name="type">The type to inspect.</param>
         /// <param name="genericType">The generic type to look for.</param>

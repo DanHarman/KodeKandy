@@ -1,4 +1,4 @@
-// <copyright file="MemberSetterDefinition.cs" company="million miles per hour ltd">
+// <copyright file="ToMemberDefinition.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -15,23 +15,25 @@
 using System;
 using System.Reflection;
 
-namespace KodeKandy.Mapnificent
+namespace KodeKandy.Mapnificent.Bindngs
 {
-    public class MemberSetterDefinition : MemberAccessorDefinition
+    public class ToMemberDefinition
     {
-        public Action<object, object> MemberSetter { get; private set; }
-        public Func<object, object> MemberGetter { get; private set; }
+        public KodeKandy.MemberAccessor Accessor { get; private set; }
 
-        public MemberSetterDefinition(MemberInfo memberInfo)
-            : base(memberInfo.DeclaringType, memberInfo.Name, memberInfo.GetMemberType())
+        public string MemberName { get { return Accessor.MemberName; } }
+
+        public Type DeclaringType { get { return Accessor.DeclaringType; } }
+
+        public Type MemberType { get { return Accessor.MemberType; } }
+
+        public ToMemberDefinition(MemberInfo memberInfo)
         {
             Require.NotNull(memberInfo, "memberInfo");
 
-            MemberSetter = ReflectionHelpers.CreateWeakMemberSetter(memberInfo);
-
             // We need a getter as well for situations where we are mapping into an existing object and need to merge into
             // 'child' members, rather than just creating new instances of them.
-            MemberGetter = ReflectionHelpers.CreateWeakMemberGetter(memberInfo);
+            Accessor = new KodeKandy.MemberAccessor(memberInfo);
         }
     }
 }

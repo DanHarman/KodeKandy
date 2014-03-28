@@ -1,4 +1,4 @@
-// <copyright file="MemberAccessorDefinition.cs" company="million miles per hour ltd">
+// <copyright file="MemberAccessor.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -13,31 +13,32 @@
 // </copyright>
 
 using System;
+using System.Reflection;
 
 namespace KodeKandy.Mapnificent
 {
     /// <summary>
-    ///     Base class for member access definitions that capture memberName, GetMemberType and appropritate delegate to
+    ///     Base class for member access definitions that capture memberPath, GetMemberType and appropritate delegate to
     ///     access a member.
     /// </summary>
     public abstract class MemberAccessorDefinition
     {
         /// <summary>
-        ///     memberName or description this accessor corresponds to.
+        ///     memberPath or description this accessor corresponds to.
         /// </summary>
-        public string MemberName { get; private set; }
+        public string MemberPath { get; private set; }
 
         public Type DeclaringType { get; private set; }
 
         public Type MemberType { get; private set; }
 
-        protected MemberAccessorDefinition(Type declaringType, string memberName, Type memberType)
+        protected MemberAccessorDefinition(Type declaringType, string memberPath, Type memberType)
         {
             Require.NotNull(declaringType, "declaringType");
-            Require.NotNull(memberName, "memberName");
+            Require.NotNull(memberPath, "memberPath");
             Require.NotNull(memberType, "memberType");
 
-            MemberName = memberName;
+            MemberPath = memberPath;
             DeclaringType = declaringType;
             MemberType = memberType;
         }
