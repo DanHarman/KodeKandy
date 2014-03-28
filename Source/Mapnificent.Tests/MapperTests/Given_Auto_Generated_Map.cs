@@ -1,4 +1,5 @@
 using System.Linq;
+using KodeKandy.Mapnificent.MemberAccess;
 using KodeKandy.Mapnificent.Tests.TestEntities;
 using NUnit.Framework;
 
@@ -18,7 +19,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
             var res = map.Bindings;
 
             // Assert
-            Assert.IsTrue(res.All(b => b.MemberBindingDefinitionType == MemberBindingDefinitionType.Auto));
+            Assert.IsTrue(res.All(b => b.BindingDefinitionType == BindingDefinitionType.Auto));
         }
 
         [Test]

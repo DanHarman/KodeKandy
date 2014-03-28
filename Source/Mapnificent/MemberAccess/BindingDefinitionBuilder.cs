@@ -1,4 +1,4 @@
-// <copyright file="MemberBindingDefinitionBuilder.cs" company="million miles per hour ltd">
+// <copyright file="BindingDefinitionBuilder.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -15,22 +15,22 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
-using KodeKandy.Mapnificent.Bindngs;
+using KodeKandy.Mapnificent.Projections;
 
-namespace KodeKandy.Mapnificent
+namespace KodeKandy.Mapnificent.MemberAccess
 {
     /// <summary>
     ///     Builder class to provide convenient type safe definition of member bindings.
     /// </summary>
     /// <typeparam name="TFromDeclaring">Declaring type of the 'from' class.</typeparam>
     /// <typeparam name="TToMember">Type of the 'to' member being set.</typeparam>
-    public class MemberBindingDefinitionBuilder<TFromDeclaring, TToMember>
+    public class BindingDefinitionBuilder<TFromDeclaring, TToMember>
     {
-        public MemberBindingDefinition MemberBindingDefinition { get; private set; }
+        public BindingDefinition BindingDefinition { get; private set; }
 
-        public MemberBindingDefinitionBuilder(MemberBindingDefinition memberBindingDefinition)
+        public BindingDefinitionBuilder(BindingDefinition bindingDefinition)
         {
-            MemberBindingDefinition = memberBindingDefinition;
+            BindingDefinition = bindingDefinition;
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace KodeKandy.Mapnificent
         /// <typeparam name="TFromMember"></typeparam>
         /// <param name="fromMember"></param>
         /// <returns></returns>
-        public MemberBindingDefinitionBuilder<TFromDeclaring, TToMember> From<TFromMember>(
+        public BindingDefinitionBuilder<TFromDeclaring, TToMember> From<TFromMember>(
             Expression<Func<TFromDeclaring, TFromMember>> fromMember)
         {
             Require.NotNull(fromMember, "fromMember");
@@ -53,7 +53,7 @@ namespace KodeKandy.Mapnificent
             var fromMemberPath = String.Join(".", memberInfos.Select(x => x.Name));
             var fromMemberGetter = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
 
-            MemberBindingDefinition.FromDefinition = new FromMemberDefinition(fromMemberPath, typeof(TFromMember), fromMemberGetter);
+            BindingDefinition.FromDefinition = new FromMemberDefinition(fromMemberPath, typeof(TFromMember), fromMemberGetter);
 
             return this;
         }
@@ -64,9 +64,9 @@ namespace KodeKandy.Mapnificent
         ///     so that the mapping definition will validate.
         /// </summary>
         /// <returns></returns>
-        public MemberBindingDefinitionBuilder<TFromDeclaring, TToMember> Ignore()
+        public BindingDefinitionBuilder<TFromDeclaring, TToMember> Ignore()
         {
-            MemberBindingDefinition.IsIgnore = true;
+            BindingDefinition.IsIgnore = true;
 
             return this;
         }
@@ -77,23 +77,18 @@ namespace KodeKandy.Mapnificent
         /// <typeparam name="TFrom"></typeparam>
         /// <param name="fromFunc"></param>
         /// <returns></returns>
-        public MemberBindingDefinitionBuilder<TFromDeclaring, TToMember> Custom(Func<MappingContext, TToMember> fromFunc)
+        public BindingDefinitionBuilder<TFromDeclaring, TToMember> Custom(Func<MappingContext, TToMember> fromFunc)
         {
             Require.NotNull(fromFunc, "fromFunc");
 
-            MemberBindingDefinition.FromDefinition = new FromCustomDefinition(ctx => (object) fromFunc(ctx));
+            BindingDefinition.FromDefinition = new FromCustomDefinition(ctx => (object) fromFunc(ctx));
 
             return this;
         }
 
-        //public MemberBindingDefinitionBuilder<TToMember> ConstructedBy(Func<TToMember> constructor)
+        //public BindingDefinitionBuilder<TToMember> ConstructedBy(Func<TToMember> constructor)
         //{
         //    return this;
         //}
     }
-
-    //public static class MemberBindingDefinitionBuilderExtensions
-    //{
-
-    //}
 }

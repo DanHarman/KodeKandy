@@ -14,7 +14,7 @@
 
 using System;
 
-namespace KodeKandy.Mapnificent
+namespace KodeKandy.Mapnificent.Projections
 {
     public class MappingContext
     {

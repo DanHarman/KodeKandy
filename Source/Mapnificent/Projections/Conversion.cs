@@ -14,7 +14,7 @@
 
 using System;
 
-namespace KodeKandy.Mapnificent
+namespace KodeKandy.Mapnificent.Projections
 {
     /// <summary>
     ///     ConversionOverride definitions encompass all mappings into a value type.

@@ -1,4 +1,4 @@
-// <copyright file="MemberBindingDefinition.cs" company="million miles per hour ltd">
+// <copyright file="BindingDefinition.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -14,11 +14,11 @@
 
 using System;
 using System.Reflection;
-using KodeKandy.Mapnificent.Bindngs;
+using KodeKandy.Mapnificent.Projections;
 
-namespace KodeKandy.Mapnificent
+namespace KodeKandy.Mapnificent.MemberAccess
 {
-    public enum MemberBindingDefinitionType
+    public enum BindingDefinitionType
     {
         /// <summary>
         ///     Binding explicitly defined by config.
@@ -33,26 +33,31 @@ namespace KodeKandy.Mapnificent
     /// <summary>
     ///     Defines the mapping for a member in a 'to' class from a 'from' class.
     /// </summary>
-    public class MemberBindingDefinition
+    public class BindingDefinition
     {
         /// <summary>
         ///     Captures whether the binding was explicitly defined in config or automatically inferred.
         /// </summary>
-        public MemberBindingDefinitionType MemberBindingDefinitionType { get; private set; }
+        public BindingDefinitionType BindingDefinitionType { get; private set; }
 
         /// <summary>
         ///     Defines the 'to' member setter details.
         /// </summary>
-        public ToMemberDefinition ToToMemberDefinition { get; private set; }
+        public ToDefinition ToDefinition { get; private set; }
 
-        private FromDefinition fromDefinition;
+        public Type ToType
+        {
+            get { return ToDefinition.MemberType; }
+        }
+
         /// <summary>
         ///     Defines the 'from' provider when it is a member on the 'from' class.
         /// </summary>
-        public FromDefinition FromDefinition
+        public FromDefinition FromDefinition { get; set; }
+
+        public Type FromType
         {
-            get { return fromDefinition; }
-            set { fromDefinition = value; }
+            get { return FromDefinition.MemberType; }
         }
 
         public bool HasCustomFromDefintion
@@ -97,46 +102,73 @@ namespace KodeKandy.Mapnificent
             }
         }
 
-        public MemberBindingDefinition(MemberInfo toMemberInfo, MemberBindingDefinitionType memberBindingDefinitionType,
+        public BindingDefinition(MemberInfo toMemberInfo, BindingDefinitionType bindingDefinitionType,
             FromDefinition fromDefinition = null, Conversion conversionOverride = null)
         {
             Require.NotNull(toMemberInfo, "toMemberInfo");
 
-            MemberBindingDefinitionType = memberBindingDefinitionType;
-            ToToMemberDefinition = new ToMemberDefinition(toMemberInfo);
+            BindingDefinitionType = bindingDefinitionType;
+            ToDefinition = new ToDefinition(toMemberInfo);
             FromDefinition = fromDefinition ?? FromUndefinedDefinition.Default;
             ConversionOverride = conversionOverride;
         }
 
-        public Type FromType
+        /// <summary>
+        ///     The binding may require a projection (i.e. a mapping or conversion) between the 'from' and 'to' types.
+        /// </summary>
+        /// <param name="mapper"></param>
+        /// <param name="fromValue"></param>
+        /// <param name="toDeclaringInstance"></param>
+        /// <param name="mapInto"></param>
+        /// <returns></returns>
+        public object ProjectValue(Mapper mapper, object fromValue, object toDeclaringInstance, bool mapInto)
         {
-            get
-            {
-                if (HasCustomFromDefintion)
-                    return ProjectionType.Custom;
-                if (FromDefinition == null)
-                    return ProjectionType.Undefined;
-                return ((FromMemberDefinition) FromDefinition).MemberType;
-            }
-        }
+            object toValue;
 
-        public Type ToType
-        {
-            get { return ToToMemberDefinition.MemberType; }
+            if (HasCustomFromDefintion)
+            {
+                // Custom 'from' methods must return the correct 'to' type so no need for conversion or mapping.
+                toValue = fromValue;
+            }
+            else if (IsMap)
+            {
+                // TODO support Map override here.
+
+                var map = mapper.GetMap(ProjectionType);
+
+                // If we are mapping into then attempt to get a value to map into.
+                if (mapInto)
+                    toValue = ToDefinition.Accessor.Getter(toDeclaringInstance) ?? map.CreateInstanceOfTo(fromValue);
+                else
+                    toValue = map.CreateInstanceOfTo(fromValue);
+
+                map.Apply(fromValue, toValue);
+            }
+            else
+            {
+                // If this is a value type binding, then order of precedence is:
+                // 1) Apply a conversion override if it is defined.
+                // 2) If the projection is identity i.e. T -> T then do nothing.
+                // 3) Ask the Mapper for a convereter.
+
+                Conversion conversion;
+
+                if (ConversionOverride != null)
+                    conversion = ConversionOverride;
+                else if (ProjectionType.IsIdentity)
+                    conversion = null;
+                else
+                    conversion = mapper.GetConversion(ProjectionType);
+
+                toValue = conversion != null ? conversion.Apply(fromValue) : fromValue;
+            }
+
+            return toValue;
         }
 
         public override string ToString()
         {
-            string bindingDescription;
-
-            if (fromDefinition != null)
-            {
-                bindingDescription = string.Format("'{0}'->'{1}'", FromDefinition.Description, ToToMemberDefinition.MemberName);
-            }
-            else
-            {
-                bindingDescription = string.Format("'<Undefined>'->'{0}'", ToToMemberDefinition.MemberName);
-            }
+            var bindingDescription = string.Format("'{0}'->'{1}'", FromDefinition, ToDefinition.MemberName);
 
             return string.Format("Binding: {0}, Type: {1}", bindingDescription, ProjectionType);
         }

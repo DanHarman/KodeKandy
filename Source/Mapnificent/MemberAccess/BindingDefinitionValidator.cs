@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using KodeKandy.Mapnificent.Bindngs;
 
-namespace KodeKandy.Mapnificent
+namespace KodeKandy.Mapnificent.MemberAccess
 {
-    public static class MemberBindingDefinitionValidator
+    public static class BindingDefinitionValidator
     {
-        public static ReadOnlyCollection<MemberDefinitionError> Validate(MemberBindingDefinition definition, Mapper mapper)
+        public static ReadOnlyCollection<MemberDefinitionError> Validate(BindingDefinition definition, Mapper mapper)
         {
             var memberDefinitionErrors = new List<MemberDefinitionError>();
 
@@ -14,7 +13,7 @@ namespace KodeKandy.Mapnificent
                 return new ReadOnlyCollection<MemberDefinitionError>(memberDefinitionErrors);
 
             if (definition.FromDefinition == FromUndefinedDefinition.Default)
-                memberDefinitionErrors.Add(MemberDefinitionError.Create(definition.ToToMemberDefinition, "Binding definition does not define a 'from' source."));
+                memberDefinitionErrors.Add(MemberDefinitionError.Create(definition.ToDefinition, "Binding definition does not define a 'from' source."));
 
 //            if (definition.FromDefinition != null && definition.ConversionOverride == null)
 //            {

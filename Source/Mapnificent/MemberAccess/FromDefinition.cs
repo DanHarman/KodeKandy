@@ -13,11 +13,17 @@
 // </copyright>
 
 using System;
+using KodeKandy.Mapnificent.Projections;
 
-namespace KodeKandy.Mapnificent.Bindngs
+namespace KodeKandy.Mapnificent.MemberAccess
 {
     public abstract class FromDefinition
     {
+        /// <summary>
+        ///     The type of the member.
+        /// </summary>
+        public abstract Type MemberType { get; }
+
         /// <summary>
         ///     Attempts to get a member value from a 'from' instance.
         /// </summary>
@@ -26,8 +32,6 @@ namespace KodeKandy.Mapnificent.Bindngs
         /// <param name="fromValue">The out value set if anything is a value can be retrieved.</param>
         /// <returns>True if a value was retrieved, otherwise false.</returns>
         public abstract bool TryGetFromValue(object fromDeclaringInstance, Mapper mapper, out object fromValue);
-
-        public abstract string Description { get; }
     }
 
     /// <summary>
@@ -42,22 +46,21 @@ namespace KodeKandy.Mapnificent.Bindngs
         /// </summary>
         public string MemberPath { get; private set; }
 
+        private readonly Type memberType;
         /// <summary>
         ///     The type of the member.
         /// </summary>
-        public Type MemberType { get; private set; }
+        public override Type MemberType { get { return memberType; } }
 
         public FromMemberDefinition(string memberPath, Type memberType, SafeGetterFunc memberGetter)
-           // : base(declaringType, memberPath, memberType)
         {
             Require.NotNull(memberPath, "memberPath");
             Require.NotNull(memberType, "memberType");
             Require.NotNull(memberGetter, "memberGetter");
 
             MemberPath = memberPath;
-            MemberType = memberType;
+            this.memberType = memberType;
             MemberGetter = memberGetter;
-
         }
 
         /// <summary>
@@ -72,9 +75,9 @@ namespace KodeKandy.Mapnificent.Bindngs
             return MemberGetter(fromDeclaringInstance, out fromValue);
         }
 
-        public override string Description
+        public override string ToString()
         {
-            get { return string.Format("Member:{0}", MemberPath); }
+            return string.Format("Member:{0}", MemberPath);
         }
     }
 
@@ -84,6 +87,11 @@ namespace KodeKandy.Mapnificent.Bindngs
     public class FromCustomDefinition : FromDefinition
     {
         private readonly Func<MappingContext, object> fromFunc;
+
+        /// <summary>
+        ///     The type of the member.
+        /// </summary>
+        public override Type MemberType { get { return ProjectionType.Custom; } }
 
         public FromCustomDefinition(Func<MappingContext, object> fromFunc)
         {
@@ -106,15 +114,20 @@ namespace KodeKandy.Mapnificent.Bindngs
             return true;
         }
 
-        public override string Description
+        public override string ToString()
         {
-            get { return "<Custom>"; }
+            return "<Custom>";
         }
     }
 
     public class FromUndefinedDefinition : FromDefinition
     {
         public static readonly FromUndefinedDefinition Default = new FromUndefinedDefinition();
+
+        /// <summary>
+        ///     The type of the member.
+        /// </summary>
+        public override Type MemberType { get { return ProjectionType.Undefined; } }
 
         private FromUndefinedDefinition()
         {}
@@ -132,9 +145,9 @@ namespace KodeKandy.Mapnificent.Bindngs
             return false;
         }
 
-        public override string Description
+        public override string ToString()
         {
-            get { return "<Undefined>"; }
+            return "<Undefined>";
         }
     }
 }

@@ -1,4 +1,4 @@
-// <copyright file="ToMemberDefinition.cs" company="million miles per hour ltd">
+// <copyright file="ToDefinition.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -15,9 +15,9 @@
 using System;
 using System.Reflection;
 
-namespace KodeKandy.Mapnificent.Bindngs
+namespace KodeKandy.Mapnificent.MemberAccess
 {
-    public class ToMemberDefinition
+    public class ToDefinition
     {
         public KodeKandy.MemberAccessor Accessor { get; private set; }
 
@@ -27,7 +27,7 @@ namespace KodeKandy.Mapnificent.Bindngs
 
         public Type MemberType { get { return Accessor.MemberType; } }
 
-        public ToMemberDefinition(MemberInfo memberInfo)
+        public ToDefinition(MemberInfo memberInfo)
         {
             Require.NotNull(memberInfo, "memberInfo");
 

@@ -33,25 +33,23 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ConstructionContext.cs" />
-    <Compile Include="Conversion.cs" />
-    <Compile Include="ConversionDefinitionBuilder.cs" />
-    <Compile Include="Bindngs\MemberBindingDefinitionValidator.cs" />
-    <Compile Include="Bindngs\MemberDefinitionError.cs" />
-    <Compile Include="Bindngs\FromMemberDefinition.cs" />
+    <Compile Include="Projections\ConstructionContext.cs" />
+    <Compile Include="Projections\Conversion.cs" />
+    <Compile Include="Projections\ConversionDefinitionBuilder.cs" />
+    <Compile Include="MemberAccess\BindingDefinitionValidator.cs" />
+    <Compile Include="MemberAccess\MemberDefinitionError.cs" />
+    <Compile Include="MemberAccess\FromDefinition.cs" />
     <Compile Include="Helpers.cs" />
-    <Compile Include="MapDefinitionBuilder.cs" />
-    <Compile Include="MapDefinitionUndefinedMembersException.cs" />
+    <Compile Include="Projections\MapDefinitionBuilder.cs" />
+    <Compile Include="Projections\MapDefinitionUndefinedMembersException.cs" />
     <Compile Include="Mapper.cs" />
-    <Compile Include="Bindngs\MemberAccessorDefinition.cs" />
-    <Compile Include="Bindngs\MemberBindingDefinition.cs" />
-    <Compile Include="Bindngs\MemberBindingDefinitionBuilder.cs" />
-    <Compile Include="Bindngs\ToMemberDefinition.cs" />
-    <Compile Include="Map.cs" />
+    <Compile Include="MemberAccess\BindingDefinition.cs" />
+    <Compile Include="MemberAccess\BindingDefinitionBuilder.cs" />
+    <Compile Include="MemberAccess\ToDefinition.cs" />
+    <Compile Include="Projections\Map.cs" />
     <Compile Include="MapnificentException.cs" />
-    <Compile Include="ProjectionType.cs" />
+    <Compile Include="Projections\ProjectionType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ToClassSchema.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using KodeKandy.Mapnificent.Projections;
 
 namespace KodeKandy.Mapnificent
 {

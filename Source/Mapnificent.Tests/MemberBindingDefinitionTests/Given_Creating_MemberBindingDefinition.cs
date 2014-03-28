@@ -1,4 +1,5 @@
 using System;
+using KodeKandy.Mapnificent.MemberAccess;
 using NUnit.Framework;
 
 namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
@@ -10,7 +11,7 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
         public void When_ToMemberInfo_Null_Then_Throws_ArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => new MemberBindingDefinition(null, MemberBindingDefinitionType.Auto));
+            Assert.Throws<ArgumentNullException>(() => new BindingDefinition(null, BindingDefinitionType.Auto));
         }
     }
 }

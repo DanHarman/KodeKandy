@@ -14,7 +14,7 @@
 
 using System;
 
-namespace KodeKandy.Mapnificent
+namespace KodeKandy.Mapnificent.Projections
 {
     /// <summary>
     ///     Type safe ConversionOverride builder.

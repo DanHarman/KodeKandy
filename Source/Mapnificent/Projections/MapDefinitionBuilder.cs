@@ -14,8 +14,9 @@
 
 using System;
 using System.Linq.Expressions;
+using KodeKandy.Mapnificent.MemberAccess;
 
-namespace KodeKandy.Mapnificent
+namespace KodeKandy.Mapnificent.Projections
 {
     /// <summary>
     ///     Type safe ConversionOverride builder.
@@ -36,7 +37,7 @@ namespace KodeKandy.Mapnificent
         }
 
         public MapDefinitionBuilder<TFromDeclaring, TToDeclaring> For<TToMember>(Expression<Func<TToDeclaring, TToMember>> toMember,
-            Action<MemberBindingDefinitionBuilder<TFromDeclaring, TToMember>> options)
+            Action<BindingDefinitionBuilder<TFromDeclaring, TToMember>> options)
         {
             Require.NotNull(toMember, "afterMappingAction");
             Require.IsTrue(ExpressionHelpers.IsMemberExpression(toMember), "Parameter 'afterMappingAction' must be a simple expression.");
@@ -46,7 +47,7 @@ namespace KodeKandy.Mapnificent
             var memberBindingDefinition = Map.GetMemberBindingDefinition(toMemberInfo);
 
             // Apply the builder options.
-            var builder = new MemberBindingDefinitionBuilder<TFromDeclaring, TToMember>(memberBindingDefinition);
+            var builder = new BindingDefinitionBuilder<TFromDeclaring, TToMember>(memberBindingDefinition);
             options(builder);
 
             return this;
