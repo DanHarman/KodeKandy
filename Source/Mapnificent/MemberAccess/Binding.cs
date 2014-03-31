@@ -1,4 +1,4 @@
-// <copyright file="BindingDefinition.cs" company="million miles per hour ltd">
+// <copyright file="Binding.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -18,7 +18,7 @@ using KodeKandy.Mapnificent.Projections;
 
 namespace KodeKandy.Mapnificent.MemberAccess
 {
-    public enum BindingDefinitionType
+    public enum BindingType
     {
         /// <summary>
         ///     Binding explicitly defined by config.
@@ -33,12 +33,12 @@ namespace KodeKandy.Mapnificent.MemberAccess
     /// <summary>
     ///     Defines the mapping for a member in a 'to' class from a 'from' class.
     /// </summary>
-    public class BindingDefinition
+    public class Binding
     {
         /// <summary>
         ///     Captures whether the binding was explicitly defined in config or automatically inferred.
         /// </summary>
-        public BindingDefinitionType BindingDefinitionType { get; private set; }
+        public BindingType BindingType { get; private set; }
 
         /// <summary>
         ///     Defines the 'to' member setter details.
@@ -102,15 +102,54 @@ namespace KodeKandy.Mapnificent.MemberAccess
             }
         }
 
-        public BindingDefinition(MemberInfo toMemberInfo, BindingDefinitionType bindingDefinitionType,
+        public Binding(MemberInfo toMemberInfo, BindingType bindingType,
             FromDefinition fromDefinition = null, Conversion conversionOverride = null)
         {
             Require.NotNull(toMemberInfo, "toMemberInfo");
 
-            BindingDefinitionType = bindingDefinitionType;
+            BindingType = bindingType;
             ToDefinition = new ToDefinition(toMemberInfo);
             FromDefinition = fromDefinition ?? FromUndefinedDefinition.Default;
             ConversionOverride = conversionOverride;
+        }
+
+        /// <summary>
+        ///     Applies a map operation between bound properties on the 'from' and 'to' class.
+        /// </summary>
+        /// <param name="mapper"></param>
+        /// <param name="fromDeclaring">An instance of the from class.</param>
+        /// <param name="toDeclaring">An instance of the to class.</param>
+        /// <param name="mapInto"></param>
+        public void Apply(Mapper mapper, object fromDeclaring, object toDeclaring, bool mapInto)
+        {
+            try
+            {
+                Require.NotNull(mapper, "mapper");
+                Require.NotNull(fromDeclaring, "fromDeclaring");
+                Require.NotNull(toDeclaring, "toDeclaring");
+
+                object fromValue;
+
+                if (IsIgnore)
+                    return;
+
+                // 1. Get the 'from' value.
+                var hasValue = FromDefinition.TryGetFromValue(fromDeclaring, mapper, out fromValue);
+
+                if (hasValue)
+                {
+                    // Project the 'from' value if required.
+                    var toValue = ProjectValue(mapper, fromValue, toDeclaring, mapInto);
+
+                    // Set the value.
+                   ToDefinition.Accessor.Setter(toDeclaring, toValue);
+                }
+            }
+            catch (Exception ex)
+            {
+                var msg = string.Format("Error applying binding '{0}'", this);
+                throw new MapnificentException(msg, ex);
+            }
         }
 
         /// <summary>
@@ -121,8 +160,13 @@ namespace KodeKandy.Mapnificent.MemberAccess
         /// <param name="toDeclaringInstance"></param>
         /// <param name="mapInto"></param>
         /// <returns></returns>
-        public object ProjectValue(Mapper mapper, object fromValue, object toDeclaringInstance, bool mapInto)
+        public object ProjectValue(Mapper mapper, object fromValue, object toDeclaringInstance, bool mapInto = false)
         {
+
+            Require.NotNull(mapper, "mapper");
+            Require.NotNull(fromValue, "fromValue");
+            Require.NotNull(toDeclaringInstance, "toDeclaringInstance");
+
             object toValue;
 
             if (HasCustomFromDefintion)
@@ -149,7 +193,7 @@ namespace KodeKandy.Mapnificent.MemberAccess
                 // If this is a value type binding, then order of precedence is:
                 // 1) Apply a conversion override if it is defined.
                 // 2) If the projection is identity i.e. T -> T then do nothing.
-                // 3) Ask the Mapper for a convereter.
+                // 3) Ask the Mapper for a converter.
 
                 Conversion conversion;
 

@@ -3,9 +3,9 @@ using System.Collections.ObjectModel;
 
 namespace KodeKandy.Mapnificent.MemberAccess
 {
-    public static class BindingDefinitionValidator
+    public static class BindingValidator
     {
-        public static ReadOnlyCollection<MemberDefinitionError> Validate(BindingDefinition definition, Mapper mapper)
+        public static ReadOnlyCollection<MemberDefinitionError> Validate(Binding definition, Mapper mapper)
         {
             var memberDefinitionErrors = new List<MemberDefinitionError>();
 

@@ -1,4 +1,4 @@
-// <copyright file="BindingDefinitionBuilder.cs" company="million miles per hour ltd">
+// <copyright file="BindingBuilder.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -24,13 +24,13 @@ namespace KodeKandy.Mapnificent.MemberAccess
     /// </summary>
     /// <typeparam name="TFromDeclaring">Declaring type of the 'from' class.</typeparam>
     /// <typeparam name="TToMember">Type of the 'to' member being set.</typeparam>
-    public class BindingDefinitionBuilder<TFromDeclaring, TToMember>
+    public class BindingBuilder<TFromDeclaring, TToMember>
     {
-        public BindingDefinition BindingDefinition { get; private set; }
+        public Binding Binding { get; private set; }
 
-        public BindingDefinitionBuilder(BindingDefinition bindingDefinition)
+        public BindingBuilder(Binding binding)
         {
-            BindingDefinition = bindingDefinition;
+            Binding = binding;
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace KodeKandy.Mapnificent.MemberAccess
         /// <typeparam name="TFromMember"></typeparam>
         /// <param name="fromMember"></param>
         /// <returns></returns>
-        public BindingDefinitionBuilder<TFromDeclaring, TToMember> From<TFromMember>(
+        public BindingBuilder<TFromDeclaring, TToMember> From<TFromMember>(
             Expression<Func<TFromDeclaring, TFromMember>> fromMember)
         {
             Require.NotNull(fromMember, "fromMember");
@@ -53,7 +53,7 @@ namespace KodeKandy.Mapnificent.MemberAccess
             var fromMemberPath = String.Join(".", memberInfos.Select(x => x.Name));
             var fromMemberGetter = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
 
-            BindingDefinition.FromDefinition = new FromMemberDefinition(fromMemberPath, typeof(TFromMember), fromMemberGetter);
+            Binding.FromDefinition = new FromMemberDefinition(fromMemberPath, typeof(TFromMember), fromMemberGetter);
 
             return this;
         }
@@ -64,9 +64,9 @@ namespace KodeKandy.Mapnificent.MemberAccess
         ///     so that the mapping definition will validate.
         /// </summary>
         /// <returns></returns>
-        public BindingDefinitionBuilder<TFromDeclaring, TToMember> Ignore()
+        public BindingBuilder<TFromDeclaring, TToMember> Ignore()
         {
-            BindingDefinition.IsIgnore = true;
+            Binding.IsIgnore = true;
 
             return this;
         }
@@ -77,16 +77,16 @@ namespace KodeKandy.Mapnificent.MemberAccess
         /// <typeparam name="TFrom"></typeparam>
         /// <param name="fromFunc"></param>
         /// <returns></returns>
-        public BindingDefinitionBuilder<TFromDeclaring, TToMember> Custom(Func<MappingContext, TToMember> fromFunc)
+        public BindingBuilder<TFromDeclaring, TToMember> Custom(Func<MappingContext, TToMember> fromFunc)
         {
             Require.NotNull(fromFunc, "fromFunc");
 
-            BindingDefinition.FromDefinition = new FromCustomDefinition(ctx => (object) fromFunc(ctx));
+            Binding.FromDefinition = new FromCustomDefinition(ctx => (object) fromFunc(ctx));
 
             return this;
         }
 
-        //public BindingDefinitionBuilder<TToMember> ConstructedBy(Func<TToMember> constructor)
+        //public BindingBuilder<TToMember> ConstructedBy(Func<TToMember> constructor)
         //{
         //    return this;
         //}

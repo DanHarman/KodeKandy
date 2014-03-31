@@ -13,10 +13,10 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
         {
             // Arrange
             var memberInfo = typeof(SimpleTo).GetMember("StringProp").Single();
-            var sut = new BindingDefinition(memberInfo, BindingDefinitionType.Explicit);
+            var sut = new Binding(memberInfo, BindingType.Explicit);
 
             // Act
-            var res = BindingDefinitionValidator.Validate(sut, new Mapper());
+            var res = BindingValidator.Validate(sut, new Mapper());
 
             // Assert
             Assert.AreEqual("Binding definition does not define a 'from' source.", res[0].Reason);
@@ -27,12 +27,12 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
         {
             // Arrange
             var memberInfo = typeof(SimpleTo).GetMember("StringProp").Single();
-            var sut = new BindingDefinition(memberInfo, BindingDefinitionType.Explicit);
+            var sut = new Binding(memberInfo, BindingType.Explicit);
             sut.FromDefinition = new FromMemberDefinition("StringProp", typeof(string),
                 ReflectionHelpers.CreateSafeWeakMemberChainGetter(new[] {memberInfo}));
 
             // Act
-            var res = BindingDefinitionValidator.Validate(sut, new Mapper());
+            var res = BindingValidator.Validate(sut, new Mapper());
 
             // Assert
             Assert.AreEqual(0, res.Count);
@@ -43,13 +43,13 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
         {
             // Arrange
             var memberInfo = typeof(SimpleTo).GetMember("StringProp").Single();
-            var sut = new BindingDefinition(memberInfo, BindingDefinitionType.Explicit)
+            var sut = new Binding(memberInfo, BindingType.Explicit)
             {
                 FromDefinition = new FromCustomDefinition(context => "Wow")
             };
 
             // Act
-            var res = BindingDefinitionValidator.Validate(sut, new Mapper());
+            var res = BindingValidator.Validate(sut, new Mapper());
 
             // Assert
             Assert.AreEqual(0, res.Count);

@@ -37,17 +37,17 @@ namespace KodeKandy.Mapnificent.Projections
         }
 
         public MapDefinitionBuilder<TFromDeclaring, TToDeclaring> For<TToMember>(Expression<Func<TToDeclaring, TToMember>> toMember,
-            Action<BindingDefinitionBuilder<TFromDeclaring, TToMember>> options)
+            Action<BindingBuilder<TFromDeclaring, TToMember>> options)
         {
             Require.NotNull(toMember, "afterMappingAction");
             Require.IsTrue(ExpressionHelpers.IsMemberExpression(toMember), "Parameter 'afterMappingAction' must be a simple expression.");
 
-            // Obtain a bindingDefinition.
+            // Obtain a Binding.
             var toMemberInfo = ExpressionHelpers.GetMemberInfo(toMember);
             var memberBindingDefinition = Map.GetMemberBindingDefinition(toMemberInfo);
 
             // Apply the builder options.
-            var builder = new BindingDefinitionBuilder<TFromDeclaring, TToMember>(memberBindingDefinition);
+            var builder = new BindingBuilder<TFromDeclaring, TToMember>(memberBindingDefinition);
             options(builder);
 
             return this;

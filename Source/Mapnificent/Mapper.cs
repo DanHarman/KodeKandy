@@ -14,15 +14,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using KodeKandy.Mapnificent.Projections;
 
 namespace KodeKandy.Mapnificent
 {
     /// <summary>
     ///     A mapper that can copy values between two class based on defined and implied relationships.
-    /// A projection from a class to a class is called a 'map'.
-    /// A projection from a class to a value type is called a 'conversion'.
+    ///     A projection from a class to a class is called a 'map'.
+    ///     A projection from a class to a value type is called a 'conversion'.
     /// </summary>
     public class Mapper
     {

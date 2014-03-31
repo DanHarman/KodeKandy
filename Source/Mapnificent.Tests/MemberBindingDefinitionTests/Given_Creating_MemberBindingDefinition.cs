@@ -11,7 +11,7 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
         public void When_ToMemberInfo_Null_Then_Throws_ArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => new BindingDefinition(null, BindingDefinitionType.Auto));
+            Assert.Throws<ArgumentNullException>(() => new Binding(null, BindingType.Auto));
         }
     }
 }

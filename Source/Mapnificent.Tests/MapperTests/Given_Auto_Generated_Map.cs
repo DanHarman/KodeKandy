@@ -19,7 +19,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
             var res = map.Bindings;
 
             // Assert
-            Assert.IsTrue(res.All(b => b.BindingDefinitionType == BindingDefinitionType.Auto));
+            Assert.IsTrue(res.All(b => b.BindingType == BindingType.Auto));
         }
 
         [Test]
