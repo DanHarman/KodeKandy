@@ -83,7 +83,6 @@
   <ItemGroup>
     <Compile Include="ObservableListTests\Given_Observing_CollectionChanged_Events.cs" />
     <Compile Include="ObservableListTests\Given_Observing_CollectionChanges.cs" />
-    <Compile Include="ObservableListTests\KKAssert.cs" />
     <Compile Include="ObservableObjectTests\Given_Observing_PropertyChanged_Events.cs" />
     <Compile Include="ObservableObjectTests\TestObservableObject.cs" />
     <Compile Include="ObservableObjectTests\Given_Observing_PropertyChanges.cs" />
@@ -96,6 +95,10 @@
     <ProjectReference Include="..\Panopticon\Panopticon.csproj">
       <Project>{cf86e617-096f-472b-80ea-525b7abd21b2}</Project>
       <Name>Panopticon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\QualityTools\QualityTools.csproj">
+      <Project>{87212236-C4EE-43E0-8B64-F69765EF415B}</Project>
+      <Name>QualityTools</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

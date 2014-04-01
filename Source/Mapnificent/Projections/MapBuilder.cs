@@ -1,4 +1,4 @@
-// <copyright file="MapDefinitionBuilder.cs" company="million miles per hour ltd">
+// <copyright file="MapBuilder.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -23,12 +23,12 @@ namespace KodeKandy.Mapnificent.Projections
     /// </summary>
     /// <typeparam name="TFromDeclaring">The type being mapped from.</typeparam>
     /// <typeparam name="TToDeclaring">The type being mapped to.</typeparam>
-    public class MapDefinitionBuilder<TFromDeclaring, TToDeclaring>
+    public class MapBuilder<TFromDeclaring, TToDeclaring>
         where TToDeclaring : class
     {
         public Map Map { get; private set; }
 
-        public MapDefinitionBuilder(Map map)
+        public MapBuilder(Map map)
         {
             Require.IsTrue(map.ProjectionType.FromType == typeof(TFromDeclaring));
             Require.IsTrue(map.ProjectionType.ToType == typeof(TToDeclaring));
@@ -36,7 +36,7 @@ namespace KodeKandy.Mapnificent.Projections
             Map = map;
         }
 
-        public MapDefinitionBuilder<TFromDeclaring, TToDeclaring> For<TToMember>(Expression<Func<TToDeclaring, TToMember>> toMember,
+        public MapBuilder<TFromDeclaring, TToDeclaring> For<TToMember>(Expression<Func<TToDeclaring, TToMember>> toMember,
             Action<BindingBuilder<TFromDeclaring, TToMember>> options)
         {
             Require.NotNull(toMember, "afterMappingAction");
@@ -53,7 +53,7 @@ namespace KodeKandy.Mapnificent.Projections
             return this;
         }
 
-        public MapDefinitionBuilder<TFromDeclaring, TToDeclaring> AfterMapping(Action<TFromDeclaring, TToDeclaring> afterMappingAction)
+        public MapBuilder<TFromDeclaring, TToDeclaring> AfterMapping(Action<TFromDeclaring, TToDeclaring> afterMappingAction)
         {
             Require.NotNull(afterMappingAction, "afterMappingAction");
 
@@ -62,7 +62,7 @@ namespace KodeKandy.Mapnificent.Projections
             return this;
         }
 
-        public MapDefinitionBuilder<TFromDeclaring, TToDeclaring> ConstructedBy(Func<ConstructionContext, TToDeclaring> constructedBy)
+        public MapBuilder<TFromDeclaring, TToDeclaring> ConstructedBy(Func<ConstructionContext, TToDeclaring> constructedBy)
         {
             Require.NotNull(constructedBy, "constructedBy");
 
@@ -71,20 +71,17 @@ namespace KodeKandy.Mapnificent.Projections
             return this;
         }
 
-        public MapDefinitionBuilder<TFromDeclaring, TToDeclaring> InheritsFrom<TFromInherits, TToInherits>()
+        public MapBuilder<TFromDeclaring, TToDeclaring> InheritsFrom<TFromInherits, TToInherits>()
         {
-            return InheritsFrom(new ProjectionType(typeof(TFromInherits), typeof(TToInherits)));
+            Map.InheritsFrom = ProjectionType.Create<TFromInherits, TToInherits>();
+
+            return this;
         }
 
-        public MapDefinitionBuilder<TFromDeclaring, TToDeclaring> InheritsFrom(ProjectionType projectionType)
-        {
-            Require.NotNull(projectionType, "projectionType");
-            Require.IsTrue(projectionType.FromType.IsAssignableFrom(Map.ProjectionType.FromType), 
-                String.Format("Cannot inherit from a map whose 'From' type '{0}' is not a supertype of this maps 'From' type '{1}'.", projectionType.FromType.Name, Map.ProjectionType.FromType.Name));
-            Require.IsTrue(projectionType.ToType.IsAssignableFrom(Map.ProjectionType.ToType),
-                String.Format("Cannot inherit from a map whose 'To' type '{0}' is not a supertype of this maps 'To' type '{1}'.", projectionType.FromType.Name, Map.ProjectionType.FromType.Name));
 
-            Map.InheritsFrom = projectionType;
+        public MapBuilder<TFromDeclaring, TToDeclaring> PolymorhpicFor<TFromDerived, TToDerived>()
+        {
+            Map.AddPolymorphicFor(ProjectionType.Create<TFromDerived, TToDerived>());
 
             return this;
         }

@@ -53,7 +53,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="MapperTests\Given_Auto_Generated_Map.cs" />
-    <Compile Include="MapperTests\Given_Inherited_Map.cs" />
+    <Compile Include="MapperTests\Given_Mapping_With_Inheritance.cs" />
+    <Compile Include="MapperTests\Given_Setting_Map_Properties.cs" />
     <Compile Include="MapperTests\Given_Mapper.cs" />
     <Compile Include="MemberBindingDefinitionTests\Given_Creating_MemberBindingDefinition.cs" />
     <Compile Include="MapperTests\Given_Auto_Generated_MapDefinition.cs" />
@@ -83,6 +84,10 @@
     <ProjectReference Include="..\Mapnificent\Mapnificent.csproj">
       <Project>{57109029-cb11-4cac-ac9c-ee0cc008a5ce}</Project>
       <Name>Mapnificent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\QualityTools\QualityTools.csproj">
+      <Project>{87212236-c4ee-43e0-8b64-f69765ef415b}</Project>
+      <Name>QualityTools</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

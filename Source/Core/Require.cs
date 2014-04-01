@@ -22,14 +22,14 @@ namespace KodeKandy
         /// <summary>
         ///     Ensures that a value is not null.
         /// </summary>
-        public static void NotNull<T>(T parameter, [InvokerParameterName] string parameterName = null, string message = null)
+        public static void NotNull<T>(T parameter, [InvokerParameterName] string parameterName, string message = null)
             where T : class
         {
             if (parameter != null)
                 return;
 
-            message = message ?? String.Format("Argument '{0}' of type {1} was null", parameterName ?? "<undefined>", typeof(T));
-
+            if (message == null)
+                throw new ArgumentNullException(parameterName);
             throw new ArgumentNullException(parameterName, message);
         }
 
@@ -37,12 +37,12 @@ namespace KodeKandy
         /// <summary>
         ///     Require tha that the string value is not null or empty.
         /// </summary>
-        public static void NotNullOrEmpty(string parameter, [InvokerParameterName] string parameterName = null, string message = null)
+        public static void NotNullOrEmpty(string parameter, [InvokerParameterName] string parameterName, string message = null)
         {
             if (!String.IsNullOrEmpty(parameter))
                 return;
 
-            message = message ?? String.Format("String argument {0} was null or empty", parameterName ?? "<undefined>");
+            message = message ?? String.Format("String argument {0} was null or empty", parameterName);
 
             throw new ArgumentNullException(parameterName, message);
         }
@@ -55,6 +55,8 @@ namespace KodeKandy
             if (predicateResult)
                 return;
 
+            if (parameterName == null)
+                throw new Exception(message ?? "Require.IsTrue predicate result was false");
             throw new ArgumentException(message ?? "Require.IsTrue predicate result was false", parameterName);
         }
 
@@ -66,6 +68,8 @@ namespace KodeKandy
             if (!predicateResult)
                 return;
 
+            if (parameterName == null)
+                throw new Exception(message ?? "Require.IsFalse predicate result was true");
             throw new ArgumentException(message ?? "Require.IsFalse predicate result was true", parameterName);
         }
     }

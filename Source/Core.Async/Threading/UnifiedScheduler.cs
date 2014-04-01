@@ -29,8 +29,8 @@ namespace KodeKandy.Threading
         protected UnifiedScheduler(string name, IScheduler rxScheduler, TaskScheduler taskScheduler)
         {
             Require.NotNullOrEmpty(name, "name");
-            Require.NotNull(rxScheduler);
-            Require.NotNull(taskScheduler);
+            Require.NotNull(rxScheduler, "rxScheduler");
+            Require.NotNull(taskScheduler, "taskScheduler");
 
             Name = name;
             this.rxScheduler = rxScheduler;

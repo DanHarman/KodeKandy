@@ -12,6 +12,7 @@
 // 
 // </copyright>
 
+using KodeKandy.QualityTools;
 using Microsoft.Reactive.Testing;
 using NUnit.Framework;
 
@@ -42,7 +43,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
             sut.Add(99);
 
             // Assert
-            KKAssert.AreEqual(expected, observer.Messages);
+            KKAssert.AreEqualByValue(expected, observer.Messages);
         }
 
         [Test]
@@ -67,7 +68,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
             sut.Remove(100);
 
             // Assert
-            KKAssert.AreEqual(expected, observer.Messages);
+            KKAssert.AreEqualByValue(expected, observer.Messages);
         }
 
         [Test]
@@ -92,7 +93,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
             sut.RemoveAt(2);
 
             // Assert
-            KKAssert.AreEqual(expected, observer.Messages);
+            KKAssert.AreEqualByValue(expected, observer.Messages);
         }
 
         [Test]
@@ -117,7 +118,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
             sut.Insert(0, 101);
 
             // Assert
-            KKAssert.AreEqual(expected, observer.Messages);
+            KKAssert.AreEqualByValue(expected, observer.Messages);
         }
 
         [Test]
@@ -139,7 +140,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
             sut.Clear();
 
             // Assert
-            KKAssert.AreEqual(expected, observer.Messages);
+            KKAssert.AreEqualByValue(expected, observer.Messages);
         }
 
         [Test]

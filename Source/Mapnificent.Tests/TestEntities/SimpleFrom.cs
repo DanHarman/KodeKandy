@@ -15,7 +15,7 @@ namespace KodeKandy.Mapnificent.Tests.TestEntities
 
     public class CarFrom : VehicleFrom
     {
-        public int NoSeats { get; set; }
+        public int NumSeats { get; set; }
     }
 
     public class VehicleTo
@@ -25,6 +25,6 @@ namespace KodeKandy.Mapnificent.Tests.TestEntities
 
     public class CarTo : VehicleTo
     {
-        public int NoSeats { get; set; }
+        public int NumSeats { get; set; }
     }
 }

@@ -32,7 +32,8 @@ namespace KodeKandy.Mapnificent.Projections
         public Mapper Mapper { get; private set; }
 
         private Func<ConstructionContext, object> constructedBy;
-        public Func<ConstructionContext, object> ConstructedBy {
+        public Func<ConstructionContext, object> ConstructedBy
+        {
             get { return constructedBy; }
             set
             {
@@ -60,25 +61,58 @@ namespace KodeKandy.Mapnificent.Projections
             get { return cachedBindings ?? (cachedBindings = GenerateBindings()); }
         }
 
-        public ProjectionType InheritsFrom { get; set; }
+        private ProjectionType inheritsFrom;
+        public ProjectionType InheritsFrom
+        {
+            get { return inheritsFrom; }
+            set
+            {
+                Require.NotNull(value, "value");
+                Require.IsTrue(value.FromType.IsAssignableFrom(ProjectionType.FromType),
+                    String.Format("Cannot inherit from a map whose 'From' type '{0}' is not a supertype of this maps 'From' type '{1}'.",
+                        value.FromType.Name, ProjectionType.FromType.Name));
+                Require.IsTrue(value.ToType.IsAssignableFrom(ProjectionType.ToType),
+                    String.Format("Cannot inherit from a map whose 'To' type '{0}' is not a supertype of this maps 'To' type '{1}'.",
+                        value.ToType.Name, ProjectionType.ToType.Name));
+
+                inheritsFrom = value;
+            }
+        }
 
         private readonly List<ProjectionType> polymorphicFor = new List<ProjectionType>();
-        public ReadOnlyCollection<ProjectionType> PolymoprhicFor
+        public ReadOnlyCollection<ProjectionType> PolymorphicFor
         {
             get { return new ReadOnlyCollection<ProjectionType>(polymorphicFor); }
+        }
+
+        public void AddPolymorphicFor(ProjectionType polymoprhicForProjectionType)
+        {
+            Require.NotNull(polymoprhicForProjectionType, "polymoprhicForProjectionType");
+
+            Require.IsTrue(ProjectionType.FromType.IsAssignableFrom(polymoprhicForProjectionType.FromType), 
+                String.Format("Cannot be polymorphic for a map whose 'From' type '{0}' is not a subtype of this maps 'From' type '{1}'.",
+                    polymoprhicForProjectionType.FromType.Name, ProjectionType.FromType.Name));
+
+            Require.IsTrue(ProjectionType.ToType.IsAssignableFrom(polymoprhicForProjectionType.ToType),
+                String.Format("Cannot be polymorphic for a map whose 'To' type '{0}' is not a subtype of this maps 'To' type '{1}'.",
+                    polymoprhicForProjectionType.ToType.Name, ProjectionType.ToType.Name));
+
+            // TODO - Need to guard against ambiguous poly maps.
+
+            polymorphicFor.Add(polymoprhicForProjectionType);
         }
 
         public ProjectionType ProjectionType { get; private set; }
 
         public Map(ProjectionType projectionType, Mapper mapper)
         {
-            Require.NotNull(projectionType);
-            Require.NotNull(mapper);
+            Require.NotNull(projectionType, "projectionType");
+            Require.NotNull(mapper, "mapper");
             Require.IsTrue(projectionType.ToType.IsClass);
 
             ProjectionType = projectionType;
             Mapper = mapper;
-            ConstructedBy = _ => Activator.CreateInstance(ProjectionType.ToType); 
+            ConstructedBy = _ => Activator.CreateInstance(ProjectionType.ToType);
         }
 
         public Binding GetMemberBindingDefinition(MemberInfo toMemberInfo)
@@ -91,11 +125,6 @@ namespace KodeKandy.Mapnificent.Projections
             }
 
             return binding;
-        }
-
-        public void AddPolymorphic(ProjectionType projectionType)
-        {
-            polymorphicFor.Add(projectionType);
         }
 
         /// <summary>
@@ -190,11 +219,20 @@ namespace KodeKandy.Mapnificent.Projections
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <param name="mapInto">If true, attemps to map into an existing object graph rather than recreating all children.</param>
-        public void Apply(object from, object to, bool mapInto = false)
+        public object Apply(object from, object to, Type fromType, Type toType, bool mapInto = false)
         {
             Require.NotNull(from, "from");
-            Require.NotNull(to, "to");
-            Require.NotNull(Mapper, "Mapper");
+
+            // Redirect to polymorphic map if there is a match.
+            var projectionType = PolymorphicFor.FirstOrDefault(pt => pt.FromType == from.GetType());
+            if (projectionType != null)
+            {
+                var map = Mapper.GetMap(projectionType);
+                return map.Apply(from, to, fromType, toType, mapInto);
+            }
+
+            if (to == null)
+                to = ConstructedBy(new ConstructionContext(Mapper, from, null));
 
             foreach (var binding in Bindings)
             {
@@ -203,6 +241,8 @@ namespace KodeKandy.Mapnificent.Projections
 
             if (PostMapStep != null)
                 PostMapStep(from, to);
+
+            return to;
         }
 
         public object CreateInstanceOfTo(object fromInstance)

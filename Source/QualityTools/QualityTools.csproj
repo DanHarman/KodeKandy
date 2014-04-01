@@ -2,18 +2,16 @@
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{57109029-CB11-4CAC-AC9C-EE0CC008A5CE}</ProjectGuid>
+    <ProjectGuid>{87212236-C4EE-43E0-8B64-F69765EF415B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KodeKandy.Mapnificent</RootNamespace>
-    <AssemblyName>KodeKandy.Mapnificent</AssemblyName>
+    <RootNamespace>KodeKandy.QualityTools</RootNamespace>
+    <AssemblyName>KodeKandy.QualityTools</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Profile136</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,31 +31,29 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Projections\ConstructionContext.cs" />
-    <Compile Include="Projections\Conversion.cs" />
-    <Compile Include="Projections\ConversionDefinitionBuilder.cs" />
-    <Compile Include="MemberAccess\BindingValidator.cs" />
-    <Compile Include="MemberAccess\MemberDefinitionError.cs" />
-    <Compile Include="MemberAccess\FromDefinition.cs" />
-    <Compile Include="Helpers.cs" />
-    <Compile Include="Projections\MapBuilder.cs" />
-    <Compile Include="Projections\MapUndefinedMembersException.cs" />
-    <Compile Include="Mapper.cs" />
-    <Compile Include="MemberAccess\Binding.cs" />
-    <Compile Include="MemberAccess\BindingBuilder.cs" />
-    <Compile Include="MemberAccess\ToDefinition.cs" />
-    <Compile Include="Projections\Map.cs" />
-    <Compile Include="MapnificentException.cs" />
-    <Compile Include="Projections\ProjectionType.cs" />
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="KKAssert.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj">
-      <Project>{8c39cca4-f76c-4ee8-b27d-a0a1ccb91300}</Project>
-      <Name>Core</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

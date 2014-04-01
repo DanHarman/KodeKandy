@@ -186,7 +186,7 @@ namespace KodeKandy.Mapnificent.MemberAccess
                 else
                     toValue = map.CreateInstanceOfTo(fromValue);
 
-                map.Apply(fromValue, toValue);
+                map.Apply(fromValue, toValue, FromType, ToType, mapInto);
             }
             else
             {

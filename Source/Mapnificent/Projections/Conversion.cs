@@ -36,7 +36,7 @@ namespace KodeKandy.Mapnificent.Projections
 
         public Conversion(ProjectionType projectionType)
         {
-            Require.NotNull(projectionType);
+            Require.NotNull(projectionType, "projectionType");
             Require.IsFalse(projectionType.ToType.IsClass);
 
             ProjectionType = projectionType;

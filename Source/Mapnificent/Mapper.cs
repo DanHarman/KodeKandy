@@ -41,7 +41,7 @@ namespace KodeKandy.Mapnificent
             DefineMap<string, string>().ConstructedBy(ctx => (string) ctx.FromInstance);
         }
 
-        public MapDefinitionBuilder<TFrom, TTo> DefineMap<TFrom, TTo>()
+        public MapBuilder<TFrom, TTo> DefineMap<TFrom, TTo>()
             where TTo : class
         {
             var mappingType = new ProjectionType(typeof(TFrom), typeof(TTo));
@@ -53,7 +53,7 @@ namespace KodeKandy.Mapnificent
                 mapDefinitions.Add(mappingType, definition);
             }
 
-            return new MapDefinitionBuilder<TFrom, TTo>(definition);
+            return new MapBuilder<TFrom, TTo>(definition);
         }
 
         public ConversionDefinitionBuilder<TFrom, TTo> DefineConversion<TFrom, TTo>()
@@ -139,11 +139,46 @@ namespace KodeKandy.Mapnificent
                 Require.NotNull(to, "to");
 
                 var map = GetMap(from.GetType(), to.GetType());
-                map.Apply(from, to);
+                map.Apply(from, to, from.GetType(), to.GetType(), true);
             }
             catch (Exception ex)
             {
-                var msg = string.Format("Error mapping between object of type '{0}' -> '{1}'", from.SafeGetTypeName(), to.SafeGetTypeName());
+                var msg = string.Format("Error mapping into between objects of type '{0}' -> '{1}'", from.SafeGetTypeName(), to.SafeGetTypeName());
+                throw new MapnificentException(msg, ex);
+            }
+        }
+
+        public TTo Map<TFrom, TTo>(TFrom from)
+            where TFrom : class
+            where TTo : class
+        {
+            try
+            {
+                Require.NotNull(from, "from");
+
+                var map = GetMap(typeof(TFrom), typeof(TTo));
+                return (TTo) map.Apply(from, null, typeof(TFrom), typeof(TTo));
+            }
+            catch (Exception ex)
+            {
+                var msg = string.Format("Error mapping between objects of type '{0}' -> '{1}'", typeof(TFrom).Name, typeof(TTo).Name);
+                throw new MapnificentException(msg, ex);
+            }
+        }
+
+        public TTo Map<TTo>(object from)
+            where TTo : class
+        {
+            try
+            {
+                Require.NotNull(from, "from");
+
+                var map = GetMap(from.GetType(), typeof(TTo));
+                return (TTo)map.Apply(from, null, from.GetType(), typeof(TTo));
+            }
+            catch (Exception ex)
+            {
+                var msg = string.Format("Error mapping between objects of type '{0}' -> '{1}'", from.GetType().Name, typeof(TTo).Name);
                 throw new MapnificentException(msg, ex);
             }
         }

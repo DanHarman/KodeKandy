@@ -26,4 +26,19 @@ namespace KodeKandy.Mapnificent
         {
         }
     }
+
+    /// <summary>
+    ///     An error associated with an error in the definition of a map.
+    /// </summary>
+    public class MapDefinitionError : MapnificentException
+    {
+        public MapDefinitionError(string message) : base(message)
+        {
+        }
+
+        public MapDefinitionError(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+    }
 }

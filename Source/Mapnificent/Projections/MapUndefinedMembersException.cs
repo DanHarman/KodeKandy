@@ -1,4 +1,4 @@
-// <copyright file="MapDefinitionUndefinedMembersException.cs" company="million miles per hour ltd">
+// <copyright file="MapUndefinedMembersException.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -19,11 +19,11 @@ using System.Text;
 
 namespace KodeKandy.Mapnificent.Projections
 {
-    public class MapDefinitionUndefinedMembersException : Exception
+    public class MapUndefinedMembersException : Exception
     {
         public IEnumerable<MemberInfo> UndefinedMemberInfos { get; private set; }
 
-        public MapDefinitionUndefinedMembersException(IEnumerable<MemberInfo> undefinedMemberInfos) : base(CreateErrorString(undefinedMemberInfos))
+        public MapUndefinedMembersException(IEnumerable<MemberInfo> undefinedMemberInfos) : base(CreateErrorString(undefinedMemberInfos))
         {
             UndefinedMemberInfos = undefinedMemberInfos;
         }
