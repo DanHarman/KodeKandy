@@ -57,6 +57,23 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
                 "Cannot be polymorphic for a map whose 'To' type 'SimpleTo' is not a subtype of this maps 'To' type 'VehicleTo'.");
         }
 
+        /// <summary>
+        ///     This needs to be verified as in polymophic scenarios we don't know the 'to' type so must infer it form the 'form'
+        ///     type, hence only one polymophic definition per 'from' type.
+        /// </summary>
+        [Test]
+        public void When_PolymorphicFor_From_Type_Then_Throws()
+        {
+            // Arrange
+            var mapper = new Mapper();
+            var sut = new Map(ProjectionType.Create<VehicleFrom, VehicleTo>(), mapper);
+            sut.AddPolymorphicFor(ProjectionType.Create<CarFrom, CarTo>());
+
+            // Act
+            KKAssert.Throws<Exception>(() => sut.AddPolymorphicFor(ProjectionType.Create<CarFrom, VehicleTo>()),
+                "Illegal 'polymorphic for' defintion. A definition has already been registered for the 'from' type 'CarFrom' and would be made ambiguous by this one.");
+        }
+
         [Test]
         public void When_AddPolymorphicFor_Then_Is_Added_To_Map()
         {

@@ -139,7 +139,7 @@ namespace KodeKandy.Mapnificent
                 Require.NotNull(to, "to");
 
                 var map = GetMap(from.GetType(), to.GetType());
-                map.Apply(from, to, from.GetType(), to.GetType(), true);
+                map.Apply(from, to, true);
             }
             catch (Exception ex)
             {
@@ -157,7 +157,7 @@ namespace KodeKandy.Mapnificent
                 Require.NotNull(from, "from");
 
                 var map = GetMap(typeof(TFrom), typeof(TTo));
-                return (TTo) map.Apply(from, null, typeof(TFrom), typeof(TTo));
+                return (TTo) map.Apply(from);
             }
             catch (Exception ex)
             {
@@ -174,7 +174,7 @@ namespace KodeKandy.Mapnificent
                 Require.NotNull(from, "from");
 
                 var map = GetMap(from.GetType(), typeof(TTo));
-                return (TTo)map.Apply(from, null, from.GetType(), typeof(TTo));
+                return (TTo)map.Apply(from);
             }
             catch (Exception ex)
             {

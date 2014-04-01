@@ -85,21 +85,23 @@ namespace KodeKandy.Mapnificent.Projections
             get { return new ReadOnlyCollection<ProjectionType>(polymorphicFor); }
         }
 
-        public void AddPolymorphicFor(ProjectionType polymoprhicForProjectionType)
+        public void AddPolymorphicFor(ProjectionType projectionType)
         {
-            Require.NotNull(polymoprhicForProjectionType, "polymoprhicForProjectionType");
+            Require.NotNull(projectionType, "projectionType");
 
-            Require.IsTrue(ProjectionType.FromType.IsAssignableFrom(polymoprhicForProjectionType.FromType), 
+            Require.IsTrue(ProjectionType.FromType.IsAssignableFrom(projectionType.FromType), 
                 String.Format("Cannot be polymorphic for a map whose 'From' type '{0}' is not a subtype of this maps 'From' type '{1}'.",
-                    polymoprhicForProjectionType.FromType.Name, ProjectionType.FromType.Name));
+                    projectionType.FromType.Name, ProjectionType.FromType.Name));
 
-            Require.IsTrue(ProjectionType.ToType.IsAssignableFrom(polymoprhicForProjectionType.ToType),
+            Require.IsTrue(ProjectionType.ToType.IsAssignableFrom(projectionType.ToType),
                 String.Format("Cannot be polymorphic for a map whose 'To' type '{0}' is not a subtype of this maps 'To' type '{1}'.",
-                    polymoprhicForProjectionType.ToType.Name, ProjectionType.ToType.Name));
+                    projectionType.ToType.Name, ProjectionType.ToType.Name));
 
-            // TODO - Need to guard against ambiguous poly maps.
+            Require.IsFalse(polymorphicFor.Any(pt => pt.FromType == projectionType.FromType),
+                String.Format("Illegal 'polymorphic for' defintion. A definition has already been registered for the 'from' type '{0}' and would be made ambiguous by this one.",
+                    projectionType.FromType.Name));
 
-            polymorphicFor.Add(polymoprhicForProjectionType);
+            polymorphicFor.Add(projectionType);
         }
 
         public ProjectionType ProjectionType { get; private set; }
@@ -219,7 +221,7 @@ namespace KodeKandy.Mapnificent.Projections
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <param name="mapInto">If true, attemps to map into an existing object graph rather than recreating all children.</param>
-        public object Apply(object from, object to, Type fromType, Type toType, bool mapInto = false)
+        public object Apply(object from, object to = null, bool mapInto = false)
         {
             Require.NotNull(from, "from");
 
@@ -227,8 +229,8 @@ namespace KodeKandy.Mapnificent.Projections
             var projectionType = PolymorphicFor.FirstOrDefault(pt => pt.FromType == from.GetType());
             if (projectionType != null)
             {
-                var map = Mapper.GetMap(projectionType);
-                return map.Apply(from, to, fromType, toType, mapInto);
+                var polyMap = Mapper.GetMap(projectionType);
+                return polyMap.Apply(from, to, mapInto);
             }
 
             if (to == null)

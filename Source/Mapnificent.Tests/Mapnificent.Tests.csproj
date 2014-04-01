@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="MapperTests\Given_Auto_Generated_Map.cs" />
     <Compile Include="MapperTests\Given_Mapping_With_Inheritance.cs" />
+    <Compile Include="MapperTests\Given_Mapping_With_Polymorphism.cs" />
     <Compile Include="MapperTests\Given_Setting_Map_Properties.cs" />
     <Compile Include="MapperTests\Given_Mapper.cs" />
     <Compile Include="MemberBindingDefinitionTests\Given_Creating_MemberBindingDefinition.cs" />
