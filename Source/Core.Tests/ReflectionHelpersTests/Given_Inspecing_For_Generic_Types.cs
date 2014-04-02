@@ -15,7 +15,7 @@ namespace KodeKandy.ReflectionHelpersTests
         public void When_Inspecting_Type_For_IEnumerable_Then_Result_Expected(Type type, bool expected)
         {
             // Act
-            var res = type.DoesImplementsGenericType(typeof(IEnumerable<>));
+            var res = type.DoesImplementGenericType(typeof(IEnumerable<>));
 
             // Assert
             Assert.AreEqual(expected, res);
@@ -38,7 +38,7 @@ namespace KodeKandy.ReflectionHelpersTests
         public void When_GenericType_Param_Is_Not_Generic_Then_Throws()
         {
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => typeof(string).DoesImplementsGenericType(typeof(int)), "Must be a generic type.");
+            Assert.Throws<ArgumentException>(() => typeof(string).DoesImplementGenericType(typeof(int)), "Must be a generic type.");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// <copyright file="MapInto.cs" company="million miles per hour ltd">
+﻿// <copyright file="Map.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -9,10 +9,10 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -159,6 +159,9 @@ namespace KodeKandy.Mapnificent.Projections
         {
             var mapDefinitionErrors = Validate();
 
+
+            // TODO check defined poly maps exist
+
             if (mapDefinitionErrors.Any())
             {
                 throw new Exception();
@@ -227,12 +230,9 @@ namespace KodeKandy.Mapnificent.Projections
             Require.NotNull(from, "from");
 
             // Redirect to polymorphic map if there is a match.
-            var projectionType = PolymorphicFor.FirstOrDefault(pt => pt.FromType == from.GetType());
-            if (projectionType != null)
-            {
-                var polyMap = Mapper.GetMap(projectionType);
+            Map polyMap;
+            if (TryGetPolymorphicMap(from.GetType(), out polyMap))
                 return polyMap.Apply(from, to, mapInto);
-            }
 
             if (to == null || to.GetType() != ProjectionType.ToType)
                 to = ConstructedBy(new ConstructionContext(Mapper, from, null));
@@ -248,7 +248,74 @@ namespace KodeKandy.Mapnificent.Projections
             return to;
         }
 
-      //  private bool ApplyPolymophicMapIfApplicable()
+        /// <summary>
+        ///     Attempt to get a polymorphic map for the supplied 'from' type.
+        /// </summary>
+        /// <param name="fromType">
+        ///     The 'from' type that we are considering polymophic, the 'to' type is implied as we do not allow
+        ///     polymophism from multiple 'from' types. This would cause ambiguity.
+        /// </param>
+        /// <param name="map">The map if there is one, otherwise null.</param>
+        /// <returns>True if a polymorphic map was defined for the 'from' type, otherwise False.</returns>
+        private bool TryGetPolymorphicMap(Type fromType, out Map map)
+        {
+            var projectionType = PolymorphicFor.FirstOrDefault(pt => pt.FromType == fromType);
+            if (projectionType != null)
+            {
+                map = Mapper.GetMap(projectionType);
+                return true;
+            }
 
+            map = null;
+            return false;
+        }
+    }
+
+    public class CollectionMap
+    {
+        private readonly Map itemMap;
+
+        public CollectionMap(Map itemMap)
+        {
+            Require.NotNull(itemMap, "itemMap");
+
+            this.itemMap = itemMap;
+        }
+
+        public ProjectionType ProjectionType
+        {
+            get
+            {
+                var fromType = typeof(IEnumerable<>).MakeGenericType(itemMap.ProjectionType.FromType);
+                var toType = typeof(IList<>).MakeGenericType(itemMap.ProjectionType.ToType);
+
+                return new ProjectionType(fromType, toType);
+            }
+        }
+
+        public static bool IsMappable(ProjectionType projectionType)
+        {
+            return true;
+        }
+
+        public object Apply(object from, object to = null, bool mapInto = false)
+        {
+            Require.NotNull(from, "from");
+            Require.IsTrue(from is IEnumerable);
+            Require.IsFalse(mapInto, "Map into not currenlty support on collection");
+
+            // need to cope with empty to type - if we pass in the expected type then we could instantiate it if its a concrete collection type.
+
+            var fromEnumerable = (IEnumerable) from;
+            var toCollection = (IList) to;
+
+            foreach (var item in fromEnumerable)
+            {
+                var mappedItem = itemMap.Apply(item);
+                toCollection.Add(mappedItem);
+            }
+
+            return to;
+        }
     }
 }

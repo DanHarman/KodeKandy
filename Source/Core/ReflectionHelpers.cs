@@ -260,7 +260,7 @@ namespace KodeKandy
         /// <param name="type">The type to inspect.</param>
         /// <param name="genericType">The type to look for.</param>
         /// <returns>True if the generic type is implemented, otherwise false.</returns>
-        public static bool DoesImplementsGenericType(this Type type, Type genericType)
+        public static bool DoesImplementGenericType(this Type type, Type genericType)
         {
             Require.NotNull(type, "type");
             Require.NotNull(genericType, "genericType");
