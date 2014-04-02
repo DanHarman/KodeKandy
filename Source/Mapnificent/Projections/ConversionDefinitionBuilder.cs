@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -24,8 +23,6 @@ namespace KodeKandy.Mapnificent.Projections
     public class ConversionDefinitionBuilder<TFrom, TTo>
         where TTo : struct
     {
-        public Conversion Conversion { get; private set; }
-
         public ConversionDefinitionBuilder(Conversion conversion)
         {
             Require.IsTrue(conversion.ProjectionType.FromType == typeof(TFrom));
@@ -33,6 +30,8 @@ namespace KodeKandy.Mapnificent.Projections
 
             Conversion = conversion;
         }
+
+        public Conversion Conversion { get; private set; }
 
         /// <summary>
         ///     Explicitly define a mapping for a member with a delegate.

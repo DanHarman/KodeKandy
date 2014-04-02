@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -28,6 +27,8 @@ namespace KodeKandy
         public abstract T Value { get; }
         public abstract Exception Exception { get; }
 
+        #region IEquatable<Rex<T>> Members
+
         public bool Equals(Rex<T> other)
         {
             if (other.IsError != IsError)
@@ -35,6 +36,8 @@ namespace KodeKandy
 
             return IsError ? Exception.Equals(other.Exception) : Value.Equals(other.Value);
         }
+
+        #endregion
 
         public override bool Equals(object obj)
         {
@@ -57,6 +60,8 @@ namespace KodeKandy
         {
             return !Equals(left, right);
         }
+
+        #region Nested type: Error
 
         public class Error : Rex<T>
         {
@@ -83,6 +88,10 @@ namespace KodeKandy
             }
         }
 
+        #endregion
+
+        #region Nested type: Result
+
         internal class Result : Rex<T>
         {
             private readonly T value;
@@ -107,6 +116,8 @@ namespace KodeKandy
                 get { return value; }
             }
         }
+
+        #endregion
     }
 
     public static class Rex

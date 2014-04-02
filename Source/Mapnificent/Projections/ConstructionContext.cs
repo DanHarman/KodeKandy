@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -18,15 +17,14 @@ namespace KodeKandy.Mapnificent.Projections
 {
     public class MappingContext
     {
-        public Mapper Mapper { get; private set; }
-        public object FromInstance { get; private set; }
-
-
         public MappingContext(Mapper mapper, object fromInstance)
         {
             Mapper = mapper;
             FromInstance = fromInstance;
         }
+
+        public Mapper Mapper { get; private set; }
+        public object FromInstance { get; private set; }
     }
 
 

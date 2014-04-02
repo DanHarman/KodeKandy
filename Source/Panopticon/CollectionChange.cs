@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -49,31 +48,6 @@ namespace KodeKandy.Panopticon
         : IEquatable<CollectionChange<T>>
     {
         public static readonly ReadOnlyCollection<T> EmptyItemps = new ReadOnlyCollection<T>(new T[] {});
-
-        /// <summary>
-        ///     The originator of the change notification.
-        /// </summary>
-        public object Source { get; private set; }
-
-        /// <summary>
-        ///     The operation that was performed.
-        /// </summary>
-        public CollectionChangeOperation Operation { get; private set; }
-
-        /// <summary>
-        ///     The items impacted by the operation.
-        /// </summary>
-        public ReadOnlyCollection<T> Items { get; private set; }
-
-        /// <summary>
-        ///     The items that were replaced by the update.
-        /// </summary>
-        public ReadOnlyCollection<T> ReplacedItems { get; private set; }
-
-        /// <summary>
-        ///     The index of the first item in the ordered collection to be impacted by the operation.
-        /// </summary>
-        public long FirstImpactedIndex { get; private set; }
 
         public CollectionChange(object source, CollectionChangeOperation operation, ReadOnlyCollection<T> items)
             : this(source, operation, items, EmptyItemps)
@@ -130,6 +104,31 @@ namespace KodeKandy.Panopticon
         }
 
         #endregion
+
+        /// <summary>
+        ///     The originator of the change notification.
+        /// </summary>
+        public object Source { get; private set; }
+
+        /// <summary>
+        ///     The operation that was performed.
+        /// </summary>
+        public CollectionChangeOperation Operation { get; private set; }
+
+        /// <summary>
+        ///     The items impacted by the operation.
+        /// </summary>
+        public ReadOnlyCollection<T> Items { get; private set; }
+
+        /// <summary>
+        ///     The items that were replaced by the update.
+        /// </summary>
+        public ReadOnlyCollection<T> ReplacedItems { get; private set; }
+
+        /// <summary>
+        ///     The index of the first item in the ordered collection to be impacted by the operation.
+        /// </summary>
+        public long FirstImpactedIndex { get; private set; }
     }
 
     public static class CollectionChange

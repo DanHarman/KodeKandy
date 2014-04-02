@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -21,12 +20,12 @@ namespace KodeKandy.Mapnificent.Projections
 {
     public class MapUndefinedMembersException : Exception
     {
-        public IEnumerable<MemberInfo> UndefinedMemberInfos { get; private set; }
-
         public MapUndefinedMembersException(IEnumerable<MemberInfo> undefinedMemberInfos) : base(CreateErrorString(undefinedMemberInfos))
         {
             UndefinedMemberInfos = undefinedMemberInfos;
         }
+
+        public IEnumerable<MemberInfo> UndefinedMemberInfos { get; private set; }
 
         private static string CreateErrorString(IEnumerable<MemberInfo> undefinedMemberInfos)
         {

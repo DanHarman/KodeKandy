@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -19,14 +18,6 @@ namespace KodeKandy.Mapnificent.MemberAccess
 {
     public class MemberDefinitionError
     {
-        public Type DeclaringType { get; private set; }
-
-        public Type ToMemberType { get; private set; }
-
-        public string ToMemberName { get; set; }
-
-        public string Reason { get; set; }
-
         public MemberDefinitionError(Type declaringType, Type toMemberType, string toMemberName, string reason)
         {
             Require.NotNull(declaringType, "declaringType");
@@ -39,6 +30,14 @@ namespace KodeKandy.Mapnificent.MemberAccess
             ToMemberName = toMemberName;
             Reason = reason;
         }
+
+        public Type DeclaringType { get; private set; }
+
+        public Type ToMemberType { get; private set; }
+
+        public string ToMemberName { get; set; }
+
+        public string Reason { get; set; }
 
         public static MemberDefinitionError Create(MemberInfo toMemberInfo, string reason)
         {

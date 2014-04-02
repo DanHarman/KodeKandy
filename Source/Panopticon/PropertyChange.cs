@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -52,6 +51,26 @@ namespace KodeKandy.Panopticon
 
     public class PropertyChange<T> : IPropertyChange<T>, IEquatable<PropertyChange<T>>
     {
+        public PropertyChange(object source, T value, string propertyNeme)
+        {
+            Source = source;
+            PropertyName = propertyNeme;
+            Value = value;
+        }
+
+        #region IEquatable<PropertyChange<T>> Members
+
+        public bool Equals(PropertyChange<T> other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(Source, other.Source) && string.Equals(PropertyName, other.PropertyName) && Equals(Value, other.Value);
+        }
+
+        #endregion
+
+        #region IPropertyChange<T> Members
+
         /// <summary>
         ///     The originator of the change notification.
         /// </summary>
@@ -75,19 +94,7 @@ namespace KodeKandy.Panopticon
         /// </summary>
         public T Value { get; private set; }
 
-        public PropertyChange(object source, T value, string propertyNeme)
-        {
-            Source = source;
-            PropertyName = propertyNeme;
-            Value = value;
-        }
-
-        public bool Equals(PropertyChange<T> other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return Equals(Source, other.Source) && string.Equals(PropertyName, other.PropertyName) && Equals(Value, other.Value);
-        }
+        #endregion
 
         public override bool Equals(object obj)
         {

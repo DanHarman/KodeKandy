@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -24,23 +23,9 @@ namespace KodeKandy.Panopticon
 {
     public class ObservableList<T> : Collection<T>, IObservableObject, INotifyPropertyChanged, INotifyCollectionChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-        private readonly CollectionChangeSubject<T> collectionChangeSubject;
-
         private const string CountName = "Count";
         private const string IndexerName = "Item[]";
-
-        public IObservable<IPropertyChange> PropertyChanges
-        {
-            get { return collectionChangeSubject; }
-        }
-
-        public IObservable<CollectionChange<T>> CollectionChanges
-        {
-            get { return collectionChangeSubject; }
-        }
+        private readonly CollectionChangeSubject<T> collectionChangeSubject;
 
         public ObservableList()
         {
@@ -53,16 +38,36 @@ namespace KodeKandy.Panopticon
             collectionChangeSubject = new CollectionChangeSubject<T>(this, () => CollectionChanged, () => PropertyChanged);
         }
 
-        [NotifyPropertyChangedInvocator("propertyName")]
-        public void SetValue<TVal>(ref TVal property, TVal value, [CallerMemberName] string propertyName = null)
+        public IObservable<CollectionChange<T>> CollectionChanges
         {
-            collectionChangeSubject.SetPropertyValue(ref property, value, propertyName);
+            get { return collectionChangeSubject; }
+        }
+
+        #region INotifyCollectionChanged Members
+
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        #endregion
+
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
+
+        #region IObservableObject Members
+
+        public IObservable<IPropertyChange> PropertyChanges
+        {
+            get { return collectionChangeSubject; }
         }
 
         public void Dispose()
         {
             collectionChangeSubject.Dispose();
         }
+
+        #endregion
 
         #region Overrides of Collection<T>
 
@@ -93,7 +98,8 @@ namespace KodeKandy.Panopticon
 
             collectionChangeSubject.NotifyPropertyValueChanged(index, CountName);
             collectionChangeSubject.NotifyPropertyValueChanged(default(T), IndexerName);
-            collectionChangeSubject.RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removedItem, index));
+            collectionChangeSubject.RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removedItem,
+                index));
             collectionChangeSubject.NotifyCollectionChange(CollectionChange.CreateRemove(this, new ReadOnlyCollection<T>(new[] {removedItem})));
         }
 
@@ -111,5 +117,11 @@ namespace KodeKandy.Panopticon
         }
 
         #endregion
+
+        [NotifyPropertyChangedInvocator("propertyName")]
+        public void SetValue<TVal>(ref TVal property, TVal value, [CallerMemberName] string propertyName = null)
+        {
+            collectionChangeSubject.SetPropertyValue(ref property, value, propertyName);
+        }
     }
 }

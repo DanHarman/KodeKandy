@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using KodeKandy.TestEntities;
@@ -20,23 +19,6 @@ namespace KodeKandy.ReflectionHelpersTests
     [TestFixture]
     public class When_Creating_SafeWeakGetter
     {
-        [Test]
-        public void Given_One_Node_Property_Chain_Then_Gets_Member()
-        {
-            // Arrange
-            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Inner, int>(x => x.Property);
-            var sut = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
-            var instance = new Inner() {Property = 1234};
-
-            // Act
-            object result;
-            var success = sut(instance, out result);
-
-            // Assert
-            Assert.IsTrue(success);
-            Assert.AreEqual(instance.Property, result);
-        }
-
         [Test]
         public void Given_One_Node_Field_Chain_Then_Gets_MemberInfo()
         {
@@ -55,12 +37,12 @@ namespace KodeKandy.ReflectionHelpersTests
         }
 
         [Test]
-        public void Given_Two_Node_Property_Chain_Then_Gets_MemberInfos()
+        public void Given_One_Node_Property_Chain_Then_Gets_Member()
         {
             // Arrange
-            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, int>(x => x.InnerProperty.Property);
+            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Inner, int>(x => x.Property);
             var sut = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
-            var instance = new Outter {InnerProperty = new Inner {Property = 1234}};
+            var instance = new Inner() {Property = 1234};
 
             // Act
             object result;
@@ -68,7 +50,7 @@ namespace KodeKandy.ReflectionHelpersTests
 
             // Assert
             Assert.IsTrue(success);
-            Assert.AreEqual(instance.InnerProperty.Property, result);
+            Assert.AreEqual(instance.Property, result);
         }
 
         [Test]
@@ -89,12 +71,12 @@ namespace KodeKandy.ReflectionHelpersTests
         }
 
         [Test]
-        public void Given_Two_Node_Property_Chain_With_Null_Link_Then_HasResult_False()
+        public void Given_Two_Node_Field_Chain_With_Null_Link_Then_HasResult_False()
         {
             // Arrange
-            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, int>(x => x.InnerProperty.Property);
+            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, int>(x => x.InnerField.Field);
             var sut = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
-            var instance = new Outter {InnerProperty = null};
+            var instance = new Outter {InnerField = null};
 
             // Act
             object result;
@@ -105,12 +87,29 @@ namespace KodeKandy.ReflectionHelpersTests
         }
 
         [Test]
-        public void Given_Two_Node_Field_Chain_With_Null_Link_Then_HasResult_False()
+        public void Given_Two_Node_Property_Chain_Then_Gets_MemberInfos()
         {
             // Arrange
-            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, int>(x => x.InnerField.Field);
+            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, int>(x => x.InnerProperty.Property);
             var sut = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
-            var instance = new Outter {InnerField = null};
+            var instance = new Outter {InnerProperty = new Inner {Property = 1234}};
+
+            // Act
+            object result;
+            var success = sut(instance, out result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(instance.InnerProperty.Property, result);
+        }
+
+        [Test]
+        public void Given_Two_Node_Property_Chain_With_Null_Link_Then_HasResult_False()
+        {
+            // Arrange
+            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, int>(x => x.InnerProperty.Property);
+            var sut = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
+            var instance = new Outter {InnerProperty = null};
 
             // Act
             object result;

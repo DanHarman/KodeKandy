@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -25,25 +24,6 @@ namespace KodeKandy
 
     public static class ReflectionHelpers
     {
-        public class SafeWeakMemberGetterResult
-        {
-            public bool HasResult { get; private set; }
-            public object Result { get; private set; }
-
-            public SafeWeakMemberGetterResult(bool hasResult, object result)
-            {
-                HasResult = hasResult;
-                Result = result;
-            }
-
-            public static SafeWeakMemberGetterResult WithResult(object result)
-            {
-                return new SafeWeakMemberGetterResult(true, result);
-            }
-
-            public static readonly SafeWeakMemberGetterResult NoResult = new SafeWeakMemberGetterResult(false, null);
-        }
-
         public static SafeGetterFunc CreateSafeWeakMemberChainGetter(IEnumerable<MemberInfo> memberInfos)
         {
             Require.NotNull(memberInfos, "memberInfos");
@@ -283,10 +263,33 @@ namespace KodeKandy
 
             if (type.IsInterface)
                 return type.IsGenericType && type.GetGenericTypeDefinition() == genericType
-                    ? type.GetGenericTypeDefinition() 
+                    ? type.GetGenericTypeDefinition()
                     : null;
 
             return type.GetInterfaces().SingleOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == genericType);
         }
+
+        #region Nested type: SafeWeakMemberGetterResult
+
+        public class SafeWeakMemberGetterResult
+        {
+            public static readonly SafeWeakMemberGetterResult NoResult = new SafeWeakMemberGetterResult(false, null);
+
+            public SafeWeakMemberGetterResult(bool hasResult, object result)
+            {
+                HasResult = hasResult;
+                Result = result;
+            }
+
+            public bool HasResult { get; private set; }
+            public object Result { get; private set; }
+
+            public static SafeWeakMemberGetterResult WithResult(object result)
+            {
+                return new SafeWeakMemberGetterResult(true, result);
+            }
+        }
+
+        #endregion
     }
 }

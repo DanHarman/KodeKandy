@@ -9,23 +9,22 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
+using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reactive.Subjects;
-using IDisposable = System.IDisposable;
 
 namespace KodeKandy.Panopticon
 {
-    public class CollectionChangeSubject<T> : PropertyChangeSubject, System.IObservable<CollectionChange<T>>
+    public class CollectionChangeSubject<T> : PropertyChangeSubject, IObservable<CollectionChange<T>>
     {
         private readonly Subject<CollectionChange<T>> collectionChangeSubject = new Subject<CollectionChange<T>>();
-        private readonly System.Func<NotifyCollectionChangedEventHandler> getNotifyCollectionChangedEventHandler;
+        private readonly Func<NotifyCollectionChangedEventHandler> getNotifyCollectionChangedEventHandler;
 
-        public CollectionChangeSubject(object source, System.Func<NotifyCollectionChangedEventHandler> getNotifyCollectionChangedEventHandler = null,
-            System.Func<PropertyChangedEventHandler> getPropertyChangedEventHandler = null)
+        public CollectionChangeSubject(object source, Func<NotifyCollectionChangedEventHandler> getNotifyCollectionChangedEventHandler = null,
+            Func<PropertyChangedEventHandler> getPropertyChangedEventHandler = null)
             : base(source, getPropertyChangedEventHandler)
         {
             this.getNotifyCollectionChangedEventHandler = getNotifyCollectionChangedEventHandler ?? (() => null);
@@ -46,7 +45,7 @@ namespace KodeKandy.Panopticon
 
         #region Implementation of IObservable<out CollectionChange<T>>
 
-        public IDisposable Subscribe(System.IObserver<CollectionChange<T>> observer)
+        public IDisposable Subscribe(IObserver<CollectionChange<T>> observer)
         {
             return collectionChangeSubject.Subscribe(observer);
         }

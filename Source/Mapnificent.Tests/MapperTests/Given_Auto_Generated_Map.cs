@@ -1,3 +1,16 @@
+// <copyright file="Given_Auto_Generated_Map.cs" company="million miles per hour ltd">
+// Copyright (c) 2013-2014 All Right Reserved
+// 
+// This source is subject to the MIT License.
+// Please see the License.txt file for more information.
+// All other rights reserved.
+// 
+// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY 
+// KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+// PARTICULAR PURPOSE.
+// </copyright>
+
 using System.Linq;
 using KodeKandy.Mapnificent.MemberAccess;
 using KodeKandy.Mapnificent.Tests.TestEntities;
@@ -14,12 +27,46 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
             // Arrange
             var sut = new Mapper();
             var map = sut.DefineMap<SimpleFrom, SimpleTo>().Map;
-           
+
             // Act
             var res = map.Bindings;
 
             // Assert
             Assert.IsTrue(res.All(b => b.BindingType == BindingType.Auto));
+        }
+
+        [Test]
+        public void When_Mapping_Flattening_Class_Then_Maps()
+        {
+            // Arrange
+            var sut = new Mapper();
+            sut.DefineMap<FlatteningFrom, FlatteningTo>();
+            var from = new FlatteningFrom {Child = new FlatteningFrom.FlatteningChildFrom {Name = "Bob"}};
+            var to = new FlatteningTo();
+
+            // Act
+            sut.MapInto(from, to);
+
+            // Assert
+            Assert.AreEqual(from.Child.Name, to.ChildName);
+        }
+
+        [Test]
+        public void When_Mapping_Nested_Class_Then_Maps()
+        {
+            // Arrange
+            var sut = new Mapper();
+            sut.DefineMap<NestedFrom, NestedTo>();
+            sut.DefineMap<NestedFrom.NestedChildFrom, NestedTo.NestedChildTo>();
+            var from = new NestedFrom {Child = new NestedFrom.NestedChildFrom {Name = "Bob"}};
+            var to = new NestedTo {Child = new NestedTo.NestedChildTo()};
+
+            // Act
+            sut.MapInto(from, to);
+
+            // Assert
+            Assert.AreEqual(from.Child.Name, to.Child.Name);
+            Assert.AreNotEqual(from.Child, to.Child); // Ensure mapping of class not ref copying!
         }
 
         [Test]
@@ -40,48 +87,14 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
         }
 
         [Test]
-        public void When_Mapping_Flattening_Class_Then_Maps()
-        {
-            // Arrange
-            var sut = new Mapper();
-            sut.DefineMap<FlatteningFrom, FlatteningTo>();
-            var from = new FlatteningFrom { Child = new FlatteningFrom.FlatteningChildFrom { Name = "Bob" } };
-            var to = new FlatteningTo();
-
-            // Act
-            sut.MapInto(from, to);
-
-            // Assert
-            Assert.AreEqual(from.Child.Name, to.ChildName);
-        }
-
-        [Test]
-        public void When_Mapping_Nested_Class_Then_Maps()
-        {
-            // Arrange
-            var sut = new Mapper();
-            sut.DefineMap<NestedFrom, NestedTo>();
-            sut.DefineMap<NestedFrom.NestedChildFrom, NestedTo.NestedChildTo>();
-            var from = new NestedFrom { Child = new NestedFrom.NestedChildFrom { Name = "Bob" } };
-            var to = new NestedTo { Child = new NestedTo.NestedChildTo() };
-
-            // Act
-            sut.MapInto(from, to);
-
-            // Assert
-            Assert.AreEqual(from.Child.Name, to.Child.Name);
-            Assert.AreNotEqual(from.Child, to.Child); // Ensure mapping of class not ref copying!
-        }
-
-        [Test]
         public void When_Mapping_With_Conversion_Then_Maps()
         {
             // Arrange
             var sut = new Mapper();
             sut.DefineMap<ConversionFrom, ConversionTo>();
             sut.DefineConversion<string, int>().Explictly(x => x.Count());
-            var from = new ConversionFrom { Age = "Twelve" };
-            var to = new ConversionTo { Age = 6 };
+            var from = new ConversionFrom {Age = "Twelve"};
+            var to = new ConversionTo {Age = 6};
 
             // Act
             sut.MapInto(from, to);

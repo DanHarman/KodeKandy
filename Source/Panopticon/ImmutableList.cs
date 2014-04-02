@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -20,7 +19,7 @@ namespace KodeKandy.Panopticon
     // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
     internal class ImmutableList<T>
     {
-        private T[] data;
+        private readonly T[] data;
 
         public ImmutableList()
         {
@@ -30,6 +29,11 @@ namespace KodeKandy.Panopticon
         public ImmutableList(T[] data)
         {
             this.data = data;
+        }
+
+        public T[] Data
+        {
+            get { return data; }
         }
 
         public ImmutableList<T> Add(T value)
@@ -57,11 +61,6 @@ namespace KodeKandy.Panopticon
                 if (data[i].Equals(value))
                     return i;
             return -1;
-        }
-
-        public T[] Data
-        {
-            get { return data; }
         }
     }
 }

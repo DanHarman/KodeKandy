@@ -9,22 +9,21 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reactive.Subjects;
-using IDisposable = System.IDisposable;
 
 namespace KodeKandy.Panopticon
 {
-    public class PropertyChangeSubject : System.IObservable<IPropertyChange>, IDisposable
+    public class PropertyChangeSubject : IObservable<IPropertyChange>, IDisposable
     {
+        private readonly Func<PropertyChangedEventHandler> getPropertyChangedEventHandler;
         private readonly Subject<IPropertyChange> propertyChangeSubject = new Subject<IPropertyChange>();
-        private readonly System.Func<PropertyChangedEventHandler> getPropertyChangedEventHandler;
 
-        public PropertyChangeSubject(object source, System.Func<PropertyChangedEventHandler> getPropertyChangedEventHandler = null)
+        public PropertyChangeSubject(object source, Func<PropertyChangedEventHandler> getPropertyChangedEventHandler = null)
         {
             Require.NotNull(source, "source");
 
@@ -55,7 +54,7 @@ namespace KodeKandy.Panopticon
 
         #region Implementation of IObservable<out IPropertyChange>
 
-        public IDisposable Subscribe(System.IObserver<IPropertyChange> observer)
+        public IDisposable Subscribe(IObserver<IPropertyChange> observer)
         {
             return propertyChangeSubject.Subscribe(observer);
         }

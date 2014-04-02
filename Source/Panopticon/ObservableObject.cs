@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -76,7 +75,6 @@ namespace KodeKandy.Panopticon
 
     public class ObservableObject : IObservableObject, INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
         private readonly PropertyChangeSubject propertyChangeSubject;
 
         public ObservableObject()
@@ -85,20 +83,30 @@ namespace KodeKandy.Panopticon
             propertyChangeSubject = new PropertyChangeSubject(this, () => PropertyChanged);
         }
 
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
+
+        #region IObservableObject Members
+
         public IObservable<IPropertyChange> PropertyChanges
         {
             get { return propertyChangeSubject; }
         }
 
+        public void Dispose()
+        {
+            propertyChangeSubject.Dispose();
+        }
+
+        #endregion
+
         [NotifyPropertyChangedInvocator("propertyName")]
         public void SetValue<T>(ref T property, T value, [CallerMemberName] string propertyName = null)
         {
             propertyChangeSubject.SetPropertyValue(ref property, value, propertyName);
-        }
-
-        public void Dispose()
-        {
-            propertyChangeSubject.Dispose();
         }
     }
 }

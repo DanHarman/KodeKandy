@@ -9,14 +9,13 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 namespace KodeKandy.TestEntities
 {
     public class Shape
     {
-        public string Name { get; set; }
         public int Id;
+        public string Name { get; set; }
     }
 }

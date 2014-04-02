@@ -9,15 +9,14 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 namespace KodeKandy.TestEntities
 {
     internal class Inner
     {
-        public int Property { get; set; }
         public int Field;
+        public int Property { get; set; }
 
         public string GetName()
         {

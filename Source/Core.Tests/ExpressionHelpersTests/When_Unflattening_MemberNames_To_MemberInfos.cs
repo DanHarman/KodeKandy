@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System.Reflection;
@@ -22,17 +21,13 @@ namespace KodeKandy.ExpressionHelpersTests
     public class When_Unflattening_MemberNames_To_MemberInfos
     {
         [Test]
-        public void Given_Two_Node_Property_Chain_Then_Gets_MemberInfos()
+        public void Given_Three_Node_Property_Chain_With_Non_Existent_Third_Node_Then_Does_Not_Get_MemberInfos()
         {
             // Arrange
-            var expected = new[]
-            {
-                typeof(Outter).GetProperty("InnerProperty"),
-                typeof(Inner).GetProperty("Property")
-            };
+            var expected = new MemberInfo[] {};
 
             // Act
-            var res = ExpressionHelpers.UnflattenMemberNamesToMemberInfos(typeof(Outter), "InnerPropertyProperty");
+            var res = ExpressionHelpers.UnflattenMemberNamesToMemberInfos(typeof(Outter), "InnerPropertyPropertyNonExistent");
 
             // Assert
             Assert.AreEqual(expected, res);
@@ -50,6 +45,23 @@ namespace KodeKandy.ExpressionHelpersTests
 
             // Act
             var res = ExpressionHelpers.UnflattenMemberNamesToMemberInfos(typeof(Outter), "InnerFieldField");
+
+            // Assert
+            Assert.AreEqual(expected, res);
+        }
+
+        [Test]
+        public void Given_Two_Node_Property_Chain_Then_Gets_MemberInfos()
+        {
+            // Arrange
+            var expected = new[]
+            {
+                typeof(Outter).GetProperty("InnerProperty"),
+                typeof(Inner).GetProperty("Property")
+            };
+
+            // Act
+            var res = ExpressionHelpers.UnflattenMemberNamesToMemberInfos(typeof(Outter), "InnerPropertyProperty");
 
             // Assert
             Assert.AreEqual(expected, res);
@@ -76,19 +88,6 @@ namespace KodeKandy.ExpressionHelpersTests
 
             // Act
             var res = ExpressionHelpers.UnflattenMemberNamesToMemberInfos(typeof(Outter), "InnerPropertyxxxProperty");
-
-            // Assert
-            Assert.AreEqual(expected, res);
-        }
-
-        [Test]
-        public void Given_Three_Node_Property_Chain_With_Non_Existent_Third_Node_Then_Does_Not_Get_MemberInfos()
-        {
-            // Arrange
-            var expected = new MemberInfo[] {};
-
-            // Act
-            var res = ExpressionHelpers.UnflattenMemberNamesToMemberInfos(typeof(Outter), "InnerPropertyPropertyNonExistent");
 
             // Assert
             Assert.AreEqual(expected, res);

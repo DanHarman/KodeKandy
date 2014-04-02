@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -26,14 +25,13 @@ namespace KodeKandy.Mapnificent
     public class Mapper
     {
         /// <summary>
-        ///     MapInto definitions encompass all mappings into a reference type.
-        /// </summary>
-        private readonly Dictionary<ProjectionType, Map> mapDefinitions = new Dictionary<ProjectionType, Map>();
-
-        /// <summary>
         ///     ConversionOverride definitions encompass all mappings into a value type.
         /// </summary>
         private readonly Dictionary<ProjectionType, Conversion> conversionDefinitions = new Dictionary<ProjectionType, Conversion>();
+        /// <summary>
+        ///     MapInto definitions encompass all mappings into a reference type.
+        /// </summary>
+        private readonly Dictionary<ProjectionType, Map> mapDefinitions = new Dictionary<ProjectionType, Map>();
 
         public Mapper()
         {
@@ -174,7 +172,7 @@ namespace KodeKandy.Mapnificent
                 Require.NotNull(from, "from");
 
                 var map = GetMap(from.GetType(), typeof(TTo));
-                return (TTo)map.Apply(from);
+                return (TTo) map.Apply(from);
             }
             catch (Exception ex)
             {

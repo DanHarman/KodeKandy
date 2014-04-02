@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -35,22 +34,12 @@ namespace KodeKandy.Mapnificent.MemberAccess
     }
 
     /// <summary>
-    ///     A 'from' definition that binds to a member on the 'from' instance to generate a value to set into the 'to' class's member.
+    ///     A 'from' definition that binds to a member on the 'from' instance to generate a value to set into the 'to' class's
+    ///     member.
     /// </summary>
     public class FromMemberDefinition : FromDefinition
     {
-        public SafeGetterFunc MemberGetter { get; private set; }
-
-        /// <summary>
-        ///     The path to the property or field this accessor corresponds to. This may be a 'chain'.
-        /// </summary>
-        public string MemberPath { get; private set; }
-
         private readonly Type memberType;
-        /// <summary>
-        ///     The type of the member.
-        /// </summary>
-        public override Type MemberType { get { return memberType; } }
 
         public FromMemberDefinition(string memberPath, Type memberType, SafeGetterFunc memberGetter)
         {
@@ -61,6 +50,21 @@ namespace KodeKandy.Mapnificent.MemberAccess
             MemberPath = memberPath;
             this.memberType = memberType;
             MemberGetter = memberGetter;
+        }
+
+        public SafeGetterFunc MemberGetter { get; private set; }
+
+        /// <summary>
+        ///     The path to the property or field this accessor corresponds to. This may be a 'chain'.
+        /// </summary>
+        public string MemberPath { get; private set; }
+
+        /// <summary>
+        ///     The type of the member.
+        /// </summary>
+        public override Type MemberType
+        {
+            get { return memberType; }
         }
 
         /// <summary>
@@ -82,22 +86,26 @@ namespace KodeKandy.Mapnificent.MemberAccess
     }
 
     /// <summary>
-    ///     A 'from' definition that executes a custom delegate on a 'from' instance to get a value to set into the 'to' member.
+    ///     A 'from' definition that executes a custom delegate on a 'from' instance to get a value to set into the 'to'
+    ///     member.
     /// </summary>
     public class FromCustomDefinition : FromDefinition
     {
         private readonly Func<MappingContext, object> fromFunc;
-
-        /// <summary>
-        ///     The type of the member.
-        /// </summary>
-        public override Type MemberType { get { return ProjectionType.Custom; } }
 
         public FromCustomDefinition(Func<MappingContext, object> fromFunc)
         {
             Require.NotNull(fromFunc, "fromFunc");
 
             this.fromFunc = fromFunc;
+        }
+
+        /// <summary>
+        ///     The type of the member.
+        /// </summary>
+        public override Type MemberType
+        {
+            get { return ProjectionType.Custom; }
         }
 
         /// <summary>
@@ -120,17 +128,24 @@ namespace KodeKandy.Mapnificent.MemberAccess
         }
     }
 
+    /// <summary>
+    ///     Used to represent undefined 'from' definitions on bindings.
+    /// </summary>
     public class FromUndefinedDefinition : FromDefinition
     {
         public static readonly FromUndefinedDefinition Default = new FromUndefinedDefinition();
 
+        private FromUndefinedDefinition()
+        {
+        }
+
         /// <summary>
         ///     The type of the member.
         /// </summary>
-        public override Type MemberType { get { return ProjectionType.Undefined; } }
-
-        private FromUndefinedDefinition()
-        {}
+        public override Type MemberType
+        {
+            get { return ProjectionType.Undefined; }
+        }
 
         /// <summary>
         ///     Attempts to get a member value from a 'from' instance.

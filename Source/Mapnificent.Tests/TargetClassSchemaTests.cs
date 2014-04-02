@@ -9,11 +9,7 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
-
-using KodeKandy.Mapnificent.Tests.TestEntities.Inheritance;
-using NUnit.Framework;
 
 namespace KodeKandy.Mapnificent.Tests
 {

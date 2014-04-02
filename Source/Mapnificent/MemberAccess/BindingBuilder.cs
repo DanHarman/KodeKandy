@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -26,12 +25,12 @@ namespace KodeKandy.Mapnificent.MemberAccess
     /// <typeparam name="TToMember">Type of the 'to' member being set.</typeparam>
     public class BindingBuilder<TFromDeclaring, TToMember>
     {
-        public Binding Binding { get; private set; }
-
         public BindingBuilder(Binding binding)
         {
             Binding = binding;
         }
+
+        public Binding Binding { get; private set; }
 
         /// <summary>
         ///     MapInto from a, nested if needed, member of the 'from' class to the specified 'to' class member. When using nested

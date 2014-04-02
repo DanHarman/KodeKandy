@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -26,8 +25,6 @@ namespace KodeKandy.Mapnificent.Projections
     public class MapBuilder<TFromDeclaring, TToDeclaring>
         where TToDeclaring : class
     {
-        public Map Map { get; private set; }
-
         public MapBuilder(Map map)
         {
             Require.IsTrue(map.ProjectionType.FromType == typeof(TFromDeclaring));
@@ -35,6 +32,8 @@ namespace KodeKandy.Mapnificent.Projections
 
             Map = map;
         }
+
+        public Map Map { get; private set; }
 
         public MapBuilder<TFromDeclaring, TToDeclaring> For<TToMember>(Expression<Func<TToDeclaring, TToMember>> toMember,
             Action<BindingBuilder<TFromDeclaring, TToMember>> options)
@@ -58,7 +57,7 @@ namespace KodeKandy.Mapnificent.Projections
             Require.NotNull(afterMappingAction, "afterMappingAction");
 
             Map.PostMapStep = (f, t) => afterMappingAction((TFromDeclaring) f, (TToDeclaring) t);
-            
+
             return this;
         }
 

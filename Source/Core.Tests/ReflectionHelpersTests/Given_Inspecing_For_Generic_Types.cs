@@ -1,4 +1,17 @@
-﻿using System;
+﻿// <copyright file="Given_Inspecing_For_Generic_Types.cs" company="million miles per hour ltd">
+// Copyright (c) 2013-2014 All Right Reserved
+// 
+// This source is subject to the MIT License.
+// Please see the License.txt file for more information.
+// All other rights reserved.
+// 
+// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY 
+// KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+// PARTICULAR PURPOSE.
+// </copyright>
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using NUnit.Framework;
@@ -8,6 +21,13 @@ namespace KodeKandy.ReflectionHelpersTests
     [TestFixture]
     public class Given_Inspecing_For_Generic_Types
     {
+        [Test]
+        public void When_GenericType_Param_Is_Not_Generic_Then_Throws()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => typeof(string).DoesImplementGenericType(typeof(int)), "Must be a generic type.");
+        }
+
         [TestCase(typeof(List<string>), true)]
         [TestCase(typeof(Collection<string>), true)]
         [TestCase(typeof(int), false)]
@@ -32,13 +52,6 @@ namespace KodeKandy.ReflectionHelpersTests
 
             // Assert
             Assert.AreEqual(expected, res);
-        }
-
-        [Test]
-        public void When_GenericType_Param_Is_Not_Generic_Then_Throws()
-        {
-            // Act & Assert
-            Assert.Throws<ArgumentException>(() => typeof(string).DoesImplementGenericType(typeof(int)), "Must be a generic type.");
         }
     }
 }

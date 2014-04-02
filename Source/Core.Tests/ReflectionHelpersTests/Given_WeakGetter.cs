@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using KodeKandy.TestEntities;
@@ -21,27 +20,27 @@ namespace KodeKandy.ReflectionHelpersTests
     public class Given_WeakGetter
     {
         [Test]
-        public void Given_WeakPropertyGetter_When_Getting_Property_Then_Suceeds()
-        {
-            // Arrange
-            var propertyInfo = typeof(Shape).GetProperty("Name");
-            var sut = ReflectionHelpers.CreateWeakPropertyGetter(propertyInfo);
-            const string expectedName = "Cube";
-            var shape = new Shape() {Name = expectedName};
-
-            // Act
-            var res = sut(shape);
-
-            // Assert
-            Assert.AreEqual(expectedName, res);
-        }
-
-        [Test]
         public void Given_WeakFieldGetter_When_Getting_Field_Then_Suceeds()
         {
             // Arrange
             var fieldInfo = typeof(Shape).GetField("Id");
             var sut = ReflectionHelpers.CreateWeakFieldGetter(fieldInfo);
+            const int expectedId = 777;
+            var shape = new Shape() {Id = expectedId};
+
+            // Act
+            var res = sut(shape);
+
+            // Assert
+            Assert.AreEqual(expectedId, res);
+        }
+
+        [Test]
+        public void Given_WeakMemberGetter_When_Getting_Field_Then_Suceeds()
+        {
+            // Arrange
+            var fieldInfo = typeof(Shape).GetField("Id");
+            var sut = ReflectionHelpers.CreateWeakMemberGetter(fieldInfo);
             const int expectedId = 777;
             var shape = new Shape() {Id = expectedId};
 
@@ -69,19 +68,19 @@ namespace KodeKandy.ReflectionHelpersTests
         }
 
         [Test]
-        public void Given_WeakMemberGetter_When_Getting_Field_Then_Suceeds()
+        public void Given_WeakPropertyGetter_When_Getting_Property_Then_Suceeds()
         {
             // Arrange
-            var fieldInfo = typeof(Shape).GetField("Id");
-            var sut = ReflectionHelpers.CreateWeakMemberGetter(fieldInfo);
-            const int expectedId = 777;
-            var shape = new Shape() {Id = expectedId};
+            var propertyInfo = typeof(Shape).GetProperty("Name");
+            var sut = ReflectionHelpers.CreateWeakPropertyGetter(propertyInfo);
+            const string expectedName = "Cube";
+            var shape = new Shape() {Name = expectedName};
 
             // Act
             var res = sut(shape);
 
             // Assert
-            Assert.AreEqual(expectedId, res);
+            Assert.AreEqual(expectedName, res);
         }
     }
 }

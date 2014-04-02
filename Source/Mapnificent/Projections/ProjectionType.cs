@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -17,29 +16,28 @@ using System;
 namespace KodeKandy.Mapnificent.Projections
 {
     /// <summary>
-    /// Defines the types projected in a map or conversion.
+    ///     Defines the types projected in a map or conversion.
     /// </summary>
     public class ProjectionType
     {
-        public class UndefinedType
-        {
-            private UndefinedType() {}
-        };
-
-        public class CustomType 
-        {
-            private CustomType() {}
-        };
-
         /// <summary>
-        /// Type indicating that a from projection has not yet been defined.
+        ///     Type indicating that a from projection has not yet been defined.
         /// </summary>
         public static Type Undefined = typeof(UndefinedType);
 
         /// <summary>
-        /// Type indicating that a projection has a custom from delegate so it is not a simple field binding projection.
+        ///     Type indicating that a projection has a custom from delegate so it is not a simple field binding projection.
         /// </summary>
         public static Type Custom = typeof(CustomType);
+
+        public ProjectionType(Type fromType, Type toType)
+        {
+            Require.NotNull(fromType, "fromType");
+            Require.NotNull(toType, "toType");
+
+            FromType = fromType;
+            ToType = toType;
+        }
 
         public Type FromType { get; set; }
         public Type ToType { get; set; }
@@ -57,15 +55,6 @@ namespace KodeKandy.Mapnificent.Projections
         public bool IsIdentity
         {
             get { return ToType == FromType; }
-        }
-
-        public ProjectionType(Type fromType, Type toType)
-        {
-            Require.NotNull(fromType, "fromType");
-            Require.NotNull(toType, "toType");
-
-            FromType = fromType;
-            ToType = toType;
         }
 
         public static ProjectionType Create<TFrom, TTo>()
@@ -107,5 +96,27 @@ namespace KodeKandy.Mapnificent.Projections
                 FromType != null ? FromType.Name : "<Undefined>",
                 ToType != null ? ToType.Name : "<Undefined>");
         }
+
+        #region Nested type: CustomType
+
+        public class CustomType
+        {
+            private CustomType()
+            {
+            }
+        };
+
+        #endregion
+
+        #region Nested type: UndefinedType
+
+        public class UndefinedType
+        {
+            private UndefinedType()
+            {
+            }
+        };
+
+        #endregion
     }
 }

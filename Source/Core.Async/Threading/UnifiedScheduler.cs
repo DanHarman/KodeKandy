@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -24,7 +23,6 @@ namespace KodeKandy.Threading
     {
         private readonly IScheduler rxScheduler;
         private readonly TaskScheduler taskScheduler;
-        public string Name { get; private set; }
 
         protected UnifiedScheduler(string name, IScheduler rxScheduler, TaskScheduler taskScheduler)
         {
@@ -36,6 +34,10 @@ namespace KodeKandy.Threading
             this.rxScheduler = rxScheduler;
             this.taskScheduler = taskScheduler;
         }
+
+        public string Name { get; private set; }
+
+        #region IScheduler Members
 
         public DateTimeOffset Now
         {
@@ -56,6 +58,8 @@ namespace KodeKandy.Threading
         {
             return rxScheduler.Schedule(state, action);
         }
+
+        #endregion
 
         public static implicit operator TaskScheduler(UnifiedScheduler contextScheduler)
         {

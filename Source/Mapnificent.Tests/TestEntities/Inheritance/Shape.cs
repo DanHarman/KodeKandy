@@ -9,16 +9,13 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
-
-using System;
 
 namespace KodeKandy.Mapnificent.Tests.TestEntities.Inheritance
 {
     public class Shape
     {
-        public string Name { get; set; }
         public int Id;
+        public string Name { get; set; }
     }
 }

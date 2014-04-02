@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System.Reactive.Concurrency;
@@ -22,8 +21,6 @@ namespace KodeKandy.Threading
     /// </summary>
     public class BackgroundScheduler : UnifiedScheduler
     {
-        public static BackgroundScheduler Default { get; protected internal set; }
-
         static BackgroundScheduler()
         {
             Default = CreateDefaultScheduler();
@@ -33,6 +30,8 @@ namespace KodeKandy.Threading
             : base(name, rxScheduler, taskScheduler)
         {
         }
+
+        public static BackgroundScheduler Default { get; protected internal set; }
 
         protected internal static BackgroundScheduler CreateDefaultScheduler()
         {

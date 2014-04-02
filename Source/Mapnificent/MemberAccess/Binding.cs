@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System;
@@ -35,6 +34,19 @@ namespace KodeKandy.Mapnificent.MemberAccess
     /// </summary>
     public class Binding
     {
+        private bool isIgnore;
+
+        public Binding(MemberInfo toMemberInfo, BindingType bindingType,
+            FromDefinition fromDefinition = null, Conversion conversionOverride = null)
+        {
+            Require.NotNull(toMemberInfo, "toMemberInfo");
+
+            BindingType = bindingType;
+            ToDefinition = new ToDefinition(toMemberInfo);
+            FromDefinition = fromDefinition ?? FromUndefinedDefinition.Default;
+            ConversionOverride = conversionOverride;
+        }
+
         /// <summary>
         ///     Captures whether the binding was explicitly defined in config or automatically inferred.
         /// </summary>
@@ -87,7 +99,6 @@ namespace KodeKandy.Mapnificent.MemberAccess
             get { return new ProjectionType(FromType, ToType); }
         }
 
-        private bool isIgnore;
         public bool IsIgnore
         {
             get { return isIgnore; }
@@ -100,17 +111,6 @@ namespace KodeKandy.Mapnificent.MemberAccess
                     ConversionOverride = null;
                 }
             }
-        }
-
-        public Binding(MemberInfo toMemberInfo, BindingType bindingType,
-            FromDefinition fromDefinition = null, Conversion conversionOverride = null)
-        {
-            Require.NotNull(toMemberInfo, "toMemberInfo");
-
-            BindingType = bindingType;
-            ToDefinition = new ToDefinition(toMemberInfo);
-            FromDefinition = fromDefinition ?? FromUndefinedDefinition.Default;
-            ConversionOverride = conversionOverride;
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace KodeKandy.Mapnificent.MemberAccess
                     var toValue = ProjectValue(mapper, fromValue, toDeclaring, mapInto);
 
                     // Set the value.
-                   ToDefinition.Accessor.Setter(toDeclaring, toValue);
+                    ToDefinition.Accessor.Setter(toDeclaring, toValue);
                 }
             }
             catch (Exception ex)
@@ -162,7 +162,6 @@ namespace KodeKandy.Mapnificent.MemberAccess
         /// <returns></returns>
         public object ProjectValue(Mapper mapper, object fromValue, object toDeclaringInstance, bool mapInto = false)
         {
-
             Require.NotNull(mapper, "mapper");
             Require.NotNull(fromValue, "fromValue");
             Require.NotNull(toDeclaringInstance, "toDeclaringInstance");

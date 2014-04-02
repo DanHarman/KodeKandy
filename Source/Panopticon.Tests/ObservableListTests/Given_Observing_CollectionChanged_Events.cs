@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System.Collections.Generic;
@@ -44,42 +43,19 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
         }
 
         [Test]
-        public void When_Remove_Then_Action_Remove_Raised()
+        public void When_Clear_Then_Action_Reset_Raised()
         {
             // Arrange
             var sut = new ObservableList<int>(new[] {10, 12, 18, 100});
             var results = new List<NotifyCollectionChangedEventArgs>();
             var expected = new[]
             {
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, 12, 1),
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, 100, 2),
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset),
             };
             sut.CollectionChanged += (o, e) => results.Add(e);
 
             // Act
-            sut.Remove(12);
-            sut.Remove(100);
-
-            // Assert
-            KKAssert.AreEqualByValue(expected, results);
-        }
-
-        [Test]
-        public void When_RemoveAt_Then_Action_Remove_Raised()
-        {
-            // Arrange
-            var sut = new ObservableList<int>(new[] {10, 12, 18, 100});
-            var results = new List<NotifyCollectionChangedEventArgs>();
-            var expected = new[]
-            {
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, 12, 1),
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, 100, 2),
-            };
-            sut.CollectionChanged += (o, e) => results.Add(e);
-
-            // Act
-            sut.RemoveAt(1);
-            sut.RemoveAt(2);
+            sut.Clear();
 
             // Assert
             KKAssert.AreEqualByValue(expected, results);
@@ -107,19 +83,42 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
         }
 
         [Test]
-        public void When_Clear_Then_Action_Reset_Raised()
+        public void When_RemoveAt_Then_Action_Remove_Raised()
         {
             // Arrange
             var sut = new ObservableList<int>(new[] {10, 12, 18, 100});
             var results = new List<NotifyCollectionChangedEventArgs>();
             var expected = new[]
             {
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset),
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, 12, 1),
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, 100, 2),
             };
             sut.CollectionChanged += (o, e) => results.Add(e);
 
             // Act
-            sut.Clear();
+            sut.RemoveAt(1);
+            sut.RemoveAt(2);
+
+            // Assert
+            KKAssert.AreEqualByValue(expected, results);
+        }
+
+        [Test]
+        public void When_Remove_Then_Action_Remove_Raised()
+        {
+            // Arrange
+            var sut = new ObservableList<int>(new[] {10, 12, 18, 100});
+            var results = new List<NotifyCollectionChangedEventArgs>();
+            var expected = new[]
+            {
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, 12, 1),
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, 100, 2),
+            };
+            sut.CollectionChanged += (o, e) => results.Add(e);
+
+            // Act
+            sut.Remove(12);
+            sut.Remove(100);
 
             // Assert
             KKAssert.AreEqualByValue(expected, results);

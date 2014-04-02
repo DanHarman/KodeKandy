@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using System.Linq;
@@ -21,19 +20,6 @@ namespace KodeKandy.ExpressionHelpersTests
     [TestFixture]
     public class When_Getting_MemberInfos
     {
-        [Test]
-        public void Given_One_Node_Property_Chain_Then_Gets_MemberInfo()
-        {
-            // Arrange
-            var expected = typeof(Inner).GetProperty("Property");
-
-            // Act
-            var res = ExpressionHelpers.GetExpressionChainMemberInfos<Inner, int>(x => x.Property);
-
-            // Assert
-            Assert.AreEqual(expected, res.Single());
-        }
-
         [Test]
         public void Given_One_Node_Field_Chain_Then_Gets_MemberInfo()
         {
@@ -48,20 +34,16 @@ namespace KodeKandy.ExpressionHelpersTests
         }
 
         [Test]
-        public void Given_Two_Node_Property_Chain_Then_Gets_MemberInfos()
+        public void Given_One_Node_Property_Chain_Then_Gets_MemberInfo()
         {
             // Arrange
-            var expected = new[]
-            {
-                typeof(Outter).GetProperty("InnerProperty"),
-                typeof(Inner).GetProperty("Property")
-            };
+            var expected = typeof(Inner).GetProperty("Property");
 
             // Act
-            var res = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, int>(x => x.InnerProperty.Property);
+            var res = ExpressionHelpers.GetExpressionChainMemberInfos<Inner, int>(x => x.Property);
 
             // Assert
-            Assert.AreEqual(expected, res);
+            Assert.AreEqual(expected, res.Single());
         }
 
         [Test]
@@ -76,6 +58,23 @@ namespace KodeKandy.ExpressionHelpersTests
 
             // Act
             var res = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, int>(x => x.InnerField.Field);
+
+            // Assert
+            Assert.AreEqual(expected, res);
+        }
+
+        [Test]
+        public void Given_Two_Node_Property_Chain_Then_Gets_MemberInfos()
+        {
+            // Arrange
+            var expected = new[]
+            {
+                typeof(Outter).GetProperty("InnerProperty"),
+                typeof(Inner).GetProperty("Property")
+            };
+
+            // Act
+            var res = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, int>(x => x.InnerProperty.Property);
 
             // Assert
             Assert.AreEqual(expected, res);

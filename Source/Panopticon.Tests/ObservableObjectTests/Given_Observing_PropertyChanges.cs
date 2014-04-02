@@ -9,7 +9,6 @@
 // KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
-// 
 // </copyright>
 
 using Microsoft.Reactive.Testing;
@@ -20,6 +19,28 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
     [TestFixture]
     public class Given_Observing_PropertyChanges : ReactiveTest
     {
+        [Test]
+        public void When_Disposed_Then_OnCompleted()
+        {
+            // Arrange
+            var scheduler = new TestScheduler();
+            var sut = new TestObservableObject {Age = 10};
+            var observer = scheduler.CreateObserver<IPropertyChange>();
+            var expected = new[]
+            {
+                OnCompleted<IPropertyChange>(90)
+            };
+            sut.PropertyChanges.Subscribe(observer);
+
+            // Act
+            scheduler.Start();
+            scheduler.AdvanceTo(90);
+            sut.Dispose();
+
+            // Assert
+            observer.Messages.AssertEqual(expected);
+        }
+
         [Test]
         public void When_SetValue_With_New_Values_Then_Event_Fires()
         {
@@ -69,28 +90,6 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
             sut.Age = 70;
             scheduler.AdvanceTo(40);
             sut.Age = 70;
-
-            // Assert
-            observer.Messages.AssertEqual(expected);
-        }
-
-        [Test]
-        public void When_Disposed_Then_OnCompleted()
-        {
-            // Arrange
-            var scheduler = new TestScheduler();
-            var sut = new TestObservableObject {Age = 10};
-            var observer = scheduler.CreateObserver<IPropertyChange>();
-            var expected = new[]
-            {
-                OnCompleted<IPropertyChange>(90)
-            };
-            sut.PropertyChanges.Subscribe(observer);
-
-            // Act
-            scheduler.Start();
-            scheduler.AdvanceTo(90);
-            sut.Dispose();
 
             // Assert
             observer.Messages.AssertEqual(expected);
