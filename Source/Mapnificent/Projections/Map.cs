@@ -26,12 +26,31 @@ namespace KodeKandy.Mapnificent.Projections
     /// </summary>
     public class Map
     {
+        private readonly Dictionary<string, Binding> explicitBindings = new Dictionary<string, Binding>();
+        private readonly List<ProjectionType> polymorphicFor = new List<ProjectionType>();
+        /// <summary>
+        ///     Cached bindings for a given Mapper. This is required since a map may be placed into more than one Mapper.
+        /// </summary>
+        private ReadOnlyCollection<Binding> cachedBindings;
+        private Func<ConstructionContext, object> constructedBy;
+        private ProjectionType inheritsFrom;
+
+        public Map(ProjectionType projectionType, Mapper mapper)
+        {
+            Require.NotNull(projectionType, "projectionType");
+            Require.NotNull(mapper, "mapper");
+            Require.IsTrue(projectionType.ToType.IsClass);
+
+            ProjectionType = projectionType;
+            Mapper = mapper;
+            ConstructedBy = _ => Activator.CreateInstance(ProjectionType.ToType);
+        }
+
         /// <summary>
         ///     The Mapper this map is associated with.
         /// </summary>
         public Mapper Mapper { get; private set; }
 
-        private Func<ConstructionContext, object> constructedBy;
         public Func<ConstructionContext, object> ConstructedBy
         {
             get { return constructedBy; }
@@ -49,19 +68,12 @@ namespace KodeKandy.Mapnificent.Projections
 
         // User defined definitions. Does not include automatic definitions - those are composed separately so as to avoid
         // confusion when inheriting maps.
-        private readonly Dictionary<string, Binding> explicitBindings = new Dictionary<string, Binding>();
-
-        /// <summary>
-        ///     Cached bindings for a given Mapper. This is required since a map may be placed into more than one Mapper.
-        /// </summary>
-        private ReadOnlyCollection<Binding> cachedBindings;
 
         public ReadOnlyCollection<Binding> Bindings
         {
             get { return cachedBindings ?? (cachedBindings = GenerateBindings()); }
         }
 
-        private ProjectionType inheritsFrom;
         public ProjectionType InheritsFrom
         {
             get { return inheritsFrom; }
@@ -79,17 +91,18 @@ namespace KodeKandy.Mapnificent.Projections
             }
         }
 
-        private readonly List<ProjectionType> polymorphicFor = new List<ProjectionType>();
         public ReadOnlyCollection<ProjectionType> PolymorphicFor
         {
             get { return new ReadOnlyCollection<ProjectionType>(polymorphicFor); }
         }
 
+        public ProjectionType ProjectionType { get; private set; }
+
         public void AddPolymorphicFor(ProjectionType projectionType)
         {
             Require.NotNull(projectionType, "projectionType");
 
-            Require.IsTrue(ProjectionType.FromType.IsAssignableFrom(projectionType.FromType), 
+            Require.IsTrue(ProjectionType.FromType.IsAssignableFrom(projectionType.FromType),
                 String.Format("Cannot be polymorphic for a map whose 'From' type '{0}' is not a subtype of this maps 'From' type '{1}'.",
                     projectionType.FromType.Name, ProjectionType.FromType.Name));
 
@@ -98,23 +111,11 @@ namespace KodeKandy.Mapnificent.Projections
                     projectionType.ToType.Name, ProjectionType.ToType.Name));
 
             Require.IsFalse(polymorphicFor.Any(pt => pt.FromType == projectionType.FromType),
-                String.Format("Illegal 'polymorphic for' defintion. A definition has already been registered for the 'from' type '{0}' and would be made ambiguous by this one.",
+                String.Format(
+                    "Illegal 'polymorphic for' defintion. A definition has already been registered for the 'from' type '{0}' and would be made ambiguous by this one.",
                     projectionType.FromType.Name));
 
             polymorphicFor.Add(projectionType);
-        }
-
-        public ProjectionType ProjectionType { get; private set; }
-
-        public Map(ProjectionType projectionType, Mapper mapper)
-        {
-            Require.NotNull(projectionType, "projectionType");
-            Require.NotNull(mapper, "mapper");
-            Require.IsTrue(projectionType.ToType.IsClass);
-
-            ProjectionType = projectionType;
-            Mapper = mapper;
-            ConstructedBy = _ => Activator.CreateInstance(ProjectionType.ToType);
         }
 
         public Binding GetMemberBindingDefinition(MemberInfo toMemberInfo)
@@ -233,7 +234,7 @@ namespace KodeKandy.Mapnificent.Projections
                 return polyMap.Apply(from, to, mapInto);
             }
 
-            if (to == null)
+            if (to == null || to.GetType() != ProjectionType.ToType)
                 to = ConstructedBy(new ConstructionContext(Mapper, from, null));
 
             foreach (var binding in Bindings)
@@ -247,11 +248,7 @@ namespace KodeKandy.Mapnificent.Projections
             return to;
         }
 
-        public object CreateInstanceOfTo(object fromInstance)
-        {
-            var instance = ConstructedBy(new ConstructionContext(Mapper, fromInstance, null));
+      //  private bool ApplyPolymophicMapIfApplicable()
 
-            return instance;
-        }
     }
 }

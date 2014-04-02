@@ -167,7 +167,7 @@ namespace KodeKandy.Mapnificent.MemberAccess
             Require.NotNull(fromValue, "fromValue");
             Require.NotNull(toDeclaringInstance, "toDeclaringInstance");
 
-            object toValue;
+            object toValue = null;
 
             if (HasCustomFromDefintion)
             {
@@ -182,11 +182,9 @@ namespace KodeKandy.Mapnificent.MemberAccess
 
                 // If we are mapping into then attempt to get a value to map into.
                 if (mapInto)
-                    toValue = ToDefinition.Accessor.Getter(toDeclaringInstance) ?? map.CreateInstanceOfTo(fromValue);
-                else
-                    toValue = map.CreateInstanceOfTo(fromValue);
+                    toValue = ToDefinition.Accessor.Getter(toDeclaringInstance);
 
-                map.Apply(fromValue, toValue, mapInto);
+                toValue = map.Apply(fromValue, toValue, mapInto);
             }
             else
             {
