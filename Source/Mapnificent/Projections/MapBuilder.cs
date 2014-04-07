@@ -18,22 +18,22 @@ using KodeKandy.Mapnificent.MemberAccess;
 namespace KodeKandy.Mapnificent.Projections
 {
     /// <summary>
-    ///     Type safe ConversionOverride builder.
+    ///     Type safe ConvertUsing builder.
     /// </summary>
     /// <typeparam name="TFromDeclaring">The type being mapped from.</typeparam>
     /// <typeparam name="TToDeclaring">The type being mapped to.</typeparam>
     public class MapBuilder<TFromDeclaring, TToDeclaring>
         where TToDeclaring : class
     {
-        public MapBuilder(Map map)
+        public MapBuilder(ClassMap classMap)
         {
-            Require.IsTrue(map.ProjectionType.FromType == typeof(TFromDeclaring));
-            Require.IsTrue(map.ProjectionType.ToType == typeof(TToDeclaring));
+            Require.IsTrue(classMap.ProjectionType.FromType == typeof(TFromDeclaring));
+            Require.IsTrue(classMap.ProjectionType.ToType == typeof(TToDeclaring));
 
-            Map = map;
+            Map = classMap;
         }
 
-        public Map Map { get; private set; }
+        public ClassMap Map { get; private set; }
 
         public MapBuilder<TFromDeclaring, TToDeclaring> For<TToMember>(Expression<Func<TToDeclaring, TToMember>> toMember,
             Action<BindingBuilder<TFromDeclaring, TToMember>> options)
@@ -61,22 +61,31 @@ namespace KodeKandy.Mapnificent.Projections
             return this;
         }
 
-        public MapBuilder<TFromDeclaring, TToDeclaring> ConstructedBy(Func<ConstructionContext, TToDeclaring> constructedBy)
+        public MapBuilder<TFromDeclaring, TToDeclaring> ConstructUsing(Func<ConstructionContext, TToDeclaring> constructedBy)
         {
             Require.NotNull(constructedBy, "constructedBy");
 
-            Map.ConstructedBy = (ctx) => (object) constructedBy(ctx);
+            Map.ConstructUsing = (ctx) => (object) constructedBy(ctx);
 
             return this;
         }
 
         public MapBuilder<TFromDeclaring, TToDeclaring> InheritsFrom<TFromInherits, TToInherits>()
         {
-            Map.InheritsFrom = ProjectionType.Create<TFromInherits, TToInherits>();
+            var projectionType = ProjectionType.Create<TFromInherits, TToInherits>();
+
+            if (!projectionType.IsClassProjection)
+            {
+                var msg = string.Format("Error inheriting from '{0}' for map of type {1}, it is only possible to inherit from a class map",
+                    projectionType, Map.ProjectionType);
+
+                throw new MapnificentException(msg, Map.Mapper);
+            }
+
+            Map.InheritsFrom = projectionType;
 
             return this;
         }
-
 
         public MapBuilder<TFromDeclaring, TToDeclaring> PolymorhpicFor<TFromDerived, TToDerived>()
         {

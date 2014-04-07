@@ -261,10 +261,8 @@ namespace KodeKandy
             Require.NotNull(genericType, "genericType");
             Require.IsTrue(genericType.IsGenericType, "Must be a generic type.", "genericType");
 
-            if (type.IsInterface)
-                return type.IsGenericType && type.GetGenericTypeDefinition() == genericType
-                    ? type.GetGenericTypeDefinition()
-                    : null;
+            if (type.IsInterface && type.IsGenericType && type.GetGenericTypeDefinition() == genericType)
+                return type.GetGenericTypeDefinition();
 
             return type.GetInterfaces().SingleOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == genericType);
         }

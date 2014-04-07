@@ -16,7 +16,7 @@ using System;
 namespace KodeKandy.Mapnificent.Projections
 {
     /// <summary>
-    ///     Type safe ConversionOverride builder.
+    ///     Type safe ConvertUsing builder.
     /// </summary>
     /// <typeparam name="TFrom">The type being mapped from.</typeparam>
     /// <typeparam name="TTo">The type being mapped to.</typeparam>

@@ -46,7 +46,7 @@
     <Compile Include="MemberAccess\Binding.cs" />
     <Compile Include="MemberAccess\BindingBuilder.cs" />
     <Compile Include="MemberAccess\ToDefinition.cs" />
-    <Compile Include="Projections\Map.cs" />
+    <Compile Include="Projections\ClassMap.cs" />
     <Compile Include="MapnificentException.cs" />
     <Compile Include="Projections\ProjectionType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

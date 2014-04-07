@@ -17,26 +17,30 @@ namespace KodeKandy.Mapnificent
 {
     public class MapnificentException : Exception
     {
-        public MapnificentException(string message) : base(message)
+        public Mapper Mapper { get; private set; }
+
+        public MapnificentException(string message, Mapper mapper) : this(message, null, mapper)
         {
         }
 
-        public MapnificentException(string message, Exception innerException) : base(message, innerException)
+        public MapnificentException(string message, Exception innerException, Mapper mapper) : base(message, innerException)
         {
+            Mapper = mapper;
         }
     }
 
     /// <summary>
-    ///     An error associated with an error in the definition of a map.
+    ///     An error associated with an error in the definition of a ClassMap.
     /// </summary>
     public class MapDefinitionError : MapnificentException
     {
-        public MapDefinitionError(string message) : base(message)
+        public MapDefinitionError(string message, Mapper mapper)
+            : this(message, null, mapper)
         {
         }
 
-        public MapDefinitionError(string message, Exception innerException)
-            : base(message, innerException)
+        public MapDefinitionError(string message, Exception innerException, Mapper mapper)
+            : base(message, innerException, mapper)
         {
         }
     }

@@ -18,40 +18,69 @@ using KodeKandy.Mapnificent.Projections;
 namespace KodeKandy.Mapnificent
 {
     /// <summary>
-    ///     A mapper that can copy values between two class based on defined and implied relationships.
-    ///     A projection from a class to a class is called a 'map'.
-    ///     A projection from a class to a value type is called a 'conversion'.
+    ///     A mapper that can copy values between two entities based on defined and implied relationships.
+    ///     - A projection from a class to a class is called a 'ClassMap'.
+    ///     - A projection from an Enumerable to a List is called a 'ListMap'.
+    ///     - A projection from a class to a value type is called a 'conversion'.
     /// </summary>
     public class Mapper
     {
         /// <summary>
-        ///     ConversionOverride definitions encompass all mappings into a value type.
+        ///     ConvertUsing definitions encompass all mappings into a value type.
         /// </summary>
         private readonly Dictionary<ProjectionType, Conversion> conversionDefinitions = new Dictionary<ProjectionType, Conversion>();
         /// <summary>
         ///     MapInto definitions encompass all mappings into a reference type.
         /// </summary>
-        private readonly Dictionary<ProjectionType, Map> mapDefinitions = new Dictionary<ProjectionType, Map>();
+        private readonly Dictionary<ProjectionType, IMap> mapDefinitions = new Dictionary<ProjectionType, IMap>();
 
         public Mapper()
         {
-            // Default map for string which just copies the instance by using a custom 'ConstructedBy' which simply returns the from instance.
-            DefineMap<string, string>().ConstructedBy(ctx => (string) ctx.FromInstance);
+            // Default ClassMap for string which just copies the instance by using a custom 'ConstructUsing' which simply returns the from instance.
+            DefineClassMap<string, string>().ConstructUsing(ctx => (string) ctx.FromInstance);
         }
 
-        public MapBuilder<TFrom, TTo> DefineMap<TFrom, TTo>()
+        public MapBuilder<TFrom, TTo> DefineClassMap<TFrom, TTo>()
             where TTo : class
         {
-            var mappingType = new ProjectionType(typeof(TFrom), typeof(TTo));
-            Map definition;
+            var projectionType = new ProjectionType(typeof(TFrom), typeof(TTo));
 
-            if (!mapDefinitions.TryGetValue(mappingType, out definition))
+            if (projectionType.IsListProjection)
+                throw new Exception(string.Format("Error, {0} is a list projection, not a class projection", projectionType));
+
+            IMap definition;
+
+            if (!mapDefinitions.TryGetValue(projectionType, out definition))
             {
-                definition = new Map(mappingType, this);
-                mapDefinitions.Add(mappingType, definition);
+                definition = new ClassMap(projectionType, this);
+                mapDefinitions.Add(projectionType, definition);
             }
 
-            return new MapBuilder<TFrom, TTo>(definition);
+            return new MapBuilder<TFrom, TTo>((ClassMap) definition);
+        }
+
+        public MapBuilder<TFrom, TTo> DefineListMap<TFrom, TTo>()
+            where TFrom : class
+            where TTo : class
+        {
+            var projectionType = new ProjectionType(typeof(TFrom), typeof(TTo));
+
+            if (!projectionType.IsListProjection)
+            {
+                throw new Exception(string.Format("{0} is not a list projection.", projectionType));
+            }
+
+            IMap definition;
+
+            if (!mapDefinitions.TryGetValue(projectionType, out definition))
+            {
+                definition = new ListMap(projectionType, this);
+                mapDefinitions.Add(projectionType, definition);
+            }
+
+            return null;
+
+            //return new MapBuilder<TFrom, TTo>(definition);
         }
 
         public ConversionDefinitionBuilder<TFrom, TTo> DefineConversion<TFrom, TTo>()
@@ -102,20 +131,65 @@ namespace KodeKandy.Mapnificent
                 return HasConversion(fromType, toType);
         }
 
-        public Map GetMap(ProjectionType projectionType)
+        public IMap GetMap(ProjectionType projectionType)
         {
-            Map map;
-            if (!mapDefinitions.TryGetValue(projectionType, out map))
+            IMap classMap;
+            if (mapDefinitions.TryGetValue(projectionType, out classMap)) return classMap;
+
+            if (projectionType.IsListProjection)
             {
-                var msg = string.Format("Unable to get map of type {0}, as no map defined.", projectionType);
-                throw new MapnificentException(msg);
+                classMap = new ListMap(projectionType, this);
+                mapDefinitions.Add(projectionType, classMap);
             }
-            return map;
+            else
+            {
+                var msg = string.Format("Unable to get Map of type {0}, as no Map defined.", projectionType);
+                throw new MapnificentException(msg, this);
+            }
+            return classMap;
         }
 
-        public Map GetMap(Type fromType, Type toType)
+        public ClassMap GetClassMap(ProjectionType projectionType)
+        {
+            if (!projectionType.IsClassProjection)
+            {
+                var msg = string.Format("Unable to get ClassMap for projection {0}, as it is not a class projection.", projectionType);
+                throw new MapnificentException(msg, this);
+            }
+            return (ClassMap) GetMap(projectionType);
+        }
+
+        /// <summary>
+        ///     Gets a list map for the specified <see cref="ProjectionType" />.
+        ///     Unlike with <see cref="ClassMap" />s or <see cref="Conversion" />s, these are autogenerated if they have not been
+        ///     manually defined.
+        /// </summary>
+        /// <param name="projectionType"></param>
+        /// <returns></returns>
+        public ListMap GetListMap(ProjectionType projectionType)
+        {
+            if (!projectionType.IsListProjection)
+            {
+                var msg = string.Format("Unable to get ListMap for projection {0}, as it is not a list projection.", projectionType);
+                throw new MapnificentException(msg, this);
+            }
+            return (ListMap) GetMap(projectionType);
+        }
+
+
+        public IMap GetMap(Type fromType, Type toType)
         {
             return GetMap(new ProjectionType(fromType, toType));
+        }
+
+        public ClassMap GetClassMap(Type fromType, Type toType)
+        {
+            return GetClassMap(new ProjectionType(fromType, toType));
+        }
+
+        public ListMap GetListMap(Type fromType, Type toType)
+        {
+            return GetListMap(new ProjectionType(fromType, toType));
         }
 
         public Conversion GetConversion(ProjectionType projectionType)
@@ -124,7 +198,7 @@ namespace KodeKandy.Mapnificent
             if (!conversionDefinitions.TryGetValue(projectionType, out conversion))
             {
                 var msg = string.Format("Unable to get converesion of type {0}, as no conversion defined.", projectionType);
-                throw new MapnificentException(msg);
+                throw new MapnificentException(msg, this);
             }
             return conversion;
         }
@@ -142,7 +216,7 @@ namespace KodeKandy.Mapnificent
             catch (Exception ex)
             {
                 var msg = string.Format("Error mapping into between objects of type '{0}' -> '{1}'", from.SafeGetTypeName(), to.SafeGetTypeName());
-                throw new MapnificentException(msg, ex);
+                throw new MapnificentException(msg, ex, this);
             }
         }
 
@@ -160,7 +234,7 @@ namespace KodeKandy.Mapnificent
             catch (Exception ex)
             {
                 var msg = string.Format("Error mapping between objects of type '{0}' -> '{1}'", typeof(TFrom).Name, typeof(TTo).Name);
-                throw new MapnificentException(msg, ex);
+                throw new MapnificentException(msg, ex, this);
             }
         }
 
@@ -177,15 +251,8 @@ namespace KodeKandy.Mapnificent
             catch (Exception ex)
             {
                 var msg = string.Format("Error mapping between objects of type '{0}' -> '{1}'", from.GetType().Name, typeof(TTo).Name);
-                throw new MapnificentException(msg, ex);
+                throw new MapnificentException(msg, ex, this);
             }
-        }
-
-        public void AddMap(Map map)
-        {
-            Require.NotNull(map, "map");
-
-            mapDefinitions.Add(map.ProjectionType, map);
         }
 
         // TODO Add Import(Mapper mapperSchema) method.

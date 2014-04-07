@@ -16,9 +16,9 @@ using System;
 namespace KodeKandy.Mapnificent.Projections
 {
     /// <summary>
-    ///     ConversionOverride definitions encompass all mappings into a value type.
+    ///     ConvertUsing definitions encompass all mappings into a value type.
     /// </summary>
-    public class Conversion
+    public class Conversion 
     {
         private Func<object, object> conversionFunc;
 
@@ -43,7 +43,7 @@ namespace KodeKandy.Mapnificent.Projections
 
         public override string ToString()
         {
-            return String.Format("ConversionOverride: {0}", ProjectionType);
+            return String.Format("ConvertUsing: {0}", ProjectionType);
         }
 
         public object Apply(object fromValue)

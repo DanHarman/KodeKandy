@@ -59,7 +59,7 @@ namespace KodeKandy.Mapnificent.MemberAccess
 
         /// <summary>
         ///     Ignores this 'to' Member in the mapping.
-        ///     If you intend to not map into a member on the 'to' class you must explicitly define that with <see cref="Ignore" />
+        ///     If you intend to not ClassMap into a member on the 'to' class you must explicitly define that with <see cref="Ignore" />
         ///     so that the mapping definition will validate.
         /// </summary>
         /// <returns></returns>
@@ -85,7 +85,7 @@ namespace KodeKandy.Mapnificent.MemberAccess
             return this;
         }
 
-        //public BindingBuilder<TToMember> ConstructedBy(Func<TToMember> constructor)
+        //public BindingBuilder<TToMember> ConstructUsing(Func<TToMember> constructor)
         //{
         //    return this;
         //}

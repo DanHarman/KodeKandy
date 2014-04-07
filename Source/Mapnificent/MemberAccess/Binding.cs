@@ -37,14 +37,14 @@ namespace KodeKandy.Mapnificent.MemberAccess
         private bool isIgnore;
 
         public Binding(MemberInfo toMemberInfo, BindingType bindingType,
-            FromDefinition fromDefinition = null, Conversion conversionOverride = null)
+            FromDefinition fromDefinition = null, Conversion convertUsing = null)
         {
             Require.NotNull(toMemberInfo, "toMemberInfo");
 
             BindingType = bindingType;
             ToDefinition = new ToDefinition(toMemberInfo);
             FromDefinition = fromDefinition ?? FromUndefinedDefinition.Default;
-            ConversionOverride = conversionOverride;
+            ConvertUsing = convertUsing;
         }
 
         /// <summary>
@@ -78,17 +78,17 @@ namespace KodeKandy.Mapnificent.MemberAccess
         }
 
         /// <summary>
-        ///     ConversionOverride used to map between the 'from' member to the 'to' member.
+        ///     ConvertUsing used to ClassMap between the 'from' member to the 'to' member.
         ///     This is an override as by default the Mapper is queried for conversions.
         /// </summary>
-        public Conversion ConversionOverride { get; set; }
+        public Conversion ConvertUsing { get; set; }
 
         /// <summary>
-        ///     Indicates if the binding is map based, or conversely Conversion based.
+        ///     Indicates if the binding is ClassMap based, or conversely Conversion based.
         /// </summary>
         public bool IsMap
         {
-            get { return ProjectionType.IsMap; }
+            get { return ProjectionType.IsClassProjection; }
         }
 
         /// <summary>
@@ -108,13 +108,13 @@ namespace KodeKandy.Mapnificent.MemberAccess
                 if (isIgnore)
                 {
                     FromDefinition = null;
-                    ConversionOverride = null;
+                    ConvertUsing = null;
                 }
             }
         }
 
         /// <summary>
-        ///     Applies a map operation between bound properties on the 'from' and 'to' class.
+        ///     Applies a ClassMap operation between bound properties on the 'from' and 'to' class.
         /// </summary>
         /// <param name="mapper"></param>
         /// <param name="fromDeclaring">An instance of the from class.</param>
@@ -148,7 +148,7 @@ namespace KodeKandy.Mapnificent.MemberAccess
             catch (Exception ex)
             {
                 var msg = string.Format("Error applying binding '{0}'", this);
-                throw new MapnificentException(msg, ex);
+                throw new MapnificentException(msg, ex, mapper);
             }
         }
 
@@ -175,11 +175,11 @@ namespace KodeKandy.Mapnificent.MemberAccess
             }
             else if (IsMap)
             {
-                // TODO support Map override here.
+                // TODO support ClassMap override here.
 
                 var map = mapper.GetMap(ProjectionType);
 
-                // If we are mapping into then attempt to get a value to map into.
+                // If we are mapping into then attempt to get a value to ClassMap into.
                 if (mapInto)
                     toValue = ToDefinition.Accessor.Getter(toDeclaringInstance);
 
@@ -194,8 +194,8 @@ namespace KodeKandy.Mapnificent.MemberAccess
 
                 Conversion conversion;
 
-                if (ConversionOverride != null)
-                    conversion = ConversionOverride;
+                if (ConvertUsing != null)
+                    conversion = ConvertUsing;
                 else if (ProjectionType.IsIdentity)
                     conversion = null;
                 else

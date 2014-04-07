@@ -12,11 +12,12 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 
 namespace KodeKandy.Mapnificent.Projections
 {
     /// <summary>
-    ///     Defines the types projected in a map or conversion.
+    ///     Defines the types projected in a ClassMap or conversion.
     /// </summary>
     public class ProjectionType
     {
@@ -35,26 +36,52 @@ namespace KodeKandy.Mapnificent.Projections
             Require.NotNull(fromType, "fromType");
             Require.NotNull(toType, "toType");
 
+            // If this is a list mapping then we upcast the fromType to an IEnumerable<T> and the toType to IList<T>, this saves having to explicitly store
+            // every permutation of collection type that derive from these base classes.
+            // On second thoughts we are going to be explicit at the moment so the comment above is liable for deletion. TODO delete once certain.
+            var fromEnumerableType = fromType.TryGetGenericTypeDefinitionOfType(typeof(IEnumerable<>));
+            var toListType = toType.TryGetGenericTypeDefinitionOfType(typeof(IList<>));
+
+            if (fromEnumerableType != null && toListType != null)
+            {
+//                FromType = fromEnumerableType;
+//                ToType = toListType;
+                FromItemType = fromEnumerableType.GetGenericArguments()[0];
+                ToItemType = toListType.GetGenericArguments()[0];
+            }
+
             FromType = fromType;
             ToType = toType;
         }
 
-        public Type FromType { get; set; }
-        public Type ToType { get; set; }
+        public Type FromType { get; private set; }
+        public Type ToType { get; private set; }
+        public Type FromItemType { get; private set; }
+        public Type ToItemType { get; private set; }
 
-        public bool IsMap
+        /// <summary>
+        ///     Indicates that the projection corresponds to a <see cref="ClassMap" />.ef
+        /// </summary>
+        public bool IsClassProjection
         {
             get { return ToType.IsClass; }
         }
 
-        public bool IsByValue
-        {
-            get { return !ToType.IsClass && ToType == FromType; }
-        }
-
+        /// <summary>
+        ///     Indicates if the projection type is from and to the same type. i.e. a clone. This implies no requirement for a
+        ///     conversion.
+        /// </summary>
         public bool IsIdentity
         {
             get { return ToType == FromType; }
+        }
+
+        /// <summary>
+        ///     Indicates if the projection type corresponds to <see cref="IEnumerable{T}" /> to <see cref="IList{T}" />.
+        /// </summary>
+        public bool IsListProjection
+        {
+            get { return FromItemType != null && ToItemType != null; }
         }
 
         public static ProjectionType Create<TFrom, TTo>()
@@ -64,7 +91,7 @@ namespace KodeKandy.Mapnificent.Projections
 
         protected bool Equals(ProjectionType other)
         {
-            return FromType == other.FromType && ToType == other.ToType;
+            return FromType == other.FromType && ToType == other.ToType && FromItemType == other.FromItemType && ToItemType == other.ToItemType;
         }
 
         public override bool Equals(object obj)

@@ -11,10 +11,31 @@
 // PARTICULAR PURPOSE.
 // </copyright>
 
+using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace KodeKandy.Mapnificent.Tests.MapperTests
 {
+    [TestFixture]
+    public class Given_Mapping_Collection
+    {
+        [Test]
+        public void blah()
+        {
+            // Arrange
+            var mapper = new Mapper();
+            var sut = mapper.GetListMap(typeof(List<string>), typeof(List<string>));
+            var from = new List<string> {"one", "two", "three"};
+
+            // Act
+            var res = sut.Apply(from) as List<string>;
+
+            // Assert
+            Assert.NotNull(res);
+            CollectionAssert.AreEqual(from, res);
+        }
+    }
+
     [TestFixture]
     public class Given_Mapper
     {
@@ -31,7 +52,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
             // Arrange
             var sut = new Mapper();
 
-            var x = sut.GetMap(typeof(string), typeof(string));
+            var x = sut.GetClassMap(typeof(string), typeof(string));
             var y = x.Bindings;
 
             // Assert

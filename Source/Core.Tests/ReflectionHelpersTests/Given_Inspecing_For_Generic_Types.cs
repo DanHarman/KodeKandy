@@ -43,6 +43,7 @@ namespace KodeKandy.ReflectionHelpersTests
 
         [TestCase(typeof(List<string>), typeof(IEnumerable<>), typeof(IEnumerable<string>))]
         [TestCase(typeof(Collection<int>), typeof(ICollection<>), typeof(ICollection<int>))]
+        [TestCase(typeof(ICollection<int>), typeof(IEnumerable<>), typeof(IEnumerable<int>))]
         [TestCase(typeof(Dictionary<int, int>), typeof(IList<>), null)]
         [Test]
         public void When_Trying_To_Get_Generic_Definition_Then_Result_Expected(Type type, Type genericType, Type expected)
