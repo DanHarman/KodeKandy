@@ -53,6 +53,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="MapperTests\Given_Auto_Generated_Map.cs" />
+    <Compile Include="MapperTests\Given_Building_Map_With_MapBuilder.cs" />
     <Compile Include="MapperTests\Given_Mapping_With_Inheritance.cs" />
     <Compile Include="MapperTests\Given_Mapping_With_Polymorphism.cs" />
     <Compile Include="MapperTests\Given_Setting_Map_Properties.cs" />

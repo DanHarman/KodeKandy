@@ -18,7 +18,7 @@ namespace KodeKandy.Mapnificent.Projections
     /// <summary>
     ///     ConvertUsing definitions encompass all mappings into a value type.
     /// </summary>
-    public class Conversion 
+    public class Conversion
     {
         private Func<object, object> conversionFunc;
 

@@ -27,7 +27,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
             // Arrange
             var map = new ClassMap(ProjectionType.Create<VehicleFrom, VehicleTo>(), new Mapper());
             var sut = new MapBuilder<VehicleFrom, VehicleTo>(map);
-            bool flag = false;
+            var flag = false;
             var constructor = (Func<ConstructionContext, VehicleTo>) (_ =>
             {
                 flag = true;
@@ -79,7 +79,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
             // Arrange
             var map = new ClassMap(ProjectionType.Create<VehicleFrom, VehicleTo>(), new Mapper());
             var sut = new MapBuilder<VehicleFrom, VehicleTo>(map);
-            bool flag = false;
+            var flag = false;
             var postMapStep = (Action<VehicleFrom, VehicleTo>) ((_, __) => flag = true);
 
             // Act

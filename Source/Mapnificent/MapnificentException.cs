@@ -17,8 +17,6 @@ namespace KodeKandy.Mapnificent
 {
     public class MapnificentException : Exception
     {
-        public Mapper Mapper { get; private set; }
-
         public MapnificentException(string message, Mapper mapper) : this(message, null, mapper)
         {
         }
@@ -27,6 +25,8 @@ namespace KodeKandy.Mapnificent
         {
             Mapper = mapper;
         }
+
+        public Mapper Mapper { get; private set; }
     }
 
     /// <summary>

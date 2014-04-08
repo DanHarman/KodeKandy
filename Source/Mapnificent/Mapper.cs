@@ -258,7 +258,7 @@ namespace KodeKandy.Mapnificent
         public TTo Map<TTo>(object from)
             where TTo : class
         {
-            return (TTo)Map(from, typeof(TTo));
+            return (TTo) Map(from, typeof(TTo));
         }
 
         // TODO Add Import(Mapper mapperSchema) method.

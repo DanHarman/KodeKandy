@@ -52,7 +52,7 @@ namespace KodeKandy.Mapnificent.Projections
             return this;
         }
 
-        public MapBuilder<TFromDeclaring, TToDeclaring> AfterMapping(Action<TFromDeclaring, TToDeclaring> afterMappingAction)
+        public MapBuilder<TFromDeclaring, TToDeclaring> PostMapStep(Action<TFromDeclaring, TToDeclaring> afterMappingAction)
         {
             Require.NotNull(afterMappingAction, "afterMappingAction");
 

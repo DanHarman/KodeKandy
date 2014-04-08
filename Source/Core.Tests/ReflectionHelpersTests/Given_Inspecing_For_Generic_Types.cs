@@ -41,21 +41,6 @@ namespace KodeKandy.ReflectionHelpersTests
             Assert.AreEqual(expected, res);
         }
 
-        [TestCase(typeof(List<string>), typeof(IEnumerable<>), typeof(IEnumerable<string>))]
-        [TestCase(typeof(Collection<int>), typeof(ICollection<>), typeof(ICollection<int>))]
-        [TestCase(typeof(ICollection<int>), typeof(IEnumerable<>), typeof(IEnumerable<int>))]
-        [TestCase(typeof(IEnumerable<int>), typeof(IEnumerable<>), typeof(IEnumerable<int>))]
-        [TestCase(typeof(Dictionary<int, int>), typeof(IList<>), null)]
-        [Test]
-        public void When_Trying_To_Get_Generic_Definition_Then_Result_Expected(Type type, Type genericType, Type expected)
-        {
-            // Act
-            var res = type.TryGetGenericTypeDefinitionOfType(genericType);
-
-            // Assert
-            Assert.AreEqual(expected, res);
-        }
-
         [TestCase(typeof(Collection<int>), typeof(int))]
         [TestCase(typeof(ICollection<string>), typeof(string))]
         [TestCase(typeof(IEnumerable<string>), typeof(string))]
@@ -68,6 +53,21 @@ namespace KodeKandy.ReflectionHelpersTests
 
             // Act
             var res = sut.GetGenericArguments()[0];
+
+            // Assert
+            Assert.AreEqual(expected, res);
+        }
+
+        [TestCase(typeof(List<string>), typeof(IEnumerable<>), typeof(IEnumerable<string>))]
+        [TestCase(typeof(Collection<int>), typeof(ICollection<>), typeof(ICollection<int>))]
+        [TestCase(typeof(ICollection<int>), typeof(IEnumerable<>), typeof(IEnumerable<int>))]
+        [TestCase(typeof(IEnumerable<int>), typeof(IEnumerable<>), typeof(IEnumerable<int>))]
+        [TestCase(typeof(Dictionary<int, int>), typeof(IList<>), null)]
+        [Test]
+        public void When_Trying_To_Get_Generic_Definition_Then_Result_Expected(Type type, Type genericType, Type expected)
+        {
+            // Act
+            var res = type.TryGetGenericTypeDefinitionOfType(genericType);
 
             // Assert
             Assert.AreEqual(expected, res);
