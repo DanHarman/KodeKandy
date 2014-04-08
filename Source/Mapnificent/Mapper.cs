@@ -120,7 +120,7 @@ namespace KodeKandy.Mapnificent
             return conversionDefinitions.ContainsKey(new ProjectionType(fromType, toType));
         }
 
-        public bool HasMapOrConversion(Type fromType, Type toType)
+        public bool HasProjection(Type fromType, Type toType)
         {
             Require.NotNull(fromType, "fromType");
             Require.NotNull(toType, "toType");
@@ -238,21 +238,27 @@ namespace KodeKandy.Mapnificent
             }
         }
 
-        public TTo Map<TTo>(object from)
-            where TTo : class
+        public object Map(object from, Type toType)
         {
             try
             {
                 Require.NotNull(from, "from");
+                Require.IsTrue(toType.IsClass);
 
-                var map = GetMap(from.GetType(), typeof(TTo));
-                return (TTo) map.Apply(from);
+                var map = GetMap(from.GetType(), toType);
+                return map.Apply(from);
             }
             catch (Exception ex)
             {
-                var msg = string.Format("Error mapping between objects of type '{0}' -> '{1}'", from.GetType().Name, typeof(TTo).Name);
+                var msg = string.Format("Error mapping between objects of type '{0}' -> '{1}'", from.GetType().Name, toType.Name);
                 throw new MapnificentException(msg, ex, this);
             }
+        }
+
+        public TTo Map<TTo>(object from)
+            where TTo : class
+        {
+            return (TTo)Map(from, typeof(TTo));
         }
 
         // TODO Add Import(Mapper mapperSchema) method.

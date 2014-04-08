@@ -11,6 +11,10 @@
 // PARTICULAR PURPOSE.
 // </copyright>
 
+using System.Collections;
+using System.Collections.Generic;
+using NUnit.Framework;
+
 namespace KodeKandy.Mapnificent.Tests.TestEntities
 {
     public class SimpleFrom
@@ -37,5 +41,15 @@ namespace KodeKandy.Mapnificent.Tests.TestEntities
     public class CarTo : VehicleTo
     {
         public int NumSeats { get; set; }
+    }
+
+    public class ContainsEnumerableTFrom
+    {
+        public IEnumerable<SimpleFrom> Collection { get; set; }
+    }
+
+    public class ContainsListTTo
+    {
+        public List<SimpleTo> Collection { get; set; }
     }
 }

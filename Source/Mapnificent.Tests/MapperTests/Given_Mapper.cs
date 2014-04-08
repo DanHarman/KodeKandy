@@ -12,6 +12,8 @@
 // </copyright>
 
 using System.Collections.Generic;
+using KodeKandy.Mapnificent.Tests.TestEntities;
+using KodeKandy.QualityTools;
 using NUnit.Framework;
 
 namespace KodeKandy.Mapnificent.Tests.MapperTests
@@ -19,20 +21,49 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
     [TestFixture]
     public class Given_Mapping_Collection
     {
+        private Mapper sut;
+
         [Test]
-        public void blah()
+        public void When_Mapping_Then_Mapped()
         {
             // Arrange
-            var mapper = new Mapper();
-            var sut = mapper.GetListMap(typeof(List<string>), typeof(List<string>));
+            sut = new Mapper();
             var from = new List<string> {"one", "two", "three"};
 
             // Act
-            var res = sut.Apply(from) as List<string>;
+            var res = sut.Map<List<string>>(from);
 
             // Assert
             Assert.NotNull(res);
             CollectionAssert.AreEqual(from, res);
+        }
+    }
+
+    [TestFixture]
+    public class Given_Mapping_With_ChildCollections
+    {
+        [Test]
+        public void When_Mapping_Object_With_Complex_Enumerable_Then_Maps()
+        {
+            // Arrange
+            var sut = new Mapper();
+            sut.DefineClassMap<SimpleFrom, SimpleTo>();
+            sut.DefineClassMap<ContainsEnumerableTFrom, ContainsListTTo>();
+            var from = new ContainsEnumerableTFrom
+            {
+                Collection = new List<SimpleFrom>
+                {
+                    new SimpleFrom {StringProp = "One", IntField = 1},
+                    new SimpleFrom {StringProp = "Two", IntField = 2},
+                    new SimpleFrom {StringProp = "Three", IntField = 3},
+                }
+            };
+
+            // Act
+            var res = sut.Map<ContainsListTTo>(from);
+
+            // Assert
+            KKAssert.AreEqualByValue(from, res);
         }
     }
 

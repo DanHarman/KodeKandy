@@ -33,7 +33,7 @@ namespace KodeKandy.Mapnificent.MemberAccess
 //                var fromMemberType = definition.FromDefinition.MemberType;
 //                var toMemberType = definition.toToMemberDefinition.MemberType;
 //
-//                if (!mapper.HasMapOrConversion(fromMemberType, toMemberType))
+//                if (!mapper.HasProjection(fromMemberType, toMemberType))
 //                {
 //                    memberDefinitionErrors.Add(
 //                        MemberDefinitionError.Create(definition.toToMemberDefinition, "Mapped from '{0}' but no {1} defined between '{2}'->'{3}'.",

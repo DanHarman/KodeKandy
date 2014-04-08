@@ -379,7 +379,7 @@ namespace KodeKandy.Mapnificent.Projections
 
         public void Validate()
         {
-            if (!Mapper.HasMapOrConversion(ProjectionType.FromItemType, ProjectionType.ToItemType))
+            if (!Mapper.HasProjection(ProjectionType.FromItemType, ProjectionType.ToItemType))
                 throw new Exception(string.Format("Mapped not defined for the item type of ListMap '{0}'", ProjectionType));
         }
     }
