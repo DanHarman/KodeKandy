@@ -20,23 +20,6 @@ using NUnit.Framework;
 namespace KodeKandy.Mapnificent.Tests.MapperTests
 {
     [TestFixture]
-    public class Given_Building_Map_With_MapBuilder
-    {
-        [Test]
-        public void asdsa()
-        {
-            // Arrange
-            var map = new ClassMap(ProjectionType.Create<SimpleFrom, SimpleTo>(), new Mapper());
-            var sut = new MapBuilder<SimpleFrom, SimpleTo>(map);
-
-            // Act
-        //    sut.PolymorhpicFor<>()
-
-            // Assert
-        }
-    }
-
-    [TestFixture]
     public class Given_Setting_Map_Properties
     {
         [Test]
