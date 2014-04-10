@@ -27,6 +27,7 @@ namespace KodeKandy.Mapnificent.Projections
     {
         private readonly Dictionary<string, Binding> explicitBindings = new Dictionary<string, Binding>();
         private readonly List<ProjectionType> polymorphicFor = new List<ProjectionType>();
+
         /// <summary>
         ///     Cached bindings for a given Mapper. This is required since a ClassMap may be placed into more than one Mapper.
         /// </summary>

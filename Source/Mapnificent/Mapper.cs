@@ -19,7 +19,8 @@ namespace KodeKandy.Mapnificent
 {
     /// <summary>
     ///     A mapper that can copy values between two entities based on defined and implied relationships.
-    ///     - A projection from a class to a class is called a 'ClassMap'.
+    ///     - A projection from a class to a class (i.e 'to' type is a reference type) is called a 'ClassMap'.
+    ///     - A projection that polymorphically redirects reference type maps depending on the 'from' type is called a 'PolymorphicMap'.
     ///     - A projection from an Enumerable to a List is called a 'ListMap'.
     ///     - A projection from a class to a value type is called a 'conversion'.
     /// </summary>
@@ -41,7 +42,7 @@ namespace KodeKandy.Mapnificent
             BuildClassMap<string, string>().ConstructUsing(ctx => (string) ctx.FromInstance);
         }
 
-        public ClassMapBuilder<TFrom, TTo> BuildClassMap<TFrom, TTo>()
+        public ClassMapBuilder<TFrom, TTo> BuildClassMap<TFrom, TTo>(bool register = true)
             where TTo : class
         {
             var projectionType = new ProjectionType(typeof(TFrom), typeof(TTo));
@@ -49,18 +50,28 @@ namespace KodeKandy.Mapnificent
             if (projectionType.IsListProjection)
                 throw new Exception(string.Format("Error, {0} is a list projection, not a class projection", projectionType));
 
-            IMap definition;
+            var definition = new ClassMap(projectionType, this);
 
-            if (!mapDefinitions.TryGetValue(projectionType, out definition))
-            {
-                definition = new ClassMap(projectionType, this);
-                mapDefinitions.Add(projectionType, definition);
-            }
+            if (register)
+                mapDefinitions[projectionType] = definition;
 
-            return new ClassMapBuilder<TFrom, TTo>((ClassMap) definition);
+            return new ClassMapBuilder<TFrom, TTo>(definition);
         }
 
-        public ClassMapBuilder<TFrom, TTo> BuildListMap<TFrom, TTo>()
+        public PolymorphicMapBuilder<TFrom, TTo> BuildPolymorphicMap<TFrom, TTo>(bool register = true)
+            where TTo : class
+        {
+            var projectionType = new ProjectionType(typeof(TFrom), typeof(TTo));
+
+            var definition = new PolymorphicMap(projectionType, this);
+
+            if (register)
+                mapDefinitions[projectionType] = definition;
+
+            return new PolymorphicMapBuilder<TFrom, TTo>(definition);
+        }
+
+        public ClassMapBuilder<TFrom, TTo> BuildListMap<TFrom, TTo>(bool register = true)
             where TFrom : class
             where TTo : class
         {
@@ -71,30 +82,24 @@ namespace KodeKandy.Mapnificent
                 throw new Exception(string.Format("{0} is not a list projection.", projectionType));
             }
 
-            IMap definition;
+            var definition = new ListMap(projectionType, this);
 
-            if (!mapDefinitions.TryGetValue(projectionType, out definition))
-            {
-                definition = new ListMap(projectionType, this);
-                mapDefinitions.Add(projectionType, definition);
-            }
+            if (register)
+                mapDefinitions[projectionType] = definition;
 
             return null;
 
             //return new ClassMapBuilder<TFrom, TTo>(definition);
         }
 
-        public ConversionBuilder<TFrom, TTo> BuildConversion<TFrom, TTo>()
+        public ConversionBuilder<TFrom, TTo> BuildConversion<TFrom, TTo>(bool register = true)
             where TTo : struct
         {
             var projectionType = new ProjectionType(typeof(TFrom), typeof(TTo));
-            Conversion definition;
+            var definition = new Conversion(projectionType);
 
-            if (!conversionDefinitions.TryGetValue(projectionType, out definition))
-            {
-                definition = new Conversion(projectionType);
-                conversionDefinitions.Add(projectionType, definition);
-            }
+            if (register)
+                conversionDefinitions[projectionType] = definition;
 
             return new ConversionBuilder<TFrom, TTo>(definition);
         }

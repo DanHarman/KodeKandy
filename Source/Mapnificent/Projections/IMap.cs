@@ -2,7 +2,7 @@ using System;
 
 namespace KodeKandy.Mapnificent.Projections
 {
-    public interface IMap
+    public interface IMap : IProjection
     {
         /// <summary>
         ///     Factory method to create an instance of the 'to' type. Defaults to <c>Activator.CreateInstance()</c> when the
