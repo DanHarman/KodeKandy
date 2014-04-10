@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="MemberAccess\BindingType.cs" />
+    <Compile Include="MemberAccess\FromCustomDefinition.cs" />
+    <Compile Include="MemberAccess\FromUndefinedDefinition.cs" />
     <Compile Include="Projections\ConstructionContext.cs" />
     <Compile Include="Projections\Conversion.cs" />
     <Compile Include="Projections\ConversionBuilder.cs" />
@@ -42,6 +45,8 @@
     <Compile Include="Helpers.cs" />
     <Compile Include="Projections\ClassMapBuilder.cs" />
     <Compile Include="Projections\IMap.cs" />
+    <Compile Include="Projections\IProjection.cs" />
+    <Compile Include="Projections\LateBoundProjection.cs" />
     <Compile Include="Projections\ListMap.cs" />
     <Compile Include="Projections\Map.cs" />
     <Compile Include="Projections\MapBuilder.cs" />
@@ -54,6 +59,7 @@
     <Compile Include="MapnificentException.cs" />
     <Compile Include="Projections\PolymorphicMap.cs" />
     <Compile Include="Projections\PolymorphicMapBuilder.cs" />
+    <Compile Include="Projections\Projection.cs" />
     <Compile Include="ProjectionType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

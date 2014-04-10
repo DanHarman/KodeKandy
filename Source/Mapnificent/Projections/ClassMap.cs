@@ -95,7 +95,7 @@ namespace KodeKandy.Mapnificent.Projections
             Binding binding;
             if (!explicitBindings.TryGetValue(toMemberInfo.Name, out binding))
             {
-                binding = new Binding(toMemberInfo, BindingType.Explicit);
+                binding = new Binding(toMemberInfo, BindingType.Explicit, Mapper);
                 explicitBindings[toMemberInfo.Name] = binding;
             }
 
@@ -167,7 +167,7 @@ namespace KodeKandy.Mapnificent.Projections
 
                     var memberGetterDefinition = new FromMemberDefinition(fromMemberPath, fromMemberType, fromMemberGetter);
 
-                    var memberBindingDefinition = new Binding(toMemberInfo, BindingType.Auto)
+                    var memberBindingDefinition = new Binding(toMemberInfo, BindingType.Auto, Mapper)
                     {
                         FromDefinition = memberGetterDefinition
                     };

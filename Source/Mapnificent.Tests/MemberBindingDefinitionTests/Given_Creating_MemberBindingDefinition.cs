@@ -23,8 +23,11 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
         [Test]
         public void When_ToMemberInfo_Null_Then_Throws_ArgumentNullException()
         {
+            // Arrange
+            var mapper = new Mapper();
+
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => new Binding(null, BindingType.Auto));
+            Assert.Throws<ArgumentNullException>(() => new Binding(null, BindingType.Auto, mapper));
         }
     }
 }

@@ -12,14 +12,15 @@
 // </copyright>
 
 using System;
+using System.Dynamic;
 using System.Reflection;
 using KodeKandy.Mapnificent.Projections;
 
 namespace KodeKandy.Mapnificent.MemberAccess
 {
     /// <summary>
-    ///     Defines the mapping for a member in a 'to' class from a 'from' class.
-    /// 
+    ///     Defines the source of data for a member in the 'to' class. This may be a member of the 'from' class, a custom
+    ///     function or merely specify that this member is to be ignored.
     /// </summary>
     /// <remarks>
     ///     n.b. These bound members will likely need to be projected with either a map or convserion of some form.
@@ -27,13 +28,15 @@ namespace KodeKandy.Mapnificent.MemberAccess
     public class Binding
     {
         private bool isIgnore;
+        private FromDefinition fromDefinition;
 
-        public Binding(MemberInfo toMemberInfo, BindingType bindingType,
+        public Binding(MemberInfo toMemberInfo, BindingType bindingType, Mapper mapper,
             FromDefinition fromDefinition = null, Conversion convertUsing = null)
         {
             Require.NotNull(toMemberInfo, "toMemberInfo");
 
             BindingType = bindingType;
+            Mapper = mapper;
             ToDefinition = new ToDefinition(toMemberInfo);
             FromDefinition = fromDefinition ?? FromUndefinedDefinition.Default;
             ConvertUsing = convertUsing;
@@ -43,6 +46,7 @@ namespace KodeKandy.Mapnificent.MemberAccess
         ///     Captures whether the binding was explicitly defined in config or automatically inferred.
         /// </summary>
         public BindingType BindingType { get; private set; }
+        public Mapper Mapper { get; private set; }
 
         /// <summary>
         ///     Defines the 'to' member setter details.
@@ -57,7 +61,20 @@ namespace KodeKandy.Mapnificent.MemberAccess
         /// <summary>
         ///     Defines the 'from' provider when it is a member on the 'from' class.
         /// </summary>
-        public FromDefinition FromDefinition { get; set; }
+        public FromDefinition FromDefinition
+        {
+            get { return fromDefinition; }
+            set
+            {
+                fromDefinition = value;
+
+                // Update the projection if its not set or just an automatic LateBoundProjection, as it may be stale if the member
+                // type has changed.
+                // TODO remove the null Mapper...
+                if (Projection == null || Projection is LateBoundProjection)
+                    Projection = new LateBoundProjection(ProjectionType, Mapper);
+            }
+        }
 
         public Type FromType
         {
@@ -84,12 +101,14 @@ namespace KodeKandy.Mapnificent.MemberAccess
         }
 
         /// <summary>
-        ///     A projection tye reflecting the type of the 'from' and 'to' members.
+        ///     A projection the reflecting the type of the 'from' and 'to' members.
         /// </summary>
         public ProjectionType ProjectionType
         {
             get { return new ProjectionType(FromType, ToType); }
         }
+
+        public Projection Projection { get; set; }
 
         public bool IsIgnore
         {

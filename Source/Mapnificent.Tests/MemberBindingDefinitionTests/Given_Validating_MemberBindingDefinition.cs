@@ -26,7 +26,8 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
         {
             // Arrange
             var memberInfo = typeof(SimpleTo).GetMember("StringProp").Single();
-            var sut = new Binding(memberInfo, BindingType.Explicit);
+            var mapper = new Mapper();
+            var sut = new Binding(memberInfo, BindingType.Explicit, mapper);
             sut.FromDefinition = new FromMemberDefinition("StringProp", typeof(string),
                 ReflectionHelpers.CreateSafeWeakMemberChainGetter(new[] {memberInfo}));
 
@@ -42,7 +43,8 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
         {
             // Arrange
             var memberInfo = typeof(SimpleTo).GetMember("StringProp").Single();
-            var sut = new Binding(memberInfo, BindingType.Explicit)
+            var mapper = new Mapper();
+            var sut = new Binding(memberInfo, BindingType.Explicit, mapper)
             {
                 FromDefinition = new FromCustomDefinition(context => "Wow")
             };
@@ -59,7 +61,8 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
         {
             // Arrange
             var memberInfo = typeof(SimpleTo).GetMember("StringProp").Single();
-            var sut = new Binding(memberInfo, BindingType.Explicit);
+            var mapper = new Mapper();
+            var sut = new Binding(memberInfo, BindingType.Explicit, mapper);
 
             // Act
             var res = BindingValidator.Validate(sut, new Mapper());

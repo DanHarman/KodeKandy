@@ -155,6 +155,12 @@ namespace KodeKandy.Mapnificent
             return classMap;
         }
 
+        public IProjection GetProjection(ProjectionType projectionType)
+        {
+            // TODO impl this and then refactor bindings to use this with the LateBoundProjection type.
+            throw new NotImplementedException();
+        }
+
         public ClassMap GetClassMap(ProjectionType projectionType)
         {
             if (!projectionType.IsClassProjection)

@@ -12,7 +12,6 @@
 // </copyright>
 
 using System;
-using KodeKandy.Mapnificent.Projections;
 
 namespace KodeKandy.Mapnificent.MemberAccess
 {
@@ -82,87 +81,6 @@ namespace KodeKandy.Mapnificent.MemberAccess
         public override string ToString()
         {
             return string.Format("Member:{0}", MemberPath);
-        }
-    }
-
-    /// <summary>
-    ///     A 'from' definition that executes a custom delegate on a 'from' instance to get a value to set into the 'to'
-    ///     member.
-    /// </summary>
-    public class FromCustomDefinition : FromDefinition
-    {
-        private readonly Func<MappingContext, object> fromFunc;
-
-        public FromCustomDefinition(Func<MappingContext, object> fromFunc)
-        {
-            Require.NotNull(fromFunc, "fromFunc");
-
-            this.fromFunc = fromFunc;
-        }
-
-        /// <summary>
-        ///     The type of the member.
-        /// </summary>
-        public override Type MemberType
-        {
-            get { return ProjectionType.Custom; }
-        }
-
-        /// <summary>
-        ///     Attempts to get a member value from a 'from' instance.
-        /// </summary>
-        /// <param name="fromDeclaringInstance">The class instance from which the member should be fetched.</param>
-        /// <param name="mapper">The current mapper (required to provide context to custom From definitions).</param>
-        /// <param name="fromValue">The out value set if anything is a value can be retrieved.</param>
-        /// <returns>True if a value was retrieved, otherwise false.</returns>
-        public override bool TryGetFromValue(object fromDeclaringInstance, Mapper mapper, out object fromValue)
-        {
-            fromValue = fromFunc(new MappingContext(mapper, fromDeclaringInstance));
-
-            return true;
-        }
-
-        public override string ToString()
-        {
-            return "<Custom>";
-        }
-    }
-
-    /// <summary>
-    ///     Used to represent undefined 'from' definitions on bindings.
-    /// </summary>
-    public class FromUndefinedDefinition : FromDefinition
-    {
-        public static readonly FromUndefinedDefinition Default = new FromUndefinedDefinition();
-
-        private FromUndefinedDefinition()
-        {
-        }
-
-        /// <summary>
-        ///     The type of the member.
-        /// </summary>
-        public override Type MemberType
-        {
-            get { return ProjectionType.Undefined; }
-        }
-
-        /// <summary>
-        ///     Attempts to get a member value from a 'from' instance.
-        /// </summary>
-        /// <param name="fromDeclaringInstance">The class instance from which the member should be fetched.</param>
-        /// <param name="mapper">The current mapper (required to provide context to custom From definitions).</param>
-        /// <param name="fromValue">The out value set if anything is a value can be retrieved.</param>
-        /// <returns>True if a value was retrieved, otherwise false.</returns>
-        public override bool TryGetFromValue(object fromDeclaringInstance, Mapper mapper, out object fromValue)
-        {
-            fromValue = null;
-            return false;
-        }
-
-        public override string ToString()
-        {
-            return "<Undefined>";
         }
     }
 }
