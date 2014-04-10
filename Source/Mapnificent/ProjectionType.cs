@@ -13,8 +13,9 @@
 
 using System;
 using System.Collections.Generic;
+using KodeKandy.Mapnificent.Projections;
 
-namespace KodeKandy.Mapnificent.Projections
+namespace KodeKandy.Mapnificent
 {
     /// <summary>
     ///     Defines the types projected in a ClassMap or conversion.
@@ -44,8 +45,6 @@ namespace KodeKandy.Mapnificent.Projections
 
             if (fromEnumerableType != null && toListType != null)
             {
-//                FromType = fromEnumerableType;
-//                ToType = toListType;
                 FromItemType = fromEnumerableType.GetGenericArguments()[0];
                 ToItemType = toListType.GetGenericArguments()[0];
             }

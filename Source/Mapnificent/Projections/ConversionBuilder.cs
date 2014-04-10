@@ -1,4 +1,4 @@
-// <copyright file="ConversionDefinitionBuilder.cs" company="million miles per hour ltd">
+// <copyright file="ConversionBuilder.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -20,10 +20,10 @@ namespace KodeKandy.Mapnificent.Projections
     /// </summary>
     /// <typeparam name="TFrom">The type being mapped from.</typeparam>
     /// <typeparam name="TTo">The type being mapped to.</typeparam>
-    public class ConversionDefinitionBuilder<TFrom, TTo>
+    public class ConversionBuilder<TFrom, TTo>
         where TTo : struct
     {
-        public ConversionDefinitionBuilder(Conversion conversion)
+        public ConversionBuilder(Conversion conversion)
         {
             Require.IsTrue(conversion.ProjectionType.FromType == typeof(TFrom));
             Require.IsTrue(conversion.ProjectionType.ToType == typeof(TTo));
@@ -39,7 +39,7 @@ namespace KodeKandy.Mapnificent.Projections
         /// <typeparam name="TFrom"></typeparam>
         /// <param name="conversionFunc"></param>
         /// <returns></returns>
-        public ConversionDefinitionBuilder<TFrom, TTo> Explictly(Func<TFrom, TTo> conversionFunc)
+        public ConversionBuilder<TFrom, TTo> Explictly(Func<TFrom, TTo> conversionFunc)
         {
             Require.NotNull(conversionFunc, "conversionFunc");
 

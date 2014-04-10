@@ -12,7 +12,6 @@
 // </copyright>
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -21,87 +20,6 @@ using KodeKandy.Mapnificent.MemberAccess;
 
 namespace KodeKandy.Mapnificent.Projections
 {
-    public interface IMap
-    {
-        /// <summary>
-        ///     Factory method to create an instance of the 'to' type. Defaults to <c>Activator.CreateInstance()</c> when the
-        ///     toType is concrete, otherwise defaults to null.
-        /// </summary>
-        Func<ConstructionContext, object> ConstructUsing { get; set; }
-
-        /// <summary>
-        ///     Action applied to the mapping target after mapping has been performed.
-        /// </summary>
-        Action<object, object> PostMapStep { get; set; }
-        ProjectionType ProjectionType { get; }
-
-        /// <summary>
-        ///     The Mapper this ClassMap is associated with.
-        /// </summary>
-        Mapper Mapper { get; }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="from"></param>
-        /// <param name="to"></param>
-        /// <param name="mapInto">If true, attemps to ClassMap into an existing object graph rather than recreating all children.</param>
-        object Apply(object from, object to = null, bool mapInto = false);
-    }
-
-    public abstract class Map : IMap
-    {
-        private Func<ConstructionContext, object> constructUsing;
-
-        protected Map(ProjectionType projectionType, Mapper mapper)
-        {
-            Require.NotNull(projectionType, "projectionType");
-            Require.NotNull(mapper, "mapper");
-
-            ProjectionType = projectionType;
-            Mapper = mapper;
-
-            // We can only create a default constructor if the toType is concrete.
-            if (!projectionType.ToType.IsInterface)
-                ConstructUsing = _ => Activator.CreateInstance(ProjectionType.ToType);
-        }
-
-        #region IMap Members
-
-        public ProjectionType ProjectionType { get; private set; }
-
-        /// <summary>
-        ///     The Mapper this ClassMap is associated with.
-        /// </summary>
-        public Mapper Mapper { get; private set; }
-
-        public Func<ConstructionContext, object> ConstructUsing
-        {
-            get { return constructUsing; }
-            set
-            {
-                Require.NotNull(value, "value");
-                constructUsing = value;
-            }
-        }
-
-        /// <summary>
-        ///     Action applied to the mapping target after mapping has been performed.
-        /// </summary>
-        public Action<object, object> PostMapStep { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="from"></param>
-        /// <param name="to"></param>
-        /// <param name="mapInto">If true, attemps to ClassMap into an existing object graph rather than recreating all children.</param>
-        public abstract object Apply(object from, object to = null, bool mapInto = false);
-
-        #endregion
-    }
-
     /// <summary>
     ///     Defines a mapping from type to a class.
     /// </summary>
@@ -326,61 +244,6 @@ namespace KodeKandy.Mapnificent.Projections
 
             classMap = null;
             return false;
-        }
-    }
-
-    public class ListMap : Map
-    {
-        public ListMap(ProjectionType projectionType, Mapper mapper) : base(projectionType, mapper)
-        {
-            Require.IsTrue(projectionType.IsListProjection);
-
-            ItemProjectionType = new ProjectionType(projectionType.FromItemType, projectionType.ToItemType);
-        }
-
-        public ProjectionType ItemProjectionType { get; private set; }
-
-        public override object Apply(object from, object to = null, bool mapInto = false)
-        {
-            Require.NotNull(from, "from");
-            Require.IsFalse(mapInto, "mapInto not currenlty support on collection");
-
-            // need to cope with empty to type - if we pass in the expected type then we could instantiate it if its a concrete collection type.
-
-            if (to == null)
-                to = ConstructUsing(new ConstructionContext(Mapper, from, null));
-
-            var fromEnumerable = (IEnumerable) from;
-            var toCollection = (IList) to;
-
-            // Abstact if it is a map or conversion.
-            Func<object, object> projectFunc;
-
-            if (ItemProjectionType.IsClassProjection)
-            {
-                var itemMap = Mapper.GetMap(ItemProjectionType);
-                projectFunc = (f) => itemMap.Apply(f);
-            }
-            else
-            {
-                var conversion = Mapper.GetConversion(ItemProjectionType);
-                projectFunc = conversion.Apply;
-            }
-
-            foreach (var item in fromEnumerable)
-            {
-                var mappedItem = projectFunc(item);
-                toCollection.Add(mappedItem);
-            }
-
-            return to;
-        }
-
-
-        public void Validate()
-        {
-            if (!Mapper.HasProjection(ProjectionType.FromItemType, ProjectionType.ToItemType))
-                throw new Exception(string.Format("Mapped not defined for the item type of ListMap '{0}'", ProjectionType));
         }
     }
 }

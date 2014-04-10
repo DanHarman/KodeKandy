@@ -29,6 +29,7 @@ namespace KodeKandy.Mapnificent
         ///     ConvertUsing definitions encompass all mappings into a value type.
         /// </summary>
         private readonly Dictionary<ProjectionType, Conversion> conversionDefinitions = new Dictionary<ProjectionType, Conversion>();
+
         /// <summary>
         ///     MapInto definitions encompass all mappings into a reference type.
         /// </summary>
@@ -37,10 +38,10 @@ namespace KodeKandy.Mapnificent
         public Mapper()
         {
             // Default ClassMap for string which just copies the instance by using a custom 'ConstructUsing' which simply returns the from instance.
-            DefineClassMap<string, string>().ConstructUsing(ctx => (string) ctx.FromInstance);
+            BuildClassMap<string, string>().ConstructUsing(ctx => (string) ctx.FromInstance);
         }
 
-        public MapBuilder<TFrom, TTo> DefineClassMap<TFrom, TTo>()
+        public ClassMapBuilder<TFrom, TTo> BuildClassMap<TFrom, TTo>()
             where TTo : class
         {
             var projectionType = new ProjectionType(typeof(TFrom), typeof(TTo));
@@ -56,10 +57,10 @@ namespace KodeKandy.Mapnificent
                 mapDefinitions.Add(projectionType, definition);
             }
 
-            return new MapBuilder<TFrom, TTo>((ClassMap) definition);
+            return new ClassMapBuilder<TFrom, TTo>((ClassMap) definition);
         }
 
-        public MapBuilder<TFrom, TTo> DefineListMap<TFrom, TTo>()
+        public ClassMapBuilder<TFrom, TTo> BuildListMap<TFrom, TTo>()
             where TFrom : class
             where TTo : class
         {
@@ -80,10 +81,10 @@ namespace KodeKandy.Mapnificent
 
             return null;
 
-            //return new MapBuilder<TFrom, TTo>(definition);
+            //return new ClassMapBuilder<TFrom, TTo>(definition);
         }
 
-        public ConversionDefinitionBuilder<TFrom, TTo> DefineConversion<TFrom, TTo>()
+        public ConversionBuilder<TFrom, TTo> BuildConversion<TFrom, TTo>()
             where TTo : struct
         {
             var projectionType = new ProjectionType(typeof(TFrom), typeof(TTo));
@@ -95,7 +96,7 @@ namespace KodeKandy.Mapnificent
                 conversionDefinitions.Add(projectionType, definition);
             }
 
-            return new ConversionDefinitionBuilder<TFrom, TTo>(definition);
+            return new ConversionBuilder<TFrom, TTo>(definition);
         }
 
         public bool HasMap(Type fromType, Type toType)

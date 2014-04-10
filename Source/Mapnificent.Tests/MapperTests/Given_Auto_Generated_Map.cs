@@ -26,7 +26,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
         {
             // Arrange
             var sut = new Mapper();
-            var map = sut.DefineClassMap<SimpleFrom, SimpleTo>().Map;
+            var map = sut.BuildClassMap<SimpleFrom, SimpleTo>().Map;
 
             // Act
             var res = map.Bindings;
@@ -40,7 +40,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
         {
             // Arrange
             var sut = new Mapper();
-            sut.DefineClassMap<FlatteningFrom, FlatteningTo>();
+            sut.BuildClassMap<FlatteningFrom, FlatteningTo>();
             var from = new FlatteningFrom {Child = new FlatteningFrom.FlatteningChildFrom {Name = "Bob"}};
             var to = new FlatteningTo();
 
@@ -56,8 +56,8 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
         {
             // Arrange
             var sut = new Mapper();
-            sut.DefineClassMap<NestedFrom, NestedTo>();
-            sut.DefineClassMap<NestedFrom.NestedChildFrom, NestedTo.NestedChildTo>();
+            sut.BuildClassMap<NestedFrom, NestedTo>();
+            sut.BuildClassMap<NestedFrom.NestedChildFrom, NestedTo.NestedChildTo>();
             var from = new NestedFrom {Child = new NestedFrom.NestedChildFrom {Name = "Bob"}};
             var to = new NestedTo {Child = new NestedTo.NestedChildTo()};
 
@@ -74,7 +74,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
         {
             // Arrange
             var sut = new Mapper();
-            sut.DefineClassMap<SimpleFrom, SimpleTo>();
+            sut.BuildClassMap<SimpleFrom, SimpleTo>();
             var from = new SimpleFrom() {StringProp = "Bob", IntField = 20};
             var to = new SimpleTo();
 
@@ -91,8 +91,8 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
         {
             // Arrange
             var sut = new Mapper();
-            sut.DefineClassMap<ConversionFrom, ConversionTo>();
-            sut.DefineConversion<string, int>().Explictly(x => x.Count());
+            sut.BuildClassMap<ConversionFrom, ConversionTo>();
+            sut.BuildConversion<string, int>().Explictly(x => x.Count());
             var from = new ConversionFrom {Age = "Twelve"};
             var to = new ConversionTo {Age = 6};
 
@@ -112,7 +112,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
         {
             // Arrange
             var sut = new Mapper();
-            sut.DefineClassMap<int, SimpleTo>()
+            sut.BuildClassMap<int, SimpleTo>()
                .For(x => x.IntField, o => o.Custom(ctx => (int) ctx.FromInstance))
                .For(x => x.StringProp, o => o.Custom(ctx => ((int) ctx.FromInstance).ToString()));
             const int from = 12;

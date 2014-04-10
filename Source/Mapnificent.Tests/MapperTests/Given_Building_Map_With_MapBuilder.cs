@@ -26,7 +26,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
         {
             // Arrange
             var map = new ClassMap(ProjectionType.Create<VehicleFrom, VehicleTo>(), new Mapper());
-            var sut = new MapBuilder<VehicleFrom, VehicleTo>(map);
+            var sut = new ClassMapBuilder<VehicleFrom, VehicleTo>(map);
             var flag = false;
             var constructor = (Func<ConstructionContext, VehicleTo>) (_ =>
             {
@@ -48,7 +48,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
         {
             // Arrange
             var map = new ClassMap(ProjectionType.Create<CarFrom, CarTo>(), new Mapper());
-            var sut = new MapBuilder<CarFrom, CarTo>(map);
+            var sut = new ClassMapBuilder<CarFrom, CarTo>(map);
             var expected = ProjectionType.Create<VehicleFrom, VehicleTo>();
 
             // Act
@@ -63,7 +63,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
         {
             // Arrange
             var map = new ClassMap(ProjectionType.Create<VehicleFrom, VehicleTo>(), new Mapper());
-            var sut = new MapBuilder<VehicleFrom, VehicleTo>(map);
+            var sut = new ClassMapBuilder<VehicleFrom, VehicleTo>(map);
             var expected = ProjectionType.Create<CarFrom, CarTo>();
 
             // Act
@@ -78,7 +78,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
         {
             // Arrange
             var map = new ClassMap(ProjectionType.Create<VehicleFrom, VehicleTo>(), new Mapper());
-            var sut = new MapBuilder<VehicleFrom, VehicleTo>(map);
+            var sut = new ClassMapBuilder<VehicleFrom, VehicleTo>(map);
             var flag = false;
             var postMapStep = (Action<VehicleFrom, VehicleTo>) ((_, __) => flag = true);
 

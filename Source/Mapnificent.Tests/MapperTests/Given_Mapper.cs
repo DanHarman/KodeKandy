@@ -47,8 +47,8 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
         {
             // Arrange
             var sut = new Mapper();
-            sut.DefineClassMap<SimpleFrom, SimpleTo>();
-            sut.DefineClassMap<ContainsEnumerableTFrom, ContainsListTTo>();
+            sut.BuildClassMap<SimpleFrom, SimpleTo>();
+            sut.BuildClassMap<ContainsEnumerableTFrom, ContainsListTTo>();
             var from = new ContainsEnumerableTFrom
             {
                 Collection = new List<SimpleFrom>

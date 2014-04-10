@@ -16,7 +16,7 @@ using System;
 namespace KodeKandy.Mapnificent.Projections
 {
     /// <summary>
-    ///     ConvertUsing definitions encompass all mappings into a value type.
+    ///     Conversions encompass all projections into a value type.
     /// </summary>
     public class Conversion
     {
@@ -31,6 +31,7 @@ namespace KodeKandy.Mapnificent.Projections
         }
 
         public ProjectionType ProjectionType { get; private set; }
+
         public Func<object, object> ConversionFunc
         {
             get { return conversionFunc; }
