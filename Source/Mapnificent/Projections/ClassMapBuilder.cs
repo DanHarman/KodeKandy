@@ -71,7 +71,7 @@ namespace KodeKandy.Mapnificent.Projections
         public ClassMapBuilder<TFromDeclaring, TToDeclaring> InheritsFrom<TFromInherits, TToInherits>()
         {
             var projectionType = ProjectionType.Create<TFromInherits, TToInherits>();
-
+            // TODO we can't inherit frmo a polymorphic map or list map...
             if (!projectionType.IsClassProjection)
             {
                 var msg = string.Format("Error inheriting from '{0}' for map of type {1}, it is only possible to inherit from a class map",

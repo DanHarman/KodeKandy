@@ -1,4 +1,4 @@
-// <copyright file="Given_Mapping_With_Polymorphism.cs" company="million miles per hour ltd">
+// <copyright file="Given_PolymorphicMap.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -17,7 +17,7 @@ using NUnit.Framework;
 namespace KodeKandy.Mapnificent.Tests.MapperTests
 {
     [TestFixture]
-    public class Given_Mapping_With_Polymorphism
+    public class Given_PolymorphicMap
     {
         [Test]
         public void When_Mapping_Derived_Instance_As_Base_Then_Maps_Polymorphically_As_Derived()
@@ -25,12 +25,10 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
             // Arrange
             var sut = new Mapper();
 
-            sut.BuildClassMap<VehicleFrom, VehicleTo>()
-               .For(x => x.Name, o => o.Custom(_ => "Ferrari"))
+            sut.BuildPolymorphicMap<VehicleFrom, VehicleTo>()
                .PolymorhpicFor<CarFrom, CarTo>();
 
-            sut.BuildClassMap<CarFrom, CarTo>()
-               .InheritsFrom<VehicleFrom, VehicleTo>();
+            sut.BuildClassMap<CarFrom, CarTo>();
 
             var from = new CarFrom() {Name = "Porsche", NumSeats = 4};
 
@@ -40,7 +38,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
 
             // Assert
             Assert.NotNull(res);
-            Assert.AreEqual("Ferrari", res.Name);
+            Assert.AreEqual("Porsche", res.Name);
             Assert.AreEqual(from.NumSeats, res.NumSeats);
         }
     }

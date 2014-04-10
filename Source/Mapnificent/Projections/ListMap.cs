@@ -32,7 +32,9 @@ namespace KodeKandy.Mapnificent.Projections
             Require.NotNull(from, "from");
             Require.IsFalse(mapInto, "mapInto not currenlty support on collection");
 
-            // need to cope with empty to type - if we pass in the expected type then we could instantiate it if its a concrete collection type.
+            // TODO: need to cope with empty to type - if we pass in the expected type then we could instantiate it if its a 
+            // concrete collection type. This is only a concern if there is no constructUsing defined.
+
 
             if (to == null)
                 to = ConstructUsing(new ConstructionContext(Mapper, from, null));
@@ -40,23 +42,11 @@ namespace KodeKandy.Mapnificent.Projections
             var fromEnumerable = (IEnumerable) from;
             var toCollection = (IList) to;
 
-            // Abstact if it is a map or conversion.
-            Func<object, object, bool, object> projectFunc;
-
-            if (ItemProjectionType.IsClassProjection)
-            {
-                var itemMap = Mapper.GetProjection(ItemProjectionType);
-                projectFunc = itemMap.Apply;
-            }
-            else
-            {
-                var conversion = Mapper.GetConversion(ItemProjectionType);
-                projectFunc = conversion.Apply;
-            }
+            var projection = Mapper.GetProjection(ItemProjectionType);
 
             foreach (var item in fromEnumerable)
             {
-                var mappedItem = projectFunc(item, null, false);
+                var mappedItem = projection.Apply(item, null, false);
                 toCollection.Add(mappedItem);
             }
 
@@ -66,7 +56,7 @@ namespace KodeKandy.Mapnificent.Projections
         public void Validate()
         {
             if (!Mapper.HasProjection(ProjectionType.FromItemType, ProjectionType.ToItemType))
-                throw new Exception(string.Format("Mapped not defined for the item type of ListMap '{0}'", ProjectionType));
+                throw new Exception(string.Format("Projection not defined for the item type of ListMap '{0}'", ProjectionType));
         }
     }
 }

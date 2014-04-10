@@ -39,7 +39,7 @@ namespace KodeKandy.Mapnificent.Projections
             var matchedProjection = polymorphs.FirstOrDefault(pt => pt.FromType == from.GetType());
             if (matchedProjection == null)
             {
-                var msg = string.Format("Error applying polymorphic map {0} as no polymorphic map defined for from type {1}.", ProjectionType,
+                var msg = string.Format("Error applying polymorphic map {0} as no polymorphic map defined for 'from' type {1}.", ProjectionType,
                     from.GetType().Name);
                 throw new MapnificentException(msg, Mapper);
             }
@@ -53,11 +53,11 @@ namespace KodeKandy.Mapnificent.Projections
             Require.NotNull(projectionType, "projectionType");
 
             Require.IsTrue(ProjectionType.FromType.IsAssignableFrom(projectionType.FromType),
-                String.Format("Cannot be polymorphic for a Map whose 'From' type '{0}' is not a subtype of this maps 'From' type '{1}'.",
+                String.Format("Cannot be polymorphic for a Projection whose 'from' type '{0}' is not a subtype of this maps 'from' type '{1}'.",
                     projectionType.FromType.Name, ProjectionType.FromType.Name));
 
             Require.IsTrue(ProjectionType.ToType.IsAssignableFrom(projectionType.ToType),
-                String.Format("Cannot be polymorphic for a Map whose 'To' type '{0}' is not a subtype of this maps 'To' type '{1}'.",
+                String.Format("Cannot be polymorphic for a Projection whose 'to' type '{0}' is not a subtype of this maps 'to' type '{1}'.",
                     projectionType.ToType.Name, ProjectionType.ToType.Name));
 
             Require.IsFalse(polymorphs.Any(pt => pt.FromType == projectionType.FromType),
