@@ -96,7 +96,7 @@ namespace KodeKandy.Mapnificent
             where TTo : struct
         {
             var projectionType = new ProjectionType(typeof(TFrom), typeof(TTo));
-            var definition = new Conversion(projectionType);
+            var definition = new Conversion(projectionType, this);
 
             if (register)
                 conversionDefinitions[projectionType] = definition;

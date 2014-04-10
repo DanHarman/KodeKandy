@@ -17,21 +17,13 @@ using KodeKandy.Mapnificent.Projections;
 
 namespace KodeKandy.Mapnificent.MemberAccess
 {
-    public enum BindingType
-    {
-        /// <summary>
-        ///     Binding explicitly defined by config.
-        /// </summary>
-        Explicit,
-        /// <summary>
-        ///     Binding automatically inferred by the library.
-        /// </summary>
-        Auto
-    }
-
     /// <summary>
     ///     Defines the mapping for a member in a 'to' class from a 'from' class.
+    /// 
     /// </summary>
+    /// <remarks>
+    ///     n.b. These bound members will likely need to be projected with either a map or convserion of some form.
+    /// </remarks>
     public class Binding
     {
         private bool isIgnore;

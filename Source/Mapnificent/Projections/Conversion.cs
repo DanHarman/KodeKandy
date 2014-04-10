@@ -18,19 +18,15 @@ namespace KodeKandy.Mapnificent.Projections
     /// <summary>
     ///     Conversions encompass all projections into a value type.
     /// </summary>
-    public class Conversion
+    public class Conversion : Projection
     {
         private Func<object, object> conversionFunc;
 
-        public Conversion(ProjectionType projectionType)
+        public Conversion(ProjectionType projectionType, Mapper mapper)
+            : base(projectionType, mapper)
         {
-            Require.NotNull(projectionType, "projectionType");
             Require.IsFalse(projectionType.ToType.IsClass);
-
-            ProjectionType = projectionType;
         }
-
-        public ProjectionType ProjectionType { get; private set; }
 
         public Func<object, object> ConversionFunc
         {
@@ -47,9 +43,9 @@ namespace KodeKandy.Mapnificent.Projections
             return String.Format("ConvertUsing: {0}", ProjectionType);
         }
 
-        public object Apply(object fromValue)
+        public override object Apply(object from, object to = null, bool mapInto = false)
         {
-            return conversionFunc(fromValue);
+            return conversionFunc(from);
         }
     }
 }

@@ -28,12 +28,12 @@ namespace KodeKandy.Mapnificent.Projections
             var toCollection = (IList) to;
 
             // Abstact if it is a map or conversion.
-            Func<object, object> projectFunc;
+            Func<object, object, bool, object> projectFunc;
 
             if (ItemProjectionType.IsClassProjection)
             {
                 var itemMap = Mapper.GetMap(ItemProjectionType);
-                projectFunc = (f) => itemMap.Apply(f);
+                projectFunc = itemMap.Apply;
             }
             else
             {
@@ -43,7 +43,7 @@ namespace KodeKandy.Mapnificent.Projections
 
             foreach (var item in fromEnumerable)
             {
-                var mappedItem = projectFunc(item);
+                var mappedItem = projectFunc(item, null, false);
                 toCollection.Add(mappedItem);
             }
 
