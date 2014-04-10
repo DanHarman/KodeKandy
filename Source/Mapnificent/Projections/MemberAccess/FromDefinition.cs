@@ -13,7 +13,7 @@
 
 using System;
 
-namespace KodeKandy.Mapnificent.MemberAccess
+namespace KodeKandy.Mapnificent.Projections.MemberAccess
 {
     public abstract class FromDefinition
     {

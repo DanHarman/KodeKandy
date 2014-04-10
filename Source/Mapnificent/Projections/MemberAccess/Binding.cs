@@ -13,9 +13,8 @@
 
 using System;
 using System.Reflection;
-using KodeKandy.Mapnificent.Projections;
 
-namespace KodeKandy.Mapnificent.MemberAccess
+namespace KodeKandy.Mapnificent.Projections.MemberAccess
 {
     /// <summary>
     ///     Defines the source of data for a member in the 'to' class. This may be a member of the 'from' class, a custom
@@ -24,7 +23,7 @@ namespace KodeKandy.Mapnificent.MemberAccess
     /// <remarks>
     ///     n.b. These bound members will likely need to be projected with either a map or convserion of some form.
     /// </remarks>
-    public class Binding
+    public class Binding : IProjection
     {
         private FromDefinition fromDefinition;
         private bool isIgnore;
@@ -111,25 +110,23 @@ namespace KodeKandy.Mapnificent.MemberAccess
         /// <summary>
         ///     Applies a ClassMap operation between bound properties on the 'from' and 'to' class.
         /// </summary>
-        /// <param name="mapper"></param>
         /// <param name="fromDeclaring">An instance of the from class.</param>
         /// <param name="toDeclaring">An instance of the to class.</param>
         /// <param name="mapInto"></param>
-        public void Apply(Mapper mapper, object fromDeclaring, object toDeclaring, bool mapInto)
+        public object Apply(object fromDeclaring, object toDeclaring, bool mapInto = false)
         {
             try
             {
-                Require.NotNull(mapper, "mapper");
                 Require.NotNull(fromDeclaring, "fromDeclaring");
                 Require.NotNull(toDeclaring, "toDeclaring");
 
                 if (IsIgnore)
-                    return;
+                    return toDeclaring;
 
                 object fromValue;
 
                 // 1. Get the 'from' value.
-                var hasValue = FromDefinition.TryGetFromValue(fromDeclaring, mapper, out fromValue);
+                var hasValue = FromDefinition.TryGetFromValue(fromDeclaring, Mapper, out fromValue);
 
                 if (hasValue)
                 {
@@ -145,11 +142,13 @@ namespace KodeKandy.Mapnificent.MemberAccess
                     // 3. Set the 'to' value.
                     ToDefinition.Accessor.Setter(toDeclaring, toValue);
                 }
+
+                return toDeclaring;
             }
             catch (Exception ex)
             {
                 var msg = string.Format("Error applying binding '{0}'", this);
-                throw new MapnificentException(msg, ex, mapper);
+                throw new MapnificentException(msg, ex, Mapper);
             }
         }
 

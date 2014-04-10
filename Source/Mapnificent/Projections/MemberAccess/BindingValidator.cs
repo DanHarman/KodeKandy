@@ -14,7 +14,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace KodeKandy.Mapnificent.MemberAccess
+namespace KodeKandy.Mapnificent.Projections.MemberAccess
 {
     public static class BindingValidator
     {

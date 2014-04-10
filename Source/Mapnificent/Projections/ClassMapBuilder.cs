@@ -13,7 +13,7 @@
 
 using System;
 using System.Linq.Expressions;
-using KodeKandy.Mapnificent.MemberAccess;
+using KodeKandy.Mapnificent.Projections.MemberAccess;
 
 namespace KodeKandy.Mapnificent.Projections
 {

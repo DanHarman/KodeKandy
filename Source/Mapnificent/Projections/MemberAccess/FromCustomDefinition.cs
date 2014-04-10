@@ -12,9 +12,8 @@
 // </copyright>
 
 using System;
-using KodeKandy.Mapnificent.Projections;
 
-namespace KodeKandy.Mapnificent.MemberAccess
+namespace KodeKandy.Mapnificent.Projections.MemberAccess
 {
     /// <summary>
     ///     A 'from' definition that executes a custom delegate on a 'from' instance to get a value to set into the 'to'

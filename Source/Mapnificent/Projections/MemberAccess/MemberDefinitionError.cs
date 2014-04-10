@@ -14,7 +14,7 @@
 using System;
 using System.Reflection;
 
-namespace KodeKandy.Mapnificent.MemberAccess
+namespace KodeKandy.Mapnificent.Projections.MemberAccess
 {
     public class MemberDefinitionError
     {

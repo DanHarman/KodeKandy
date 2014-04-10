@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using KodeKandy.Mapnificent.MemberAccess;
+using KodeKandy.Mapnificent.Projections.MemberAccess;
 
 namespace KodeKandy.Mapnificent.Projections
 {
@@ -216,7 +216,7 @@ namespace KodeKandy.Mapnificent.Projections
 
             foreach (var binding in Bindings)
             {
-                binding.Apply(Mapper, from, to, mapInto);
+                binding.Apply(from, to, mapInto);
             }
 
             if (PostMapStep != null)

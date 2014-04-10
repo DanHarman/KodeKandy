@@ -12,7 +12,7 @@
 // </copyright>
 
 using System.Linq;
-using KodeKandy.Mapnificent.MemberAccess;
+using KodeKandy.Mapnificent.Projections.MemberAccess;
 using KodeKandy.Mapnificent.Tests.TestEntities;
 using NUnit.Framework;
 

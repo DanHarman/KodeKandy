@@ -14,9 +14,8 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
-using KodeKandy.Mapnificent.Projections;
 
-namespace KodeKandy.Mapnificent.MemberAccess
+namespace KodeKandy.Mapnificent.Projections.MemberAccess
 {
     /// <summary>
     ///     Builder class to provide convenient type safe definition of member bindings.

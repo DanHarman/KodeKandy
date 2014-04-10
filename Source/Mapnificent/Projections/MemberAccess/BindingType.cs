@@ -11,7 +11,7 @@
 // PARTICULAR PURPOSE.
 // </copyright>
 
-namespace KodeKandy.Mapnificent.MemberAccess
+namespace KodeKandy.Mapnificent.Projections.MemberAccess
 {
     public enum BindingType
     {
