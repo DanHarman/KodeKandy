@@ -46,7 +46,7 @@ namespace KodeKandy.Mapnificent.Tests.MemberBindingDefinitionTests
             var mapper = new Mapper();
             var sut = new Binding(memberInfo, BindingType.Explicit, mapper)
             {
-                FromDefinition = new FromCustomDefinition(context => "Wow")
+                FromDefinition = new FromCustomDefinition(context => "Wow", typeof(string))
             };
 
             // Act

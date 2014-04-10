@@ -74,14 +74,14 @@ namespace KodeKandy.Mapnificent.MemberAccess
         /// <summary>
         ///     Explicitly define a mapping for a member with a delegate.
         /// </summary>
-        /// <typeparam name="TFrom"></typeparam>
+        /// <typeparam name="TFromResult"></typeparam>
         /// <param name="fromFunc"></param>
         /// <returns></returns>
-        public BindingBuilder<TFromDeclaring, TToMember> Custom(Func<MappingContext, TToMember> fromFunc)
+        public BindingBuilder<TFromDeclaring, TToMember> Custom<TFromResult>(Func<MappingContext, TFromResult> fromFunc)
         {
             Require.NotNull(fromFunc, "fromFunc");
 
-            Binding.FromDefinition = new FromCustomDefinition(ctx => (object) fromFunc(ctx));
+            Binding.FromDefinition = new FromCustomDefinition(ctx => (object) fromFunc(ctx), typeof(TFromResult));
 
             return this;
         }

@@ -23,12 +23,14 @@ namespace KodeKandy.Mapnificent.MemberAccess
     public class FromCustomDefinition : FromDefinition
     {
         private readonly Func<MappingContext, object> fromFunc;
+        private readonly Type memberType;
 
-        public FromCustomDefinition(Func<MappingContext, object> fromFunc)
+        public FromCustomDefinition(Func<MappingContext, object> fromFunc, Type fromType)
         {
             Require.NotNull(fromFunc, "fromFunc");
 
             this.fromFunc = fromFunc;
+            memberType = fromType;
         }
 
         /// <summary>
@@ -36,7 +38,7 @@ namespace KodeKandy.Mapnificent.MemberAccess
         /// </summary>
         public override Type MemberType
         {
-            get { return ProjectionType.Custom; }
+            get { return memberType; }
         }
 
         /// <summary>

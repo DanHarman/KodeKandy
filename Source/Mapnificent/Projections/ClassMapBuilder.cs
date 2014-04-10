@@ -25,14 +25,17 @@ namespace KodeKandy.Mapnificent.Projections
     public class ClassMapBuilder<TFromDeclaring, TToDeclaring> : MapBuilder<TFromDeclaring, TToDeclaring>
         where TToDeclaring : class
     {
-        public ClassMapBuilder(ClassMap classMap) 
+        public ClassMapBuilder(ClassMap classMap)
             : base(classMap)
         {
             Require.IsTrue(classMap.ProjectionType.FromType == typeof(TFromDeclaring));
             Require.IsTrue(classMap.ProjectionType.ToType == typeof(TToDeclaring));
         }
 
-        public new ClassMap Map { get { return (ClassMap) base.Map; } }
+        public new ClassMap Map
+        {
+            get { return (ClassMap) base.Map; }
+        }
 
         public ClassMapBuilder<TFromDeclaring, TToDeclaring> For<TToMember>(Expression<Func<TToDeclaring, TToMember>> toMember,
             Action<BindingBuilder<TFromDeclaring, TToMember>> options)

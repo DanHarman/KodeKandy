@@ -33,15 +33,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="MemberAccess\BindingType.cs" />
-    <Compile Include="MemberAccess\FromCustomDefinition.cs" />
-    <Compile Include="MemberAccess\FromUndefinedDefinition.cs" />
+    <Compile Include="Projections\MemberAccess\BindingType.cs" />
+    <Compile Include="Projections\MemberAccess\FromCustomDefinition.cs" />
+    <Compile Include="Projections\MemberAccess\FromUndefinedDefinition.cs" />
     <Compile Include="Projections\ConstructionContext.cs" />
     <Compile Include="Projections\Conversion.cs" />
     <Compile Include="Projections\ConversionBuilder.cs" />
-    <Compile Include="MemberAccess\BindingValidator.cs" />
-    <Compile Include="MemberAccess\MemberDefinitionError.cs" />
-    <Compile Include="MemberAccess\FromDefinition.cs" />
+    <Compile Include="Projections\MemberAccess\BindingValidator.cs" />
+    <Compile Include="Projections\MemberAccess\MemberDefinitionError.cs" />
+    <Compile Include="Projections\MemberAccess\FromDefinition.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="Projections\ClassMapBuilder.cs" />
     <Compile Include="Projections\IMap.cs" />
@@ -52,9 +52,9 @@
     <Compile Include="Projections\MapBuilder.cs" />
     <Compile Include="Projections\MapUndefinedMembersException.cs" />
     <Compile Include="Mapper.cs" />
-    <Compile Include="MemberAccess\Binding.cs" />
-    <Compile Include="MemberAccess\BindingBuilder.cs" />
-    <Compile Include="MemberAccess\ToDefinition.cs" />
+    <Compile Include="Projections\MemberAccess\Binding.cs" />
+    <Compile Include="Projections\MemberAccess\BindingBuilder.cs" />
+    <Compile Include="Projections\MemberAccess\ToDefinition.cs" />
     <Compile Include="Projections\ClassMap.cs" />
     <Compile Include="MapnificentException.cs" />
     <Compile Include="Projections\PolymorphicMap.cs" />

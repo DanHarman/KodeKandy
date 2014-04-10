@@ -12,7 +12,6 @@
 // </copyright>
 
 using System;
-using System.Dynamic;
 using System.Reflection;
 using KodeKandy.Mapnificent.Projections;
 
@@ -27,11 +26,11 @@ namespace KodeKandy.Mapnificent.MemberAccess
     /// </remarks>
     public class Binding
     {
-        private bool isIgnore;
         private FromDefinition fromDefinition;
+        private bool isIgnore;
 
         public Binding(MemberInfo toMemberInfo, BindingType bindingType, Mapper mapper,
-            FromDefinition fromDefinition = null, Conversion convertUsing = null)
+            FromDefinition fromDefinition = null)
         {
             Require.NotNull(toMemberInfo, "toMemberInfo");
 
@@ -39,13 +38,13 @@ namespace KodeKandy.Mapnificent.MemberAccess
             Mapper = mapper;
             ToDefinition = new ToDefinition(toMemberInfo);
             FromDefinition = fromDefinition ?? FromUndefinedDefinition.Default;
-            ConvertUsing = convertUsing;
         }
 
         /// <summary>
         ///     Captures whether the binding was explicitly defined in config or automatically inferred.
         /// </summary>
         public BindingType BindingType { get; private set; }
+
         public Mapper Mapper { get; private set; }
 
         /// <summary>
@@ -70,7 +69,6 @@ namespace KodeKandy.Mapnificent.MemberAccess
 
                 // Update the projection if its not set or just an automatic LateBoundProjection, as it may be stale if the member
                 // type has changed.
-                // TODO remove the null Mapper...
                 if (Projection == null || Projection is LateBoundProjection)
                     Projection = new LateBoundProjection(ProjectionType, Mapper);
             }
@@ -84,20 +82,6 @@ namespace KodeKandy.Mapnificent.MemberAccess
         public bool HasCustomFromDefintion
         {
             get { return FromDefinition is FromCustomDefinition; }
-        }
-
-        /// <summary>
-        ///     ConvertUsing used to ClassMap between the 'from' member to the 'to' member.
-        ///     This is an override as by default the Mapper is queried for conversions.
-        /// </summary>
-        public Conversion ConvertUsing { get; set; }
-
-        /// <summary>
-        ///     Indicates if the binding is ClassMap based, or conversely Conversion based.
-        /// </summary>
-        public bool IsMap
-        {
-            get { return ProjectionType.IsClassProjection; }
         }
 
         /// <summary>
@@ -119,7 +103,7 @@ namespace KodeKandy.Mapnificent.MemberAccess
                 if (isIgnore)
                 {
                     FromDefinition = null;
-                    ConvertUsing = null;
+                    Projection = null;
                 }
             }
         }
@@ -139,20 +123,26 @@ namespace KodeKandy.Mapnificent.MemberAccess
                 Require.NotNull(fromDeclaring, "fromDeclaring");
                 Require.NotNull(toDeclaring, "toDeclaring");
 
-                object fromValue;
-
                 if (IsIgnore)
                     return;
+
+                object fromValue;
 
                 // 1. Get the 'from' value.
                 var hasValue = FromDefinition.TryGetFromValue(fromDeclaring, mapper, out fromValue);
 
                 if (hasValue)
                 {
-                    // Project the 'from' value if required.
-                    var toValue = ProjectValue(mapper, fromValue, toDeclaring, mapInto);
+                    object toValue = null;
 
-                    // Set the value.
+                    // 2. Project.
+                    // If we are 'mapping into' then attempt to get a value to map into.
+                    if (ProjectionType.IsClassProjection && mapInto)
+                        toValue = ToDefinition.Accessor.Getter(toDeclaring);
+
+                    toValue = Projection.Apply(fromValue, toValue, mapInto);
+
+                    // 3. Set the 'to' value.
                     ToDefinition.Accessor.Setter(toDeclaring, toValue);
                 }
             }
@@ -161,61 +151,6 @@ namespace KodeKandy.Mapnificent.MemberAccess
                 var msg = string.Format("Error applying binding '{0}'", this);
                 throw new MapnificentException(msg, ex, mapper);
             }
-        }
-
-        /// <summary>
-        ///     The binding may require a projection (i.e. a mapping or conversion) between the 'from' and 'to' types.
-        /// </summary>
-        /// <param name="mapper"></param>
-        /// <param name="fromValue"></param>
-        /// <param name="toDeclaringInstance"></param>
-        /// <param name="mapInto"></param>
-        /// <returns></returns>
-        public object ProjectValue(Mapper mapper, object fromValue, object toDeclaringInstance, bool mapInto = false)
-        {
-            Require.NotNull(mapper, "mapper");
-            Require.NotNull(fromValue, "fromValue");
-            Require.NotNull(toDeclaringInstance, "toDeclaringInstance");
-
-            object toValue = null;
-
-            if (HasCustomFromDefintion)
-            {
-                // Custom 'from' methods must return the correct 'to' type so no need for conversion or mapping.
-                toValue = fromValue;
-            }
-            else if (IsMap)
-            {
-                // TODO support ClassMap override here.
-
-                var map = mapper.GetMap(ProjectionType);
-
-                // If we are mapping into then attempt to get a value to ClassMap into.
-                if (mapInto)
-                    toValue = ToDefinition.Accessor.Getter(toDeclaringInstance);
-
-                toValue = map.Apply(fromValue, toValue, mapInto);
-            }
-            else
-            {
-                // If this is a value type binding, then order of precedence is:
-                // 1) Apply a conversion override if it is defined.
-                // 2) If the projection is identity i.e. T -> T then do nothing.
-                // 3) Ask the Mapper for a converter.
-
-                Conversion conversion;
-
-                if (ConvertUsing != null)
-                    conversion = ConvertUsing;
-                else if (ProjectionType.IsIdentity)
-                    conversion = null;
-                else
-                    conversion = mapper.GetConversion(ProjectionType);
-
-                toValue = conversion != null ? conversion.Apply(fromValue) : fromValue;
-            }
-
-            return toValue;
         }
 
         public override string ToString()
