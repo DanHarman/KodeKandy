@@ -30,6 +30,7 @@ namespace KodeKandy
 
             var getters = memberInfos.Select(CreateWeakMemberGetter).ToArray();
 
+            // If there are no chain at all then return instance.
             if (getters.Length == 0)
                 return (object inst, out object value) =>
                 {
@@ -37,7 +38,7 @@ namespace KodeKandy
                     return true;
                 };
 
-            // If there is no chain then avoid unnecessary looping etc.
+            // If there is only one indirection then avoid unnecessary looping etc.
             if (getters.Length == 1)
                 return (object inst, out object value) =>
                 {

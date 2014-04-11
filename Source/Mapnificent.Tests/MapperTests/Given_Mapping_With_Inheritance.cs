@@ -34,7 +34,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
             var to = new CarTo();
 
             // Act
-            sut.MapInto(from, to);
+            sut.Merge(from, to);
 
             // Assert
             Assert.AreEqual("Ferrari", to.Name);

@@ -74,7 +74,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
         {
             var sut = new Mapper();
 
-            //   Assert.Throws<MapnificentException>(() => sut.MapInto<Simple>(new Object()));
+            //   Assert.Throws<MapnificentException>(() => sut.Merge<Simple>(new Object()));
         }
 
         [Test]

@@ -18,10 +18,10 @@ using System.Resources;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("Mapnificent")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("KodeKandy.Mapnificent")]
+[assembly: AssemblyDescription("A new era in mapping")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("million miles per hour ltd")]
 [assembly: AssemblyProduct("Mapnificent")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]

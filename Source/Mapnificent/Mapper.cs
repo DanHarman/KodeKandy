@@ -210,7 +210,7 @@ namespace KodeKandy.Mapnificent
             return (Conversion) conversion;
         }
 
-        public void MapInto(object from, object to)
+        public void Merge(object from, object to)
         {
             try
             {

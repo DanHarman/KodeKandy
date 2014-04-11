@@ -28,6 +28,7 @@ namespace KodeKandy.Mapnificent.Projections
         {
             try
             {
+                // TODO: cache this value.
                 var map = Mapper.GetProjection(ProjectionType);
 
                 return map.Apply(from, to, mapInto);
