@@ -22,16 +22,16 @@ namespace KodeKandy.Mapnificent.Projections
     {
         public LateBoundProjection(ProjectionType projectionType, Mapper mapper) : base(projectionType, mapper)
         {
+            projection = new Lazy<IProjection>(() => Mapper.GetProjection(ProjectionType));
         }
+
+        private readonly Lazy<IProjection> projection;
 
         public override object Apply(object from, object to = null, bool mapInto = false)
         {
             try
             {
-                // TODO: cache this value.
-                var map = Mapper.GetProjection(ProjectionType);
-
-                return map.Apply(from, to, mapInto);
+                return projection.Value.Apply(from, to, mapInto);
             }
             catch (Exception ex)
             {
