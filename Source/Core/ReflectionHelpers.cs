@@ -27,9 +27,15 @@ namespace KodeKandy
         public static SafeGetterFunc CreateSafeWeakMemberChainGetter(IEnumerable<MemberInfo> memberInfos)
         {
             Require.NotNull(memberInfos, "memberInfos");
-            Require.IsTrue(memberInfos.Any());
 
             var getters = memberInfos.Select(CreateWeakMemberGetter).ToArray();
+
+            if (getters.Length == 0)
+                return (object inst, out object value) =>
+                {
+                    value = inst;
+                    return true;
+                };
 
             // If there is no chain then avoid unnecessary looping etc.
             if (getters.Length == 1)

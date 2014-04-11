@@ -118,5 +118,22 @@ namespace KodeKandy.ReflectionHelpersTests
             // Assert
             Assert.IsFalse(success);
         }
+
+        [Test]
+        public void Given_Zero_Node_Property_Chain_Then_Gets_Root_Instance()
+        {
+            // Arrange
+            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, Outter>(x => x);
+            var sut = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
+            var instance = new Outter { InnerProperty = new Inner { Property = 1234 } };
+
+            // Act
+            object result;
+            var success = sut(instance, out result);
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.AreEqual(instance, result);
+        }
     }
 }
