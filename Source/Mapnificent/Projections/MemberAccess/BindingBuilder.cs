@@ -41,17 +41,27 @@ namespace KodeKandy.Mapnificent.Projections.MemberAccess
         /// </summary>
         /// <typeparam name="TFromMember"></typeparam>
         /// <param name="fromMember"></param>
+        /// <param name="convertFunc"></param>
         /// <returns></returns>
         public BindingBuilder<TFromDeclaring, TToMember> From<TFromMember>(
-            Expression<Func<TFromDeclaring, TFromMember>> fromMember)
+            Expression<Func<TFromDeclaring, TFromMember>> fromMember, Func<TFromMember, TToMember> convertFunc = null)
         {
             Require.NotNull(fromMember, "fromMember");
 
             var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos(fromMember);
             var fromMemberPath = String.Join(".", memberInfos.Select(x => x.Name));
             var fromMemberGetter = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
+   
 
             Binding.FromDefinition = new FromMemberDefinition(fromMemberPath, typeof(TFromMember), fromMemberGetter);
+
+            if (convertFunc != null)
+            {
+                var anonConvertFunc = (Func<object, object>) (x => convertFunc((TFromMember) x));
+                var conversion = new Conversion(ProjectionType.Create<TFromMember, TToMember>(), Binding.Mapper) { ConversionFunc = anonConvertFunc };
+               
+                Binding.Projection = conversion;
+            }
 
             return this;
         }

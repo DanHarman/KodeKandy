@@ -25,7 +25,7 @@ namespace KodeKandy.Mapnificent.Projections
         public Conversion(ProjectionType projectionType, Mapper mapper)
             : base(projectionType, mapper)
         {
-            Require.IsFalse(projectionType.ToType.IsClass);
+//            Require.IsFalse(projectionType.ToType.IsClass);
         }
 
         public Func<object, object> ConversionFunc
