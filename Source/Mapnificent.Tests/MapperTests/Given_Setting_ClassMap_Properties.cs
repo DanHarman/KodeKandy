@@ -23,21 +23,6 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
     public class Given_Setting_ClassMap_Properties
     {
         [Test]
-        public void When_AddPolymorphicFor_Then_Is_Added_To_Map()
-        {
-            // Arrange
-            var mapper = new Mapper();
-            var sut = new ClassMap(ProjectionType.Create<VehicleFrom, VehicleTo>(), mapper);
-            var expected = ProjectionType.Create<CarFrom, CarTo>();
-
-            // Act
-            sut.AddPolymorphicFor(expected);
-
-            // Assert
-            CollectionAssert.Contains(sut.PolymorphicFor, expected);
-        }
-
-        [Test]
         public void When_ConstructUsing_Set_To_Null_Then_Throws()
         {
             // Arrange

@@ -84,12 +84,5 @@ namespace KodeKandy.Mapnificent.Projections
 
             return this;
         }
-
-        public ClassMapBuilder<TFromDeclaring, TToDeclaring> PolymorhpicFor<TFromDerived, TToDerived>()
-        {
-            Map.AddPolymorphicFor(ProjectionType.Create<TFromDerived, TToDerived>());
-
-            return this;
-        }
     }
 }

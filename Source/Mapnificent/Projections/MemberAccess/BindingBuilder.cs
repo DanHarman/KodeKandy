@@ -46,21 +46,45 @@ namespace KodeKandy.Mapnificent.Projections.MemberAccess
         public BindingBuilder<TFromDeclaring, TToMember> From<TFromMember>(
             Expression<Func<TFromDeclaring, TFromMember>> fromMember, Func<TFromMember, TToMember> convertFunc = null)
         {
+            IProjection projection = null;
+            
+            if (convertFunc != null)
+            {
+                var anonConvertFunc = (Func<object, object>) (x => convertFunc((TFromMember) x));
+                projection = new Conversion(ProjectionType.Create<TFromMember, TToMember>(), Binding.Mapper) { ConversionFunc = anonConvertFunc };
+            }
+
+            return From(fromMember, projection);
+        }
+
+        /// <summary>
+        ///     Merge from a, nested if needed, member of the 'from' class to the specified 'to' class member. When using nested
+        ///     and/or reference types, if there is a null in the expression chain, then no mapping will take place for that member
+        ///     and the default value for that member will be set if it has been defined.
+        /// 
+        ///     This expression must be member chain expression, not a plain delegate doing adhoc work to create the value. If you
+        ///     wish to fully customise rather than use a member chain use the <see cref="Custom" /> method.
+        /// </summary>
+        /// <typeparam name="TFromMember"></typeparam>
+        /// <param name="fromMember"></param>
+        /// <param name="projection"></param>
+        /// <returns></returns>
+        public BindingBuilder<TFromDeclaring, TToMember> From<TFromMember>(
+            Expression<Func<TFromDeclaring, TFromMember>> fromMember, IProjection projection)
+        {
             Require.NotNull(fromMember, "fromMember");
 
             var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos(fromMember);
             var fromMemberPath = String.Join(".", memberInfos.Select(x => x.Name));
             var fromMemberGetter = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
-   
 
             Binding.FromDefinition = new FromMemberDefinition(fromMemberPath, typeof(TFromMember), fromMemberGetter);
 
-            if (convertFunc != null)
+            if (projection != null)
             {
-                var anonConvertFunc = (Func<object, object>) (x => convertFunc((TFromMember) x));
-                var conversion = new Conversion(ProjectionType.Create<TFromMember, TToMember>(), Binding.Mapper) { ConversionFunc = anonConvertFunc };
-               
-                Binding.Projection = conversion;
+                Require.IsTrue(projection.ProjectionType.FromType == typeof(TFromMember));
+                Require.IsTrue(projection.ProjectionType.ToType == typeof(TToMember));
+                Binding.Projection = projection;
             }
 
             return this;

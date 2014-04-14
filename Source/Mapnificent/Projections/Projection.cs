@@ -18,17 +18,14 @@ namespace KodeKandy.Mapnificent.Projections
     /// </summary>
     public abstract class Projection : IProjection
     {
-        protected Projection(ProjectionType projectionType, Mapper mapper)
+        protected Projection(Mapper mapper)
         {
-            Require.NotNull(projectionType, "projectionType");
             Require.NotNull(mapper, "mapper");
 
-            ProjectionType = projectionType;
             Mapper = mapper;
         }
 
-
-        public ProjectionType ProjectionType { get; private set; }
+        public abstract ProjectionType ProjectionType { get; }
 
         /// <summary>
         ///     The Mapper this projection is associated with.

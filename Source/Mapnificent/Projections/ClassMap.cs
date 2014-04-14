@@ -65,31 +65,6 @@ namespace KodeKandy.Mapnificent.Projections
             }
         }
 
-        public ReadOnlyCollection<ProjectionType> PolymorphicFor
-        {
-            get { return new ReadOnlyCollection<ProjectionType>(polymorphicFor); }
-        }
-
-        public void AddPolymorphicFor(ProjectionType projectionType)
-        {
-            Require.NotNull(projectionType, "projectionType");
-
-            Require.IsTrue(ProjectionType.FromType.IsAssignableFrom(projectionType.FromType),
-                String.Format("Cannot be polymorphic for a ClassMap whose 'From' type '{0}' is not a subtype of this maps 'From' type '{1}'.",
-                    projectionType.FromType.Name, ProjectionType.FromType.Name));
-
-            Require.IsTrue(ProjectionType.ToType.IsAssignableFrom(projectionType.ToType),
-                String.Format("Cannot be polymorphic for a ClassMap whose 'To' type '{0}' is not a subtype of this maps 'To' type '{1}'.",
-                    projectionType.ToType.Name, ProjectionType.ToType.Name));
-
-            Require.IsFalse(polymorphicFor.Any(pt => pt.FromType == projectionType.FromType),
-                String.Format(
-                    "Illegal 'polymorphic for' defintion. A definition has already been registered for the 'from' type '{0}' and would be made ambiguous by this one.",
-                    projectionType.FromType.Name));
-
-            polymorphicFor.Add(projectionType);
-        }
-
         public Binding GetMemberBindingDefinition(MemberInfo toMemberInfo)
         {
             Binding binding;
@@ -206,11 +181,6 @@ namespace KodeKandy.Mapnificent.Projections
         {
             Require.NotNull(from, "from");
 
-            // Redirect to polymorphic ClassMap if there is a match.
-            ClassMap polyMap;
-            if (TryGetPolymorphicMap(from.GetType(), out polyMap))
-                return polyMap.Apply(from, to, mapInto);
-
             if (to == null || to.GetType() != ProjectionType.ToType)
                 to = ConstructUsing(new ConstructionContext(Mapper, from, null));
 
@@ -223,28 +193,6 @@ namespace KodeKandy.Mapnificent.Projections
                 PostMapStep(from, to);
 
             return to;
-        }
-
-        /// <summary>
-        ///     Attempt to get a polymorphic ClassMap for the supplied 'from' type.
-        /// </summary>
-        /// <param name="fromType">
-        ///     The 'from' type that we are considering polymophic, the 'to' type is implied as we do not allow
-        ///     polymophism from multiple 'from' types. This would cause ambiguity.
-        /// </param>
-        /// <param name="classMap">The ClassMap if there is one, otherwise null.</param>
-        /// <returns>True if a polymorphic ClassMap was defined for the 'from' type, otherwise False.</returns>
-        private bool TryGetPolymorphicMap(Type fromType, out ClassMap classMap)
-        {
-            var projectionType = PolymorphicFor.FirstOrDefault(pt => pt.FromType == fromType);
-            if (projectionType != null)
-            {
-                classMap = Mapper.GetClassMap(projectionType);
-                return true;
-            }
-
-            classMap = null;
-            return false;
         }
     }
 }

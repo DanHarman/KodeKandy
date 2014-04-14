@@ -26,7 +26,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
             var sut = new Mapper();
 
             sut.BuildPolymorphicMap<VehicleFrom, VehicleTo>()
-               .PolymorhpicFor<CarFrom, CarTo>();
+               .AddPolymorph<CarFrom, CarTo>();
 
             sut.BuildClassMap<CarFrom, CarTo>();
 

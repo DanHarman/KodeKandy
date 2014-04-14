@@ -20,23 +20,31 @@ namespace KodeKandy.Mapnificent.Projections
 {
     public class PolymorphicMap : Map
     {
-        private readonly List<ProjectionType> polymorphs = new List<ProjectionType>();
+        private readonly List<IProjection> polymorphs = new List<IProjection>();
+
+        private readonly ProjectionType projectionType;
 
         public PolymorphicMap(ProjectionType projectionType, Mapper mapper)
             : base(projectionType, mapper)
         {
+            this.projectionType = projectionType;
         }
 
-        public ReadOnlyCollection<ProjectionType> Polymorphs
+        public override ProjectionType ProjectionType
         {
-            get { return new ReadOnlyCollection<ProjectionType>(polymorphs); }
+            get { return projectionType; }
+        }
+
+        public ReadOnlyCollection<IProjection> Polymorphs
+        {
+            get { return new ReadOnlyCollection<IProjection>(polymorphs); }
         }
 
         public override object Apply(object from, object to = null, bool mapInto = false)
         {
             Require.NotNull(from, "from");
 
-            var matchedProjection = polymorphs.FirstOrDefault(pt => pt.FromType == from.GetType());
+            var matchedProjection = polymorphs.FirstOrDefault(pt => pt.ProjectionType.FromType == from.GetType());
             if (matchedProjection == null)
             {
                 var msg = string.Format("Error applying polymorphic map {0} as no polymorphic map defined for 'from' type {1}.", ProjectionType,
@@ -44,28 +52,27 @@ namespace KodeKandy.Mapnificent.Projections
                 throw new MapnificentException(msg, Mapper);
             }
 
-            var map = Mapper.GetProjection(matchedProjection);
-            return map.Apply(from, to, mapInto);
+            return matchedProjection.Apply(from, to, mapInto);
         }
 
-        public void AddPolymorph(ProjectionType projectionType)
+        public void AddPolymorph(ProjectionType polymorphProjectionType)
         {
-            Require.NotNull(projectionType, "projectionType");
+            Require.NotNull(polymorphProjectionType, "polymorphProjectionType");
 
-            Require.IsTrue(ProjectionType.FromType.IsAssignableFrom(projectionType.FromType),
+            Require.IsTrue(ProjectionType.FromType.IsAssignableFrom(polymorphProjectionType.FromType),
                 String.Format("Cannot be polymorphic for a Projection whose 'from' type '{0}' is not a subtype of this maps 'from' type '{1}'.",
-                    projectionType.FromType.Name, ProjectionType.FromType.Name));
+                    polymorphProjectionType.FromType.Name, ProjectionType.FromType.Name));
 
-            Require.IsTrue(ProjectionType.ToType.IsAssignableFrom(projectionType.ToType),
+            Require.IsTrue(ProjectionType.ToType.IsAssignableFrom(polymorphProjectionType.ToType),
                 String.Format("Cannot be polymorphic for a Projection whose 'to' type '{0}' is not a subtype of this maps 'to' type '{1}'.",
-                    projectionType.ToType.Name, ProjectionType.ToType.Name));
+                    polymorphProjectionType.ToType.Name, ProjectionType.ToType.Name));
 
-            Require.IsFalse(polymorphs.Any(pt => pt.FromType == projectionType.FromType),
+            Require.IsFalse(polymorphs.Any(pt => pt.ProjectionType.FromType == polymorphProjectionType.FromType),
                 String.Format(
                     "Illegal polymorph defintion. A definition has already been registered for the 'from' type '{0}' and would be made ambiguous by this one.",
-                    projectionType.FromType.Name));
+                    polymorphProjectionType.FromType.Name));
 
-            polymorphs.Add(projectionType);
+            polymorphs.Add(new LateBoundProjection(polymorphProjectionType, Mapper));
         }
     }
 }

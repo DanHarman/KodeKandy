@@ -35,7 +35,7 @@ namespace KodeKandy.Mapnificent.Projections
             return (PolymorphicMapBuilder<TFromDeclaring, TToDeclaring>) base.PostMapStep(afterMappingAction);
         }
 
-        public PolymorphicMapBuilder<TFromDeclaring, TToDeclaring> PolymorhpicFor<TFromDerived, TToDerived>()
+        public PolymorphicMapBuilder<TFromDeclaring, TToDeclaring> AddPolymorph<TFromDerived, TToDerived>()
         {
             Map.AddPolymorph(ProjectionType.Create<TFromDerived, TToDerived>());
 

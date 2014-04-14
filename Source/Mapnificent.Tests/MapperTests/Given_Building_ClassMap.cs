@@ -1,4 +1,4 @@
-// <copyright file="Given_Building_Map_With_MapBuilder.cs" company="million miles per hour ltd">
+// <copyright file="Given_Building_ClassMap.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -19,7 +19,7 @@ using NUnit.Framework;
 namespace KodeKandy.Mapnificent.Tests.MapperTests
 {
     [TestFixture]
-    public class Given_Building_Map_With_MapBuilder
+    public class Given_Building_ClassMap
     {
         [Test]
         public void When_ConstructUsing_Then_Is_Set_On_Map()
@@ -58,20 +58,7 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
             Assert.AreEqual(expected, map.InheritsFrom);
         }
 
-        [Test]
-        public void When_PolymorphicFor_Then_Is_Added_To_Map()
-        {
-            // Arrange
-            var map = new ClassMap(ProjectionType.Create<VehicleFrom, VehicleTo>(), new Mapper());
-            var sut = new ClassMapBuilder<VehicleFrom, VehicleTo>(map);
-            var expected = ProjectionType.Create<CarFrom, CarTo>();
 
-            // Act
-            sut.PolymorhpicFor<CarFrom, CarTo>();
-
-            // Assert
-            CollectionAssert.Contains(map.PolymorphicFor, expected);
-        }
 
         [Test]
         public void When_PostMapStep_Then_Is_Set_On_Map()

@@ -17,15 +17,22 @@ namespace KodeKandy.Mapnificent.Projections
 {
     /// <summary>
     ///     Conversions encompass all projections into a value type.
+    /// n.b. This is still relevent when projecting into classes when you want to treat them as value types.
     /// </summary>
     public class Conversion : Projection
     {
         private Func<object, object> conversionFunc;
 
         public Conversion(ProjectionType projectionType, Mapper mapper)
-            : base(projectionType, mapper)
+            : base(mapper)
         {
-//            Require.IsFalse(projectionType.ToType.IsClass);
+            this.projectionType = projectionType;
+        }
+
+        private readonly ProjectionType projectionType;
+        public override ProjectionType ProjectionType
+        {
+            get { return projectionType; }
         }
 
         public Func<object, object> ConversionFunc

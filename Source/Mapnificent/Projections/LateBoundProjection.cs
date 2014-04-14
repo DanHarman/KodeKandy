@@ -20,12 +20,19 @@ namespace KodeKandy.Mapnificent.Projections
     /// </summary>
     public class LateBoundProjection : Projection
     {
-        public LateBoundProjection(ProjectionType projectionType, Mapper mapper) : base(projectionType, mapper)
+        private readonly Lazy<IProjection> projection;
+        private readonly ProjectionType projectionType;
+
+        public LateBoundProjection(ProjectionType projectionType, Mapper mapper) : base(mapper)
         {
+            this.projectionType = projectionType;
             projection = new Lazy<IProjection>(() => Mapper.GetProjection(ProjectionType));
         }
 
-        private readonly Lazy<IProjection> projection;
+        public override ProjectionType ProjectionType
+        {
+            get { return projectionType; }
+        }
 
         public override object Apply(object from, object to = null, bool mapInto = false)
         {

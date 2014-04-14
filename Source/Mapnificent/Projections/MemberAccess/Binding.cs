@@ -91,7 +91,7 @@ namespace KodeKandy.Mapnificent.Projections.MemberAccess
             get { return new ProjectionType(FromType, ToType); }
         }
 
-        public Projection Projection { get; set; }
+        public IProjection Projection { get; set; }
 
         public bool IsIgnore
         {

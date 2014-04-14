@@ -15,6 +15,9 @@ namespace KodeKandy.Mapnificent.Projections
 {
     public interface IProjection
     {
+        ProjectionType ProjectionType { get; }
+
+
         /// <summary>
         ///     Applies a projection.
         /// </summary>

@@ -20,11 +20,19 @@ namespace KodeKandy.Mapnificent.Projections
         private Func<ConstructionContext, object> constructUsing;
 
         protected Map(ProjectionType projectionType, Mapper mapper)
-            : base(projectionType, mapper)
+            : base(mapper)
         {
+            this.projectionType = projectionType;
+
             // We can only create a default constructor if the toType is concrete.
             if (!projectionType.ToType.IsInterface)
                 ConstructUsing = _ => Activator.CreateInstance(ProjectionType.ToType);
+        }
+
+        private readonly ProjectionType projectionType;
+        public override ProjectionType ProjectionType
+        {
+            get { return projectionType; }
         }
 
         #region IMap Members

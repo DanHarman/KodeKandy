@@ -30,7 +30,7 @@ namespace KodeKandy.Mapnificent.Projections
         public override object Apply(object from, object to = null, bool mapInto = false)
         {
             Require.NotNull(from, "from");
-       // TODO Reinstate     Require.IsFalse(mapInto, "mapInto not currenlty support on collection");
+            // TODO Reinstate     Require.IsFalse(mapInto, "mapInto not currenlty support on collection");
 
             // TODO: need to cope with empty to type - if we pass in the expected type then we could instantiate it if its a 
             // concrete collection type. This is only a concern if there is no constructUsing defined.
