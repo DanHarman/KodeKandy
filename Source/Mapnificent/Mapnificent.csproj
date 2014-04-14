@@ -38,12 +38,12 @@
     <Compile Include="Projections\MemberAccess\FromUndefinedDefinition.cs" />
     <Compile Include="Projections\ConstructionContext.cs" />
     <Compile Include="Projections\Conversion.cs" />
-    <Compile Include="Projections\ConversionBuilder.cs" />
+    <Compile Include="Builders\ConversionBuilder.cs" />
     <Compile Include="Projections\MemberAccess\BindingValidator.cs" />
     <Compile Include="Projections\MemberAccess\MemberDefinitionError.cs" />
     <Compile Include="Projections\MemberAccess\FromDefinition.cs" />
     <Compile Include="Helpers.cs" />
-    <Compile Include="Projections\ClassMapBuilder.cs" />
+    <Compile Include="Builders\ClassMapBuilder.cs" />
     <Compile Include="Projections\IMap.cs" />
     <Compile Include="Projections\IProjection.cs" />
     <Compile Include="Projections\LateBoundProjection.cs" />
@@ -58,7 +58,7 @@
     <Compile Include="Projections\ClassMap.cs" />
     <Compile Include="MapnificentException.cs" />
     <Compile Include="Projections\PolymorphicMap.cs" />
-    <Compile Include="Projections\PolymorphicMapBuilder.cs" />
+    <Compile Include="Builders\PolymorphicMapBuilder.cs" />
     <Compile Include="Projections\Projection.cs" />
     <Compile Include="ProjectionType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -13,9 +13,10 @@
 
 using System;
 using System.Linq.Expressions;
+using KodeKandy.Mapnificent.Projections;
 using KodeKandy.Mapnificent.Projections.MemberAccess;
 
-namespace KodeKandy.Mapnificent.Projections
+namespace KodeKandy.Mapnificent.Builders
 {
     /// <summary>
     ///     Type safe ClassMap builder.
@@ -54,9 +55,9 @@ namespace KodeKandy.Mapnificent.Projections
             return this;
         }
 
-        public new ClassMapBuilder<TFromDeclaring, TToDeclaring> PostMapStep(Action<TFromDeclaring, TToDeclaring> afterMappingAction)
+        public new ClassMapBuilder<TFromDeclaring, TToDeclaring> AfterMapping(Action<TFromDeclaring, TToDeclaring> afterMappingAction)
         {
-            return (ClassMapBuilder<TFromDeclaring, TToDeclaring>) base.PostMapStep(afterMappingAction);
+            return (ClassMapBuilder<TFromDeclaring, TToDeclaring>) base.AfterMapping(afterMappingAction);
         }
 
         public ClassMapBuilder<TFromDeclaring, TToDeclaring> ConstructUsing(Func<ConstructionContext, TToDeclaring> constructedBy)

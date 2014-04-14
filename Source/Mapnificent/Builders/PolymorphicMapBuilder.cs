@@ -12,8 +12,9 @@
 // </copyright>
 
 using System;
+using KodeKandy.Mapnificent.Projections;
 
-namespace KodeKandy.Mapnificent.Projections
+namespace KodeKandy.Mapnificent.Builders
 {
     public class PolymorphicMapBuilder<TFromDeclaring, TToDeclaring> : MapBuilder<TFromDeclaring, TToDeclaring>
         where TToDeclaring : class
@@ -30,9 +31,9 @@ namespace KodeKandy.Mapnificent.Projections
             get { return (PolymorphicMap) base.Map; }
         }
 
-        public new PolymorphicMapBuilder<TFromDeclaring, TToDeclaring> PostMapStep(Action<TFromDeclaring, TToDeclaring> afterMappingAction)
+        public new PolymorphicMapBuilder<TFromDeclaring, TToDeclaring> AfterMapping(Action<TFromDeclaring, TToDeclaring> afterMappingAction)
         {
-            return (PolymorphicMapBuilder<TFromDeclaring, TToDeclaring>) base.PostMapStep(afterMappingAction);
+            return (PolymorphicMapBuilder<TFromDeclaring, TToDeclaring>) base.AfterMapping(afterMappingAction);
         }
 
         public PolymorphicMapBuilder<TFromDeclaring, TToDeclaring> AddPolymorph<TFromDerived, TToDerived>()

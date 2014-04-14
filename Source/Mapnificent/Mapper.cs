@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using KodeKandy.Mapnificent.Builders;
 using KodeKandy.Mapnificent.Projections;
 
 namespace KodeKandy.Mapnificent

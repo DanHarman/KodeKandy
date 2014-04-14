@@ -12,8 +12,9 @@
 // </copyright>
 
 using System;
+using KodeKandy.Mapnificent.Projections;
 
-namespace KodeKandy.Mapnificent.Projections
+namespace KodeKandy.Mapnificent.Builders
 {
     /// <summary>
     ///     Type safe ConvertUsing builder.

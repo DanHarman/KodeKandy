@@ -26,7 +26,7 @@ namespace KodeKandy.Mapnificent.Projections
         /// <summary>
         ///     Action applied to the mapping target after mapping has been performed.
         /// </summary>
-        Action<object, object> PostMapStep { get; set; }
+        Action<object, object> AfterMapping { get; set; }
         ProjectionType ProjectionType { get; }
 
         /// <summary>

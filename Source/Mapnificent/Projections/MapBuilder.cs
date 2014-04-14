@@ -24,11 +24,11 @@ namespace KodeKandy.Mapnificent.Projections
 
         public IMap Map { get; private set; }
 
-        public MapBuilder<TFromDeclaring, TToDeclaring> PostMapStep(Action<TFromDeclaring, TToDeclaring> afterMappingAction)
+        public MapBuilder<TFromDeclaring, TToDeclaring> AfterMapping(Action<TFromDeclaring, TToDeclaring> afterMappingAction)
         {
             Require.NotNull(afterMappingAction, "afterMappingAction");
 
-            Map.PostMapStep = (f, t) => afterMappingAction((TFromDeclaring) f, (TToDeclaring) t);
+            Map.AfterMapping = (f, t) => afterMappingAction((TFromDeclaring) f, (TToDeclaring) t);
 
             return this;
         }

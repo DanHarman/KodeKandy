@@ -50,7 +50,7 @@ namespace KodeKandy.Mapnificent.Projections
         /// <summary>
         ///     Action applied to the mapping target after mapping has been performed.
         /// </summary>
-        public Action<object, object> PostMapStep { get; set; }
+        public Action<object, object> AfterMapping { get; set; }
 
         #endregion
     }

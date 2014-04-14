@@ -12,11 +12,12 @@
 // </copyright>
 
 using System;
+using KodeKandy.Mapnificent.Builders;
 using KodeKandy.Mapnificent.Projections;
 using KodeKandy.Mapnificent.Tests.TestEntities;
 using NUnit.Framework;
 
-namespace KodeKandy.Mapnificent.Tests.MapperTests
+namespace KodeKandy.Mapnificent.Tests.BuilderTests
 {
     [TestFixture]
     public class Given_Building_ClassMap
@@ -58,10 +59,8 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
             Assert.AreEqual(expected, map.InheritsFrom);
         }
 
-
-
         [Test]
-        public void When_PostMapStep_Then_Is_Set_On_Map()
+        public void When_AfterMapping_Then_Is_Set_On_Map()
         {
             // Arrange
             var map = new ClassMap(ProjectionType.Create<VehicleFrom, VehicleTo>(), new Mapper());
@@ -70,8 +69,8 @@ namespace KodeKandy.Mapnificent.Tests.MapperTests
             var postMapStep = (Action<VehicleFrom, VehicleTo>) ((_, __) => flag = true);
 
             // Act
-            sut.PostMapStep(postMapStep);
-            map.PostMapStep(null, null);
+            sut.AfterMapping(postMapStep);
+            map.AfterMapping(null, null);
 
             // Assert
             Assert.IsTrue(flag);

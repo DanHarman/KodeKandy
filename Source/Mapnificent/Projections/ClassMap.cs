@@ -26,7 +26,6 @@ namespace KodeKandy.Mapnificent.Projections
     public class ClassMap : Map
     {
         private readonly Dictionary<string, Binding> explicitBindings = new Dictionary<string, Binding>();
-        private readonly List<ProjectionType> polymorphicFor = new List<ProjectionType>();
 
         /// <summary>
         ///     Cached bindings for a given Mapper. This is required since a ClassMap may be placed into more than one Mapper.
@@ -109,9 +108,6 @@ namespace KodeKandy.Mapnificent.Projections
         {
             var mapDefinitionErrors = Validate();
 
-
-            // TODO check defined poly maps exist
-
             if (mapDefinitionErrors.Any())
             {
                 throw new Exception();
@@ -124,12 +120,11 @@ namespace KodeKandy.Mapnificent.Projections
             var autoMemberBindings = new List<Binding>();
             var memberDefinitionErrors = new List<MemberDefinitionError>();
 
-            // Discover which 'to' class members do not already have definitions so that they can be automapped.
+            // Discover which 'to' class members do not already have definitions, so that they may be automapped.
             var undefinedToMemberInfos = ReflectionHelpers.GetMemberInfos(ProjectionType.ToType)
                                                           .Where(m => excludedBindings.All(b => b.ToDefinition.MemberName != m.Name));
 
-            // Iterate all the undefined members on the 'to' class and try to automatically create matches from
-            // inspecting members on the 'from' class.
+            // Iterate these the undefined members and try to automatically create matches from inspecting members on the 'from' class.
             foreach (var toMemberInfo in undefinedToMemberInfos)
             {
                 var unflattenedMemberInfos = ExpressionHelpers.UnflattenMemberNamesToMemberInfos(ProjectionType.FromType, toMemberInfo.Name);
@@ -151,8 +146,7 @@ namespace KodeKandy.Mapnificent.Projections
                 }
                 else
                 {
-                    memberDefinitionErrors.Add(MemberDefinitionError.Create(toMemberInfo, "No '{0}' defined and unable to find auto-match.",
-                        toMemberInfo.GetMemberType().IsClass ? "ClassMap" : "conversion"));
+                    memberDefinitionErrors.Add(MemberDefinitionError.Create(toMemberInfo, "No binding defined and unable to auto-match."));
                 }
             }
 
@@ -189,8 +183,8 @@ namespace KodeKandy.Mapnificent.Projections
                 binding.Apply(from, to, mapInto);
             }
 
-            if (PostMapStep != null)
-                PostMapStep(from, to);
+            if (AfterMapping != null)
+                AfterMapping(from, to);
 
             return to;
         }
