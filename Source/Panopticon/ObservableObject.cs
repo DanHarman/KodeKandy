@@ -18,11 +18,6 @@ using KodeKandy.Panopticon.Properties;
 
 namespace KodeKandy.Panopticon
 {
-    //public class CompletionMixin
-    //{
-    //    private Exception Exception = null;
-    //}
-
     //public class ObservableCommand<T> : ICommand, IObservable<T>, IObserver<bool>
     //{
     //    private readonly Subject<T> executeSubject = new Subject<T>();
@@ -68,11 +63,6 @@ namespace KodeKandy.Panopticon
     //    }
     //}
 
-    public interface IObservableObject : IDisposable
-    {
-        IObservable<IPropertyChange> PropertyChanges { get; }
-    }
-
     public class ObservableObject : IObservableObject, INotifyPropertyChanged
     {
         private readonly PropertyChangeSubject propertyChangeSubject;
@@ -90,9 +80,23 @@ namespace KodeKandy.Panopticon
 
         #region IObservableObject Members
 
+        /// <summary>
+        ///     An observable providing notification of property changes. It will complete when the object is
+        ///     disposed.
+        /// </summary>
         public IObservable<IPropertyChange> PropertyChanges
         {
             get { return propertyChangeSubject; }
+        }
+
+        /// <summary>
+        ///     Suppress all change notifications for the lifetime of the returned disposable.
+        ///     Typically used within a 'using' block.
+        /// </summary>
+        /// <returns>A disposable that should be disposed when notification suppression is over.</returns>
+        public IDisposable BeginNotificationSuppression()
+        {
+            return propertyChangeSubject.BeginNotificationSuppression();
         }
 
         public void Dispose()

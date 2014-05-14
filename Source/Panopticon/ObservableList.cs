@@ -57,9 +57,31 @@ namespace KodeKandy.Panopticon
 
         #region IObservableObject Members
 
+        /// <summary>
+        ///     An observable providing notification of property changes. It will complete when the object is
+        ///     disposed.
+        /// </summary>
         public IObservable<IPropertyChange> PropertyChanges
         {
             get { return collectionChangeSubject; }
+        }
+
+        /// <summary>
+        ///     Suppress all change notifications for the lifetime of the returned disposable.
+        ///     Typically used within a 'using' block.
+        /// </summary>
+        /// <returns>A disposable that should be disposed when notification suppression is over.</returns>
+        public IDisposable BeginNotificationSuppression()
+        {
+            return collectionChangeSubject.BeginNotificationSuppression(() =>
+            {
+                // Once a collection falls out of notification suppression, we must fire a reset/image to all subscribers so they can catch up.
+                // If you think this should only happy on more than 'n' changes, then count your changes first before calling suppress!
+                collectionChangeSubject.NotifyPropertyValueChanged(0, CountName);
+                collectionChangeSubject.NotifyPropertyValueChanged(default(T), IndexerName);
+                collectionChangeSubject.RaiseCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                collectionChangeSubject.NotifyCollectionChange(CollectionChange.CreateImage(this, new ReadOnlyCollection<T>(this)));
+            });
         }
 
         public void Dispose()

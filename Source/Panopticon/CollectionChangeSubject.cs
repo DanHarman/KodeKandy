@@ -14,7 +14,9 @@
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Reactive.Disposables;
 using System.Reactive.Subjects;
+using System.Threading;
 
 namespace KodeKandy.Panopticon
 {
@@ -32,6 +34,9 @@ namespace KodeKandy.Panopticon
 
         public void RaiseCollectionChanged(NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
         {
+            if (IsNotificationSuppressed)
+                return;
+
             var handlerSnapshot = getNotifyCollectionChangedEventHandler();
 
             if (handlerSnapshot != null)
@@ -40,6 +45,9 @@ namespace KodeKandy.Panopticon
 
         public void NotifyCollectionChange(CollectionChange<T> collectionChange)
         {
+            if (IsNotificationSuppressed)
+                return;
+
             collectionChangeSubject.OnNext(collectionChange);
         }
 
