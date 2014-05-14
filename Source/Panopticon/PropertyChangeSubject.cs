@@ -33,23 +33,23 @@ namespace KodeKandy.Panopticon
 
         public object Source { get; private set; }
 
-        public void SetPropertyValue<T>(ref T property, T value, string propertyName)
+        public void SetPropertyValue<T>(ref T property, T value, string propertyName, object userData = null)
         {
             if (EqualityComparer<T>.Default.Equals(property, value))
                 return;
 
             property = value;
-            NotifyPropertyValueChanged(value, propertyName);
+            NotifyPropertyValueChanged(value, propertyName, userData);
         }
 
-        public void NotifyPropertyValueChanged<T>(T value, string propertyName)
+        public void NotifyPropertyValueChanged<T>(T value, string propertyName, object userData = null)
         {
             var handlerSnapshot = getPropertyChangedEventHandler();
 
             if (handlerSnapshot != null)
                 handlerSnapshot(Source, new PropertyChangedEventArgs(propertyName));
 
-            propertyChangeSubject.OnNext(PropertyChange.Create(Source, value, propertyName));
+            propertyChangeSubject.OnNext(PropertyChange.Create(Source, value, propertyName, userData));
         }
 
         #region Implementation of IObservable<out IPropertyChange>

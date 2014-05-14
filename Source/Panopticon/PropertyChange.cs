@@ -31,6 +31,11 @@ namespace KodeKandy.Panopticon
         ///     The properties new value.
         /// </summary>
         object Value { get; }
+
+        /// <summary>
+        /// Additional user data on the notification. Useful if dealing with re-entrancy issues.
+        /// </summary>
+        object UserData { get; }
     }
 
     public interface IPropertyChange<out T> : IPropertyChange
@@ -43,19 +48,20 @@ namespace KodeKandy.Panopticon
 
     public static class PropertyChange
     {
-        public static IPropertyChange Create<T>(object source, T value, string propertyNeme)
+        public static IPropertyChange Create<T>(object source, T value, string propertyNeme, object userData = null)
         {
-            return new PropertyChange<T>(source, value, propertyNeme);
+            return new PropertyChange<T>(source, value, propertyNeme, userData);
         }
     }
 
     public class PropertyChange<T> : IPropertyChange<T>, IEquatable<PropertyChange<T>>
     {
-        public PropertyChange(object source, T value, string propertyNeme)
+        public PropertyChange(object source, T value, string propertyNeme, object userData = null)
         {
             Source = source;
             PropertyName = propertyNeme;
             Value = value;
+            UserData = userData;
         }
 
         #region IEquatable<PropertyChange<T>> Members
@@ -64,7 +70,7 @@ namespace KodeKandy.Panopticon
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(Source, other.Source) && string.Equals(PropertyName, other.PropertyName) && Equals(Value, other.Value);
+            return Equals(Source, other.Source) && string.Equals(PropertyName, other.PropertyName) && Equals(Value, other.Value) && Equals(UserData, other.UserData);
         }
 
         #endregion
@@ -94,6 +100,11 @@ namespace KodeKandy.Panopticon
         /// </summary>
         public T Value { get; private set; }
 
+        /// <summary>
+        /// Additional user data on the notification. Useful if dealing with re-entrancy issues.
+        /// </summary>
+        public object UserData { get; private set; }
+
         #endregion
 
         public override bool Equals(object obj)
@@ -111,6 +122,7 @@ namespace KodeKandy.Panopticon
                 var hashCode = (Source != null ? Source.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (PropertyName != null ? PropertyName.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Value != null ? Value.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (UserData != null ? UserData.GetHashCode() : 0);
                 return hashCode;
             }
         }

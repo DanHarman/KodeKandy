@@ -79,7 +79,6 @@ namespace KodeKandy.Panopticon
 
         public ObservableObject()
         {
-            // propertyChangeSubject = new PropertyChangeSubject(this, new object(), () => PropertyChanged);
             propertyChangeSubject = new PropertyChangeSubject(this, () => PropertyChanged);
         }
 
@@ -107,6 +106,12 @@ namespace KodeKandy.Panopticon
         public void SetValue<T>(ref T property, T value, [CallerMemberName] string propertyName = null)
         {
             propertyChangeSubject.SetPropertyValue(ref property, value, propertyName);
+        }
+
+        [NotifyPropertyChangedInvocator("propertyName")]
+        public void SetValue<TVal>(ref TVal property, TVal value, object userData, [CallerMemberName] string propertyName = null)
+        {
+            propertyChangeSubject.SetPropertyValue(ref property, value, propertyName, userData);
         }
     }
 }

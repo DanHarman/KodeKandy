@@ -123,5 +123,11 @@ namespace KodeKandy.Panopticon
         {
             collectionChangeSubject.SetPropertyValue(ref property, value, propertyName);
         }
+
+        [NotifyPropertyChangedInvocator("propertyName")]
+        public void SetValue<TVal>(ref TVal property, TVal value, object userData, [CallerMemberName] string propertyName = null)
+        {
+            collectionChangeSubject.SetPropertyValue(ref property, value, propertyName, userData);
+        }
     }
 }
