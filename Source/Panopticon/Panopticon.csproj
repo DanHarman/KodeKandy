@@ -37,10 +37,8 @@
     <Compile Include="IObservableObject.cs" />
     <Compile Include="ObservableList.cs" />
     <Compile Include="ObservableObject.cs" />
-    <Compile Include="OrderedCollectionChangeSubject.cs" />
     <Compile Include="CollectionChangeSubject.cs" />
     <Compile Include="PropertyChangeSubject.cs" />
-    <Compile Include="ObservableObjectNonMixin.cs" />
     <Compile Include="CollectionChange.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -32,7 +32,7 @@ namespace KodeKandy.Panopticon.Tests.PropertyChangeSubjectTests
         }
 
         [Test]
-        public void When_SetPropertyValue_Then_Fires_PropertyChange_With_Correct_Values()
+        public void When_SetPropertyValue_Then_Fires_PropertyChange_On_Observable_With_Correct_Values()
         {
             // Arrange
             var scheduler = new TestScheduler();
@@ -40,7 +40,7 @@ namespace KodeKandy.Panopticon.Tests.PropertyChangeSubjectTests
             var observer = scheduler.CreateObserver<IPropertyChange>();
             var expected = new[]
             {
-                OnNext(10, PropertyChange.Create(this, 17, "Age", "UserData-1")),
+                OnNext(10, (IPropertyChange) PropertyChange.Create(this, 17, "Age", "UserData-1")),
             };
             int age = 10;
             sut.Subscribe(observer);
@@ -57,27 +57,25 @@ namespace KodeKandy.Panopticon.Tests.PropertyChangeSubjectTests
         }
 
         [Test]
-        public void When_SetPropertyValue_Then_Fires_PropertyChangedEventArgs_With_Correct_Values()
+        public void When_SetPropertyValue_Then_Fires_PropertyChange_On_Event_With_Correct_Values()
         {
             // Arrange            
-            int age = 10;
-            var propertyChanges = new List<Tuple<object, PropertyChangedEventArgs, int>>();
-            PropertyChangedEventHandler propertyChanged = (sender, args) => propertyChanges.Add(Tuple.Create(sender, args, age));
-            var sut = new PropertyChangeSubject(this, () => propertyChanged);
-            
+            var propertyChanges = new List<IPropertyChange>();
+            var sut = new PropertyChangeSubject(this);
+            sut.PropertyChanged += (sender, args) => propertyChanges.Add((IPropertyChange) args);
+            var age = 10;
+            var expectedPropertyChange = PropertyChange.Create(this, 17, "Age", "UserData-1");
+
             // Act            
             sut.SetPropertyValue(ref age, 17, "Age", "UserData-1");
             
             // Assert
             Assert.AreEqual(1, propertyChanges.Count);
-            Assert.AreEqual(17, age);
-            Assert.AreEqual(this, propertyChanges[0].Item1);
-            Assert.AreEqual("Age", propertyChanges[0].Item2.PropertyName);
-            Assert.AreEqual(17, propertyChanges[0].Item3);
+            Assert.AreEqual(expectedPropertyChange, propertyChanges[0]);
         }
 
         [Test]
-        public void When_NotifyPropertyValueChanged_Then_Fires_PropertyChange_With_Correct_Values()
+        public void When_NotifyPropertyValueChanged_Then_Fires_PropertyChange_On_Observable_With_Correct_Values()
         {
             // Arrange
             var scheduler = new TestScheduler();
@@ -85,7 +83,7 @@ namespace KodeKandy.Panopticon.Tests.PropertyChangeSubjectTests
             var observer = scheduler.CreateObserver<IPropertyChange>();
             var expected = new[]
             {
-                OnNext(30, PropertyChange.Create(this, 70, "Age", "UserData-2"))
+                OnNext(30, (IPropertyChange) PropertyChange.Create(this, 70, "Age", "UserData-2"))
             };
             sut.Subscribe(observer);
 
@@ -100,20 +98,20 @@ namespace KodeKandy.Panopticon.Tests.PropertyChangeSubjectTests
         }
 
         [Test]
-        public void When_NotifyPropertyValueChanged_Then_Fires_PropertyChangedEventArgs_With_Correct_Values()
+        public void When_NotifyPropertyValueChanged_Then_Fires_PropertyChange_On_Event_With_Correct_Values()
         {
             // Arrange            
-            var propertyChanges = new List<Tuple<object, PropertyChangedEventArgs>>();
-            PropertyChangedEventHandler propertyChanged = (sender, args) => propertyChanges.Add(Tuple.Create(sender, args));
-            var sut = new PropertyChangeSubject(this, () => propertyChanged);
+            var propertyChanges = new List<IPropertyChange>();
+            var sut = new PropertyChangeSubject(this);
+            sut.PropertyChanged += (sender, args) => propertyChanges.Add((IPropertyChange) args);
+            var expectedPropertyChange = PropertyChange.Create(this, 70, "Age", "UserData-2");
 
             // Act            
             sut.NotifyPropertyValueChanged(70, "Age", "UserData-2");
 
             // Assert
             Assert.AreEqual(1, propertyChanges.Count);
-            Assert.AreEqual(this, propertyChanges[0].Item1);
-            Assert.AreEqual("Age", propertyChanges[0].Item2.PropertyName);            
+            Assert.AreEqual(expectedPropertyChange, propertyChanges[0]);
         }
     }
 }

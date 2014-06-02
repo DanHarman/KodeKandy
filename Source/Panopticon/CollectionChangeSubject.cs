@@ -25,9 +25,10 @@ namespace KodeKandy.Panopticon
         private readonly Subject<CollectionChange<T>> collectionChangeSubject = new Subject<CollectionChange<T>>();
         private readonly Func<NotifyCollectionChangedEventHandler> getNotifyCollectionChangedEventHandler;
 
-        public CollectionChangeSubject(object source, Func<NotifyCollectionChangedEventHandler> getNotifyCollectionChangedEventHandler = null,
-            Func<PropertyChangedEventHandler> getPropertyChangedEventHandler = null)
-            : base(source, getPropertyChangedEventHandler)
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        public CollectionChangeSubject(object source)
+            : base(source)
         {
             this.getNotifyCollectionChangedEventHandler = getNotifyCollectionChangedEventHandler ?? (() => null);
         }
@@ -37,7 +38,7 @@ namespace KodeKandy.Panopticon
             if (IsNotificationSuppressed)
                 return;
 
-            var handlerSnapshot = getNotifyCollectionChangedEventHandler();
+            var handlerSnapshot = CollectionChanged;
 
             if (handlerSnapshot != null)
                 handlerSnapshot(Source, notifyCollectionChangedEventArgs);

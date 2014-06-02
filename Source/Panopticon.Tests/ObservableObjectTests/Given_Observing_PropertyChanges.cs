@@ -50,8 +50,8 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
             var observer = scheduler.CreateObserver<IPropertyChange>();
             var expected = new[]
             {
-                OnNext(10, PropertyChange.Create(sut, 17, "Age")),
-                OnNext(30, PropertyChange.Create(sut, 70, "Age"))
+                OnNext(10, (IPropertyChange) PropertyChange.Create(sut, 17, "Age")),
+                OnNext(30, (IPropertyChange) PropertyChange.Create(sut, 70, "Age"))
             };
             sut.PropertyChanges.Subscribe(observer);
 
@@ -76,7 +76,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
             var observer = scheduler.CreateObserver<IPropertyChange>();
             var expected = new[]
             {
-                OnNext(30, PropertyChange.Create(sut, 70, "Age"))
+                OnNext(30, (IPropertyChange) PropertyChange.Create(sut, 70, "Age"))
             };
             sut.PropertyChanges.Subscribe(observer);
 

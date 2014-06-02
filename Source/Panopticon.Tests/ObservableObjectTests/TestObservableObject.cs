@@ -23,7 +23,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
         }
     }
 
-    internal class TestObservableObject2 : ObservableObject2
+    internal class TestObservableObject2 : ObservableObject
     {
         private int age;
         public int Age
@@ -33,7 +33,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
         }
     }
 
-    internal class TestObservableObject3 : ObservableObject3
+    internal class TestObservableObject3 : ObservableObject
     {
         private int age;
         public int Age

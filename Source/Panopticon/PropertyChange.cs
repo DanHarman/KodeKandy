@@ -12,6 +12,7 @@
 // </copyright>
 
 using System;
+using System.ComponentModel;
 
 namespace KodeKandy.Panopticon
 {
@@ -48,18 +49,18 @@ namespace KodeKandy.Panopticon
 
     public static class PropertyChange
     {
-        public static IPropertyChange Create<T>(object source, T value, string propertyNeme, object userData = null)
+        public static PropertyChange<T> Create<T>(object source, T value, string propertyNeme, object userData = null)
         {
             return new PropertyChange<T>(source, value, propertyNeme, userData);
         }
     }
 
-    public class PropertyChange<T> : IPropertyChange<T>, IEquatable<PropertyChange<T>>
+    public class PropertyChange<T> : PropertyChangedEventArgs, IPropertyChange<T>, IEquatable<PropertyChange<T>>
     {
         public PropertyChange(object source, T value, string propertyNeme, object userData = null)
+            : base(propertyNeme)
         {
             Source = source;
-            PropertyName = propertyNeme;
             Value = value;
             UserData = userData;
         }
@@ -81,11 +82,6 @@ namespace KodeKandy.Panopticon
         ///     The originator of the change notification.
         /// </summary>
         public object Source { get; private set; }
-
-        /// <summary>
-        ///     The name of the changed property.
-        /// </summary>
-        public string PropertyName { get; private set; }
 
         /// <summary>
         ///     The properties new value.

@@ -39,3 +39,26 @@ Change3 Lots of obj event - Average : 1933ms
 3 - 10k event sub & 10k notification. - Average : 361.2ms
 3 - 10k RX subcribe calls. - Average : 44.2ms
 3 - 10k event sub subscribe calls. - Average : 1ms
+
+1 - No subscribers lots of events - Average : 798.8ms
+1 - Making lots of subscriptions - Average : 82.4ms
+1 - Lots of refcount subscriptions on one object with lots of notifications - Average : 1626.4ms
+1 - Lots of subscriptions on one object with lots of notifications - Average : 1608.2ms
+1 - Lots of objects with 1 sub and lots of events - Average : 2089.8ms
+
+1 rx Subcriber 10k notifications - Average : 2038.4ms
+1 event Subscriber 10k notifications - Average : 1931.6ms
+3 - 10k RX subcriber & 10k notification. - Average : 778ms
+3 - 10k RX subscriber & 10k notification filtered to prop. - Average : 2043.2ms
+3 - 10k event sub & 10k notification. - Average : 365.6ms
+3 - 10k RX subcribe calls. - Average : 56ms
+3 - 10k event sub subscribe calls. - Average : 1ms
+
+1 rx Subcriber 10k notifications - Average : 2055.8ms
+1 event Subscriber 10k notifications - Average : 1944.8ms
+3 - 10k RX subcriber & 10k notification. - Average : 732.4ms
+3 - 10k RX subscriber & 10k notification filtered to prop. - Average : 1708ms
+3 - 10k event sub & 10k notification. - Average : 368.6ms
+3 - 10k RX subcribe calls. - Average : 45.8ms
+3 - 10k event sub subscribe calls. - Average : 1ms
+

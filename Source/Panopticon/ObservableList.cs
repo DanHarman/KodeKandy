@@ -29,13 +29,13 @@ namespace KodeKandy.Panopticon
 
         public ObservableList()
         {
-            collectionChangeSubject = new CollectionChangeSubject<T>(this, () => CollectionChanged, () => PropertyChanged);
+            collectionChangeSubject = new CollectionChangeSubject<T>(this);
         }
 
         public ObservableList(IEnumerable<T> collection)
             : base(new List<T>(collection))
         {
-            collectionChangeSubject = new CollectionChangeSubject<T>(this, () => CollectionChanged, () => PropertyChanged);
+            collectionChangeSubject = new CollectionChangeSubject<T>(this);
         }
 
         public IObservable<CollectionChange<T>> CollectionChanges
@@ -45,7 +45,11 @@ namespace KodeKandy.Panopticon
 
         #region INotifyCollectionChanged Members
 
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler CollectionChanged
+        {
+            add { collectionChangeSubject.CollectionChanged += value; }
+            remove { collectionChangeSubject.CollectionChanged -= value; }
+        }
 
         #endregion
 

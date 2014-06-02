@@ -92,7 +92,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
             TimeOperation(5, "1 - Lots of refcount subscriptions on one object with lots of notifications", () =>
             {
                 var sut = new TestObservableObject { Age = 10 };
-                var zz = sut.WhenPropertyChanged(x => x.Age).Publish().RefCount();
+                var zz = sut.WhenPropertyChanged3(x => x.Age).Publish().RefCount();
 
                 for (var i = 0; i < 10000; ++i)
                    zz.Subscribe(_ => { });
@@ -107,7 +107,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
                 ;
 
                 for (var i = 0; i < 10000; ++i)
-                    sut.WhenPropertyChanged(x => x.Age).Subscribe(_ => { });
+                    sut.WhenPropertyChanged3(x => x.Age).Subscribe(_ => { });
 
                 for (var i = 0; i < 10000; ++i)
                     sut.Age = i;
@@ -125,60 +125,6 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
                 }
             });
         }
-
-        [Test]
-        public void When_V2()
-        {
-            // Arrange
-//            var sut = new TestObservableObject2 { Age = 10 };
-//            var results = new List<Tuple<string, int>>(10000000);
-//
-//            sut.PropertyChanged += (o, pc) => { }; //results.Add(Tuple.Create(pc.PropertyName, sut.Age));
-        //    sut.PropertyChanges.Subscribe(_ => { });
-
-           // sut.WhenPropertyChanged(x => x.Age);
-
-
-            // Act
-            TimeOperation(5, "2 - No subscribers lots of events", () =>
-            {
-                var sut = new TestObservableObject2 { Age = 10 };
-
-                for (var i = 0; i < 10000000; ++i)
-                    sut.Age = i;
-            });
-
-            TimeOperation(5, "2 - Making lots of subscriptions", () =>
-            {
-                var sut = new TestObservableObject2 { Age = 10 };
-
-                for (var i = 0; i < 10000; ++i)
-                    sut.WhenPropertyChanged2(x => x.Age).Subscribe(_ => { });
-            });
-
-            TimeOperation(5, "Lots of subscriptions and lots of notifications.", () =>
-            {
-                var sut = new TestObservableObject2 { Age = 10 };
-                for (var i = 0; i < 10000; ++i)
-                    sut.WhenPropertyChanged2(x => x.Age).Subscribe(_ => { });
-
-                for (var i = 0; i < 10000; ++i)
-                    sut.Age = i;
-            });
-
-            TimeOperation(5, "Change2 Lots of obj", () =>
-            {
-                for (var i = 0; i < 10000; ++i)
-                {
-                    var sut = new TestObservableObject2 {Age = 10};
-                    var zz = sut.WhenPropertyChanged2(x => x.Age).Subscribe(_ => { });
-
-                    for (var j = 0; j < 10000; ++j)
-                        sut.Age = i;
-                }
-            });
-        }
-
 
         [Test]
         public void When_V3()
