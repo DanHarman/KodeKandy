@@ -1,0 +1,41 @@
+﻿
+Subject per propertyChange Subject with publish of subject on single field.
+
+Set1 - Average : 855ms
+Change1 - Average : 80ms
+Change1-3 - Average : 1058.4ms
+Change1 Lots of obj - Average : 259.2ms
+
+
+
+Dictionary wrapping FromEventPattern caching single subject per instance.
+
+Set2 - Average : 380.8ms
+Change2 - Average : 159ms
+Change2 - Average : 3139ms
+Change2 Lots of obj - Average : 388.6ms
+
+
+Change3 Lots of obj - Average : 2032.6ms
+Change3 Lots of obj event - Average : 1938.6ms
+3 - 10k RX sub & 10k notification. - Average : 723ms
+3 - 10k RX sub & 10k notification filtered to prop. - Average : 1716.4ms
+3 - 10k event sub & 10k notification. - Average : 361.8ms
+3 - 10k RX sub. - Average : 42.4ms
+3 - 10k event sub. - Average : 1ms
+
+Change3 Lots of obj - Average : 2025.8ms
+Change3 Lots of obj event - Average : 1933ms
+3 - 10k RX sub & 10k notification. - Average : 755ms
+3 - 10k RX sub & 10k notification filtered to prop. - Average : 2743ms
+3 - 10k event sub & 10k notification. - Average : 354ms
+3 - 10k RX sub. - Average : 43.2ms
+3 - 10k event sub. - Average : 1ms
+
+1 rx Subcriber 10k notifications - Average : 2045.8ms
+1 event Subscriber 10k notifications - Average : 1928.6ms
+3 - 10k RX subcriber & 10k notification. - Average : 717.4ms
+3 - 10k RX subscriber & 10k notification filtered to prop. - Average : 1712.6ms
+3 - 10k event sub & 10k notification. - Average : 361.2ms
+3 - 10k RX subcribe calls. - Average : 44.2ms
+3 - 10k event sub subscribe calls. - Average : 1ms

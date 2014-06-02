@@ -22,4 +22,24 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
             set { SetValue(ref age, value); }
         }
     }
+
+    internal class TestObservableObject2 : ObservableObject2
+    {
+        private int age;
+        public int Age
+        {
+            get { return age; }
+            set { SetValue(ref age, value); }
+        }
+    }
+
+    internal class TestObservableObject3 : ObservableObject3
+    {
+        private int age;
+        public int Age
+        {
+            get { return age; }
+            set { SetValue(ref age, value); }
+        }
+    }
 }

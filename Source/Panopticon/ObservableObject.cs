@@ -118,4 +118,124 @@ namespace KodeKandy.Panopticon
             propertyChangeSubject.SetPropertyValue(ref property, value, propertyName, userData);
         }
     }
+
+    public class ObservableObject2 : IObservableObject, INotifyPropertyChanged
+    {
+        public readonly PropertyChangeSubject2 propertyChangeSubject;
+
+        public ObservableObject2()
+        {
+            propertyChangeSubject = new PropertyChangeSubject2(this);
+        }
+
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged
+        {
+            add { propertyChangeSubject.PropertyChanged += value; }
+            remove { propertyChangeSubject.PropertyChanged -= value; }
+        }
+
+        #endregion
+
+        #region IObservableObject Members
+
+        /// <summary>
+        ///     An observable providing notification of property changes. It will complete when the object is
+        ///     disposed.
+        /// </summary>
+        public IObservable<IPropertyChange> PropertyChanges
+        {
+            get { return propertyChangeSubject; }
+        }
+
+        /// <summary>
+        ///     Suppress all change notifications for the lifetime of the returned disposable.
+        ///     Typically used within a 'using' block.
+        /// </summary>
+        /// <returns>A disposable that should be disposed when notification suppression is over.</returns>
+        public IDisposable BeginNotificationSuppression()
+        {
+            return propertyChangeSubject.BeginNotificationSuppression();
+        }
+
+        public void Dispose()
+        {
+            propertyChangeSubject.Dispose();
+        }
+
+        #endregion
+
+        [NotifyPropertyChangedInvocator("propertyName")]
+        public void SetValue<T>(ref T property, T value, [CallerMemberName] string propertyName = null)
+        {
+            propertyChangeSubject.SetPropertyValue(ref property, value, propertyName);
+        }
+
+        [NotifyPropertyChangedInvocator("propertyName")]
+        public void SetValue<TVal>(ref TVal property, TVal value, object userData, [CallerMemberName] string propertyName = null)
+        {
+            propertyChangeSubject.SetPropertyValue(ref property, value, propertyName, userData);
+        }
+    }
+
+    public class ObservableObject3 : INotifyPropertyChanged//, IObservableObject
+    {
+        public readonly PropertyChangeSubject3 propertyChangeSubject;
+
+        public ObservableObject3()
+        {
+            propertyChangeSubject = new PropertyChangeSubject3(this);
+        }
+
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged
+        {
+            add { propertyChangeSubject.PropertyChanged += value; }
+            remove { propertyChangeSubject.PropertyChanged -= value; }
+        }
+
+        #endregion
+
+        #region IObservableObject Members
+
+        /// <summary>
+        ///     An observable providing notification of property changes. It will complete when the object is
+        ///     disposed.
+        /// </summary>
+        public PropertyChangeSubject3 PropertyChanges
+        {
+            get { return propertyChangeSubject; }
+        }
+
+        /// <summary>
+        ///     Suppress all change notifications for the lifetime of the returned disposable.
+        ///     Typically used within a 'using' block.
+        /// </summary>
+        /// <returns>A disposable that should be disposed when notification suppression is over.</returns>
+        public IDisposable BeginNotificationSuppression()
+        {
+            return propertyChangeSubject.BeginNotificationSuppression();
+        }
+
+        public void Dispose()
+        {
+            propertyChangeSubject.Dispose();
+        }
+
+        #endregion
+
+        [NotifyPropertyChangedInvocator("propertyName")]
+        public void SetValue<T>(ref T property, T value, [CallerMemberName] string propertyName = null)
+        {
+            propertyChangeSubject.SetPropertyValue(ref property, value, propertyName);
+        }
+
+        [NotifyPropertyChangedInvocator("propertyName")]
+        public void SetValue<TVal>(ref TVal property, TVal value, object userData, [CallerMemberName] string propertyName = null)
+        {
+            propertyChangeSubject.SetPropertyValue(ref property, value, propertyName, userData);
+        }
+    }
 }
