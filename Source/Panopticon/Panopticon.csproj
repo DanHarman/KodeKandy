@@ -35,10 +35,11 @@
   <ItemGroup>
     <Compile Include="ImmutableList.cs" />
     <Compile Include="IObservableObject.cs" />
+    <Compile Include="ObservableCommand.cs" />
     <Compile Include="ObservableList.cs" />
     <Compile Include="ObservableObject.cs" />
     <Compile Include="CollectionChangeSubject.cs" />
-    <Compile Include="PropertyChangedObservable.cs" />
+    <Compile Include="NotifyPropertyChangedObservable.cs" />
     <Compile Include="PropertyChangeSubject.cs" />
     <Compile Include="CollectionChange.cs" />
     <Compile Include="Properties\Annotations.cs" />

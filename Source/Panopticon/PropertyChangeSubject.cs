@@ -88,7 +88,7 @@ namespace KodeKandy.Panopticon
 //                            h => PropertyChanged -= h)
 //                        .Where(x => x.EventArgs.PropertyName == propertyName).Select(x => (IPropertyChange) x.EventArgs).Publish().RefCount();
 
-                    res = (new PropertyChangedObservable(h => PropertyChanged += h, h => PropertyChanged -= h))
+                    res = (new NotifyPropertyChangedObservable(h => PropertyChanged += h, h => PropertyChanged -= h))
                        .Where(x => x.PropertyName == propertyName).Select(x => (IPropertyChange)x);
 
                     var bleh = Observable.Defer(() => Observable.Return(PropertyChange.Create(Source, getter(Source), propertyName)));
@@ -144,10 +144,10 @@ namespace KodeKandy.Panopticon
 //                            h => PropertyChanged -= h)
 //                        .Where(x => x.EventArgs.PropertyName == propertyName).Select(x => (T) getter(Source)).Publish().RefCount();
 
-//                    var hotLive = (new PropertyChangedObservable(h => PropertyChanged += h, h => PropertyChanged -= h))
+//                    var hotLive = (new NotifyPropertyChangedObservable(h => PropertyChanged += h, h => PropertyChanged -= h))
 //                       .Where(x => x.PropertyName == propertyName).Select(x => (T)getter(Source));//.Publish().RefCount();
 
-                    var hotLive = (new PropertyChangedObservable(h => PropertyChanged += h, h => PropertyChanged -= h))
+                    var hotLive = (new NotifyPropertyChangedObservable(h => PropertyChanged += h, h => PropertyChanged -= h))
                                  .Where(x => x.PropertyName == propertyName).Select(x => getter((TClass)Source));
 
 //                    var bleh = Observable.Defer(() => Observable.Return(PropertyChange.Create(Source, getter(Source), propertyName)));
@@ -167,7 +167,7 @@ namespace KodeKandy.Panopticon
             return res;
         }
 
-        #region Nested type: PropertyChangedObservable
+        #region Nested type: NotifyPropertyChangedObservable
 
         #endregion
 
