@@ -61,6 +61,7 @@
     <Compile Include="MemberInfoExtensionsTests\Given_Checking_CanRead.cs" />
     <Compile Include="MemberInfoExtensionsTests\Given_Checking_CanRWrite.cs" />
     <Compile Include="MemberInfoExtensionsTests\Given_Creating_MemberAccessor.cs" />
+    <Compile Include="ReflectionHelpersTests\Given_StrongGetter.cs" />
     <Compile Include="TestEntities\ReadWriteTestEntity.cs" />
     <Compile Include="ReflectionHelpersTests\Given_Inspecing_For_Generic_Types.cs" />
     <Compile Include="ReflectionHelpersTests\When_Creating_SafeWeakGetter.cs" />

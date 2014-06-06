@@ -1,0 +1,73 @@
+Subscribing to 1 property, notifying it 10000x, and repeating this 100x
+[MarkRx] - Average : 137.2ms
+[DanRx-coop] - Average : 202.6ms
+[DanRx-non-coop] - Average : 188.8ms
+Subscribing 10000x to 1 property:
+[MarkRx] - Average : 126.8ms
+[DanRx-coop] - Average : 12ms
+[DanRx-noncoop] - Average : 11.8ms
+Subscribing to 1 property on 10000 obj:
+[MarkRx] - Average : 1299.6ms
+[DanRx-coop] - Average : 2005.2ms
+[DanRx-noncoop] - Average : 1698.6ms
+Disposing of a subscription on each of 10000 obj:
+[MarkRx] - Average : 13.4ms
+[DanRx-coop] - Average : 46.8ms
+[DanRx-noncoop] - Average : 21.8ms
+Disposing of 10000 subscriptions to 1 property on 1 object:
+[MarkRx] - Average : 1825ms
+[DanRx-coop] - Average : 63.4ms
+[DanRx-noncoop] - Average : 67.4ms
+
+Subscribing to 1 property, notifying it 10000x, and repeating this 100x
+[MarkRx] - Average : 181.2ms
+[DanRx-coop] - Average : 199.6ms
+[DanRx-non-coop] - Average : 187.6ms
+
+Subscribing 10000x to 1 property:
+[MarkRx] - Average : 128ms
+[DanRx-coop] - Average : 12.8ms
+[DanRx-noncoop] - Average : 12ms
+
+Subscribing to 1 property on 10000 obj:
+[MarkRx] - Average : 1339.6ms
+[DanRx-coop] - Average : 1983.6ms
+[DanRx-noncoop] - Average : 1689.4ms
+
+Disposing of a subscription on each of 10000 obj:
+[MarkRx] - Average : 14.8ms
+[DanRx-coop] - Average : 50.2ms
+[DanRx-noncoop] - Average : 34.6ms
+
+Disposing of 10000 subscriptions to 1 property on 1 object:
+[MarkRx] - Average : 1.6ms
+[DanRx-coop] - Average : 62.8ms
+[DanRx-noncoop] - Average : 68.8ms
+
+// Run which dodges the boxing and no Weak Event.
+
+Subscribing to 1 property, notifying it 10000x, and repeating this 100x
+[MarkRx] - Average : 185ms
+[DanRx-coop] - Average : 153.4ms
+[DanRx-non-coop] - Average : 153.6ms
+
+Subscribing 10000x to 1 property:
+[MarkRx] - Average : 128.8ms
+[DanRx-coop] - Average : 16.6ms
+[DanRx-noncoop] - Average : 11.2ms
+
+Subscribing to 1 property on 10000 obj:
+[MarkRx] - Average : 1365.2ms
+[DanRx-coop] - Average : 1765.4ms
+[DanRx-noncoop] - Average : 343.8ms
+
+Disposing of a subscription on each of 10000 obj:
+[MarkRx] - Average : 11.8ms
+[DanRx-coop] - Average : 30.2ms
+[DanRx-noncoop] - Average : 25.2ms
+
+Disposing of 10000 subscriptions to 1 property on 1 object:
+[MarkRx] - Average : 1.4ms
+[DanRx-coop] - Average : 71ms
+[DanRx-noncoop] - Average : 71.2ms
+

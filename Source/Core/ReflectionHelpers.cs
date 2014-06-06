@@ -274,6 +274,27 @@ namespace KodeKandy
             return type.GetInterfaces().SingleOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == genericType);
         }
 
+
+        /// <summary>
+        /// Creates a strongly typed getter delegate to a property.
+        /// This does not support structs as they require the first param of the delegate to be passed by reference.
+        /// </summary>
+        /// <param name="propertyInfo"></param>
+        /// <returns></returns>
+        public static Delegate CreatePropertyGetter(PropertyInfo propertyInfo)
+        {
+            var getterMethodInfo = propertyInfo.GetGetMethod(true);
+
+            if (getterMethodInfo == null)
+                throw new Exception(string.Format("No get method defined for property '{0}' on class '{1}", propertyInfo.Name,
+                    propertyInfo.DeclaringType));
+
+            var instanceType = getterMethodInfo.ReflectedType;
+            var propertyType = getterMethodInfo.ReturnType;
+
+            return Delegate.CreateDelegate(typeof(Func<,>).MakeGenericType(instanceType, propertyType), getterMethodInfo);
+        }
+
         #region Nested type: SafeWeakMemberGetterResult
 
         public class SafeWeakMemberGetterResult

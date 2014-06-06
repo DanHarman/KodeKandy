@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapnificent", "Mapnificent\Mapnificent.csproj", "{57109029-CB11-4CAC-AC9C-EE0CC008A5CE}"
 EndProject
@@ -24,6 +24,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Async", "Core.Async\Core.Async.csproj", "{34EACD97-C7C9-455D-B091-77DC4D37C42E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QualityTools", "QualityTools\QualityTools.csproj", "{87212236-C4EE-43E0-8B64-F69765EF415B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panopticon.PerformanceTests", "Panopticon.PerformanceTests\Panopticon.PerformanceTests.csproj", "{717C2DC1-249A-4B03-8AC8-7F4AC9D1C830}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{87212236-C4EE-43E0-8B64-F69765EF415B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87212236-C4EE-43E0-8B64-F69765EF415B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87212236-C4EE-43E0-8B64-F69765EF415B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{717C2DC1-249A-4B03-8AC8-7F4AC9D1C830}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{717C2DC1-249A-4B03-8AC8-7F4AC9D1C830}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{717C2DC1-249A-4B03-8AC8-7F4AC9D1C830}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{717C2DC1-249A-4B03-8AC8-7F4AC9D1C830}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

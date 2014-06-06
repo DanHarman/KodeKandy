@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
@@ -24,6 +23,68 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
     [TestFixture]
     public class Given_Observing_PropertyChanged_Events
     {
+        public void TimeOperation(int repeats, string label, Action action)
+        {
+            var sw = new Stopwatch();
+            var res = new List<long>();
+            for (var j = 0; j < repeats + 1; ++j)
+            {
+                sw.Reset();
+                sw.Start();
+                action();
+                sw.Stop();
+
+                //  Console.Error.WriteLine("Elapsed : {0}ms", sw.ElapsedMilliseconds);
+                res.Add(sw.ElapsedMilliseconds);
+            }
+
+            Console.Error.WriteLine("{0} - Average : {1}ms", label, res.Skip(1).Average());
+        }
+
+        [Test]
+        public void When_PropObs()
+        {
+            TimeOperation(5, "1 prop observer Subcriber 10k notifications", () =>
+            {
+                var cnt = 0;
+
+                for (var i = 0; i < 1000; ++i)
+                {
+                    var sut = new TestObservableObject3 {Age = 10};
+                    PropertyObserver.Observe<int>(sut, "Age", v => { ++cnt; });
+
+                    for (var j = 0; j < 10000; ++j)
+                        sut.Age = j; ;
+                }
+             //   Console.Error.WriteLine("  Count: {0}", cnt);
+            });
+
+            TimeOperation(5, "1 rx Subcriber 10k notifications", () =>
+            {
+                var cnt = 0;
+                for (var i = 0; i < 1000; ++i)
+                {
+
+                    var sut = new TestObservableObject3 {Age = 10};
+                    var zz = sut.WhenPropertyChanged3(x => x.Age).Subscribe(_ => { ++cnt; });
+
+                    for (var j = 0; j < 10000; ++j)
+                        sut.Age = j;
+                }
+              //  Console.Error.WriteLine("  Count: {0}", cnt);
+            });
+        }
+
+        [Test]
+        public void When_Subscribe_To_Property_Changed_Then_Gets_Initial_Value()
+        {
+            var sut = new TestObservableObject3 { Age = 10 };
+            var zz = sut.WhenPropertyChanged(x => x.Age).Subscribe(v => Assert.AreEqual(10, v));
+            zz.Dispose();
+            sut.Age = 99;
+            var yy = sut.WhenPropertyChanged(x => x.Age).Subscribe(v => Assert.AreEqual(99, v));
+        }
+
         [Test]
         public void When_SetValue_With_New_Values_Then_Event_Raised()
         {
@@ -45,22 +106,26 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
             CollectionAssert.AreEqual(expected, results);
         }
 
-        public void TimeOperation(int repeats, string label, Action action)
+        [Test]
+        public void When_SetValue_With_Same_Values_Then_Event_Raised_Once_Per_Value()
         {
-            var sw = new Stopwatch();
-            var res = new List<long>();
-            for (var j = 0; j < repeats + 1; ++j)
+            // Arrange
+            var sut = new TestObservableObject {Age = 10};
+            var results = new List<Tuple<string, int>>();
+            var expected = new[]
             {
-                sw.Reset();
-                sw.Start();
-                action();
-                sw.Stop();
+                Tuple.Create("Age", 70)
+            };
+            sut.PropertyChanged += (o, pc) => results.Add(Tuple.Create(pc.PropertyName, sut.Age));
 
-              //  Console.Error.WriteLine("Elapsed : {0}ms", sw.ElapsedMilliseconds);
-                res.Add(sw.ElapsedMilliseconds);
-            }
+            // Act
+            sut.Age = 10;
+            sut.Age = 10;
+            sut.Age = 70;
+            sut.Age = 70;
 
-            Console.Error.WriteLine("{0} - Average : {1}ms", label, res.Skip(1).Average()); 
+            // Assert
+            CollectionAssert.AreEqual(expected, results);
         }
 
         [Test]
@@ -75,7 +140,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
 
             TimeOperation(5, "1 - No subscribers lots of events", () =>
             {
-                var sut = new TestObservableObject { Age = 10 };
+                var sut = new TestObservableObject {Age = 10};
 
                 for (var i = 0; i < 10000000; ++i)
                     sut.Age = i;
@@ -83,7 +148,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
 
             TimeOperation(5, "1 - Making lots of subscriptions", () =>
             {
-                var sut = new TestObservableObject { Age = 10 };
+                var sut = new TestObservableObject {Age = 10};
                 var zz = sut.WhenPropertyChanged(x => x.Age).Publish().RefCount();
                 for (var i = 0; i < 10000; ++i)
                     zz.Subscribe(_ => { });
@@ -91,11 +156,11 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
 
             TimeOperation(5, "1 - Lots of refcount subscriptions on one object with lots of notifications", () =>
             {
-                var sut = new TestObservableObject { Age = 10 };
+                var sut = new TestObservableObject {Age = 10};
                 var zz = sut.WhenPropertyChanged3(x => x.Age).Publish().RefCount();
 
                 for (var i = 0; i < 10000; ++i)
-                   zz.Subscribe(_ => { });
+                    zz.Subscribe(_ => { });
 
                 for (var i = 0; i < 10000; ++i)
                     sut.Age = i;
@@ -119,7 +184,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
                 {
                     var sut = new TestObservableObject {Age = 10};
                     var zz = sut.WhenPropertyChanged(x => x.Age).Subscribe(_ => { });
-                    
+
                     for (var j = 0; j < 10000; ++j)
                         sut.Age = i;
                 }
@@ -204,45 +269,39 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
 
             TimeOperation(5, "1 rx Subcriber 10k notifications", () =>
             {
-                for (var i = 0; i < 10000; ++i)
-                {
-                    var sut = new TestObservableObject3 { Age = 10 };
-                    var zz = sut.WhenPropertyChanged3(x => x.Age).Subscribe(_ => { });
+                var sut = new TestObservableObject3 {Age = 10};
+                var zz = sut.WhenPropertyChanged3(x => x.Age).Subscribe(_ => { });
 
-                    for (var j = 0; j < 10000; ++j)
-                        sut.Age = i;
-                }
+                for (var i = 0; i < 10000; ++i)
+                    sut.Age = i;
             });
 
             TimeOperation(5, "1 event Subscriber 10k notifications", () =>
             {
-                for (var i = 0; i < 10000; ++i)
-                {
-                    var sut = new TestObservableObject3 { Age = 10 };
-                    sut.PropertyChanged += (sender, args) => { };
+                var sut = new TestObservableObject3 {Age = 10};
+                sut.PropertyChanged += (sender, args) => { };
 
-                    for (var j = 0; j < 10000; ++j)
-                        sut.Age = i;
-                }
+                for (var i = 0; i < 10000; ++i)
+                    sut.Age = i;
             });
 
             TimeOperation(5, "3 - 10k RX subcriber & 10k notification.", () =>
             {
                 var cnt = 0;
-                var sut = new TestObservableObject3 { Age = 10 };
+                var sut = new TestObservableObject3 {Age = 10};
                 for (var i = 0; i < 10000; ++i)
-                    sut.PropertyChanges/*.Where(x => x.PropertyName == "Age")*/.Subscribe(_ => { ++ cnt; });
+                    sut.PropertyChanges /*.Where(x => x.PropertyName == "Age")*/.Subscribe(_ => { ++ cnt; });
 
                 for (var i = 0; i < 10000; ++i)
                     sut.Age = i;
 
-          //      Debug.WriteLine(cnt);
+                //      Debug.WriteLine(cnt);
             });
 
             TimeOperation(5, "3 - 10k RX subscriber & 10k notification filtered to prop.", () =>
             {
                 var cnt = 0;
-                var sut = new TestObservableObject3 { Age = 10 };
+                var sut = new TestObservableObject3 {Age = 10};
                 for (var i = 0; i < 10000; ++i)
                     sut.WhenPropertyChanged3(x => x.Age).Subscribe(_ => { ++cnt; });
 
@@ -256,55 +315,32 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
             {
                 var cnt = 0;
 
-                var sut = new TestObservableObject3 { Age = 10 };
+                var sut = new TestObservableObject3 {Age = 10};
                 for (var i = 0; i < 10000; ++i)
                     sut.PropertyChanged += (sender, args) => { ++cnt; };
 
                 for (var i = 0; i < 10000; ++i)
                     sut.Age = i;
 
-            //    Debug.WriteLine(cnt);
-
+                //    Debug.WriteLine(cnt);
             });
 
             TimeOperation(5, "3 - 10k RX subcribe calls.", () =>
             {
                 var cnt = 0;
-                var sut = new TestObservableObject3 { Age = 10 };
+                var sut = new TestObservableObject3 {Age = 10};
                 for (var i = 0; i < 10000; ++i)
-                    sut.PropertyChanges/*.Where(x => x.PropertyName == "Age")*/.Subscribe(_ => { ++cnt; });
+                    sut.PropertyChanges /*.Where(x => x.PropertyName == "Age")*/.Subscribe(_ => { ++cnt; });
             });
 
             TimeOperation(5, "3 - 10k event sub subscribe calls.", () =>
             {
                 var cnt = 0;
 
-                var sut = new TestObservableObject3 { Age = 10 };
+                var sut = new TestObservableObject3 {Age = 10};
                 for (var i = 0; i < 10000; ++i)
                     sut.PropertyChanged += (sender, args) => { ++cnt; };
             });
-        }
-
-        [Test]
-        public void When_SetValue_With_Same_Values_Then_Event_Raised_Once_Per_Value()
-        {
-            // Arrange
-            var sut = new TestObservableObject {Age = 10};
-            var results = new List<Tuple<string, int>>();
-            var expected = new[]
-            {
-                Tuple.Create("Age", 70)
-            };
-            sut.PropertyChanged += (o, pc) => results.Add(Tuple.Create(pc.PropertyName, sut.Age));
-
-            // Act
-            sut.Age = 10;
-            sut.Age = 10;
-            sut.Age = 70;
-            sut.Age = 70;
-
-            // Assert
-            CollectionAssert.AreEqual(expected, results);
         }
     }
 }

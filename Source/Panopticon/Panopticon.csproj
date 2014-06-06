@@ -38,11 +38,14 @@
     <Compile Include="ObservableList.cs" />
     <Compile Include="ObservableObject.cs" />
     <Compile Include="CollectionChangeSubject.cs" />
+    <Compile Include="PropertyChangedObservable.cs" />
     <Compile Include="PropertyChangeSubject.cs" />
     <Compile Include="CollectionChange.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyChange.cs" />
+    <Compile Include="PropertyObserver.cs" />
+    <Compile Include="Internal\WeakEventHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.IO">

@@ -17,5 +17,7 @@ namespace KodeKandy.TestEntities
     {
         public int Id;
         public string Name { get; set; }
+
+        public int Edges { get; set; }
     }
 }

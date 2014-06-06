@@ -140,7 +140,7 @@ namespace KodeKandy.Panopticon.Properties
     /// <example>
     ///     <code>
     ///  public class Foo : INotifyPropertyChanged {
-    ///    public event PropertyChangedEventHandler PropertyChanged;
+    ///    public event Handler PropertyChanged;
     ///    [NotifyPropertyChangedInvocator]
     ///    protected virtual void NotifyChanged(string propertyName) { ... }
     /// 

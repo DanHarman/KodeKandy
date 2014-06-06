@@ -82,6 +82,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="CollectionChangeSubjectTests\Given_CollectionChangeSubject.cs" />
+    <Compile Include="Internal\Given_WeakEventHandler.cs" />
     <Compile Include="ObservableListTests\Given_Observing_CollectionChanged_Events.cs" />
     <Compile Include="ObservableListTests\Given_Observing_CollectionChanges.cs" />
     <Compile Include="ObservableObjectTests\Given_Observing_PropertyChanged_Events.cs" />
