@@ -76,6 +76,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{8C39CCA4-F76C-4EE8-B27D-A0A1CCB91300}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Panopticon\Panopticon.csproj">
       <Project>{cf86e617-096f-472b-80ea-525b7abd21b2}</Project>
       <Name>Panopticon</Name>

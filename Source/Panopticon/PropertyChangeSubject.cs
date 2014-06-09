@@ -13,11 +13,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reflection;
 using System.Threading;
 
 namespace KodeKandy.Panopticon
@@ -139,29 +142,46 @@ namespace KodeKandy.Panopticon
                     var getter = (Func<TClass, TProperty>)ReflectionHelpers.CreatePropertyGetter(Source.GetType().GetProperty(propertyName));
 
 //                    var hotLive = Observable
-//                        .FromEventPattern<Handler, PropertyChangedEventArgs>(
-//                            h => PropertyChanged += new WeakEventHandler(h).Handler,
+//                        .FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(
+//                            h => PropertyChanged += h,
 //                            h => PropertyChanged -= h)
-//                        .Where(x => x.EventArgs.PropertyName == propertyName).Select(x => (T) getter(Source)).Publish().RefCount();
-
-//                    var hotLive = (new NotifyPropertyChangedObservable(h => PropertyChanged += h, h => PropertyChanged -= h))
-//                       .Where(x => x.PropertyName == propertyName).Select(x => (T)getter(Source));//.Publish().RefCount();
+//                        .Where(x => x.EventArgs.PropertyName == propertyName).Select(x => getter((TClass)Source)).Publish().RefCount();
 
                     var hotLive = (new NotifyPropertyChangedObservable(h => PropertyChanged += h, h => PropertyChanged -= h))
                                  .Where(x => x.PropertyName == propertyName).Select(x => getter((TClass)Source));
-
-//                    var bleh = Observable.Defer(() => Observable.Return(PropertyChange.Create(Source, getter(Source), propertyName)));
-//
-//                    res = res.Merge(bleh);
                     var coldInitial = Observable.Defer(() => Observable.Return(getter((TClass)Source)));
                     res = coldInitial.Concat(hotLive);
                     observablesForProperty2.Add(propertyName, res);
                 }
+            }
 
-                //                if (propertyChangeSubject == null)
-                //                    propertyChangeSubject = new Subject<IPropertyChange>();
-                //
-                //                res = propertyChangeSubject.Where(x => x.PropertyName == propertyName).Publish().RefCount();
+            return res;
+        }
+
+        public IObservable<object> GetObservableForProperty(MemberInfo memberInfo)
+        {
+            IObservable<object> res;
+            lock (gate)
+            {
+                // Caching and publishing the filtered subject for a property gives significant performance
+                // benefits when multiple subscribers listen to the same property.
+                // When there is only one subscriber, the overhead of the dictionary lookup shouldn't matter.
+                if (observablesForProperty2 == null)
+                    observablesForProperty2 = new Dictionary<string, object>();
+
+                object outRes;
+                observablesForProperty2.TryGetValue(memberInfo.Name, out outRes);
+                if (outRes != null)
+                    res = (IObservable<object>) outRes;
+                else
+                {
+                    var getter = ReflectionHelpers.CreateWeakMemberGetter(memberInfo);
+                    var hotLive = (new NotifyPropertyChangedObservable(h => PropertyChanged += h, h => PropertyChanged -= h))
+                                 .Where(x => x.PropertyName == memberInfo.Name).Select(x => getter(Source));
+                    var coldInitial = Observable.Defer(() => Observable.Return(getter(Source)));
+                    res = coldInitial.Concat(hotLive);
+                    observablesForProperty2.Add(memberInfo.Name, res);
+                }
             }
 
             return res;
@@ -299,29 +319,85 @@ namespace KodeKandy.Panopticon
             return instance.propertyChangeSubject.GetObservableForProperty(name).Select(x => (TProperty) x.Value);
         }
 
-        public static IObservable<TProperty> WhenPropertyChangedNu<TClass, TProperty>(this TClass instance,
+        public static IObservable<TProperty> WhenPropertyChangedChain<TClass, TProperty>(this TClass instance,
             Expression<Func<TClass, TProperty>> memberPath)
             where TClass : ObservableObject
         {
-            var name = ExpressionHelpers.GetMemberName(memberPath);
-            return instance.propertyChangeSubject.GetObservableForProperty<TClass, TProperty>(name);
+            var memberInfos = ExpressionHelpers.GetMemberInfos(memberPath);
+
+            return WhenPropertyChangedChain<TClass, TProperty>(instance, memberInfos);
+//            var observableFactories = members.Select(CreateWhenPropertyChanged);
+//
+//            foreach (var factory in observableFactories)
+//            {
+//                var obs = factory()
+//            }
+//
+//            var currObserver = Observable.Return<object>(instance);
+//            foreach (var memberInfo in members)
+//            {
+//                currObserver = UnwoundAgg(currObserver, memberInfo);
+//            }
+//
+//            return currObserver.Cast<TProperty>();
+            return memberInfos.Aggregate(Observable.Return((object) instance), (currInst, memberInfo) =>
+                    currInst.Select(x => ((ObservableObject) x).propertyChangeSubject.GetObservableForProperty(memberInfo))
+                            .Switch())
+                            .Cast<TProperty>();
+
+            //    return instance.propertyChangeSubject.GetObservableForProperty<TClass, TProperty>(names[0]);
         }
+
+        public static IObservable<TProperty> WhenPropertyChangedChain<TClass, TProperty>(this TClass instance,
+    ReadOnlyCollection<MemberInfo> memberInfos)
+    where TClass : ObservableObject
+        {
+          
+            //            var observableFactories = members.Select(CreateWhenPropertyChanged);
+            //
+            //            foreach (var factory in observableFactories)
+            //            {
+            //                var obs = factory()
+            //            }
+            //
+                        var currObserver = Observable.Return<object>(instance);
+                        foreach (var memberInfo in memberInfos)
+                        {
+                            currObserver = UnwoundAgg(currObserver, memberInfo);
+                        }
+            
+                        return currObserver.Cast<TProperty>();
+            return memberInfos.Aggregate(Observable.Return((object)instance), (currInst, memberInfo) =>
+                    currInst.Select(x => ((ObservableObject)x).propertyChangeSubject.GetObservableForProperty(memberInfo))
+                            .Switch())
+                            .Cast<TProperty>();
+
+            //    return instance.propertyChangeSubject.GetObservableForProperty<TClass, TProperty>(names[0]);
+        }
+
+        private static IObservable<object> UnwoundAgg(IObservable<object> instance, MemberInfo memberInfo)
+        {
+            return instance.Select(x => ((ObservableObject) x).propertyChangeSubject.GetObservableForProperty(memberInfo))
+                    .Switch();
+        }
+
+        private static Delegate CreateWhenPropertyChanged(MemberInfo memberInfo)
+        {
+            var instanceType = memberInfo.ReflectedType;
+            var memberType = memberInfo.GetMemberType();
+
+            var specialisedMethod = openWhenPropertyChangedNuMethod.MakeGenericMethod(instanceType, memberType);
+            return Delegate.CreateDelegate(typeof(Func<,>).MakeGenericType(instanceType, typeof(string)), specialisedMethod);
+        }
+
+        private static readonly MethodInfo openWhenPropertyChangedNuMethod = typeof(ObservableObjectMixin).GetMethod("WhenPropertyChangedNu",
+            BindingFlags.Static | BindingFlags.NonPublic);
 
         public static IObservable<TProperty> WhenPropertyChangedNu<TClass, TProperty>(this ObservableObject instance,
             string propertyName)
         {
             return instance.propertyChangeSubject.GetObservableForProperty<TClass, TProperty>(propertyName);
         }
-
-//        public static IObservable<TProperty> WhenPropertyChanged2<TClass, TProperty>(this TClass instance,
-//            Expression<Func<TClass, TProperty>> memberPath)
-//            where TClass : ObservableObject2
-//
-//        {
-//            var name = ExpressionHelpers.GetMemberName(memberPath);
-//
-//            return instance.propertyChangeSubject.GetObservableForProperty(name).Select(x => ((MonadicPropertyChangedEventArgs<TProperty>) x).Value);
-//        }
 
         public static IObservable<IPropertyChange> WhenPropertyChanged3<TClass, TProperty>(this TClass instance,
             Expression<Func<TClass, TProperty>> memberPath)

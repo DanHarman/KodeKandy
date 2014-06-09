@@ -23,7 +23,7 @@ namespace KodeKandy.ReflectionHelpersTests
         public void Given_One_Node_Field_Chain_Then_Gets_MemberInfo()
         {
             // Arrange
-            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Inner, int>(x => x.Field);
+            var memberInfos = ExpressionHelpers.GetMemberInfos<Inner, int>(x => x.Field);
             var sut = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
             var instance = new Inner() {Field = 1234};
 
@@ -40,7 +40,7 @@ namespace KodeKandy.ReflectionHelpersTests
         public void Given_One_Node_Property_Chain_Then_Gets_Member()
         {
             // Arrange
-            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Inner, int>(x => x.Property);
+            var memberInfos = ExpressionHelpers.GetMemberInfos<Inner, int>(x => x.Property);
             var sut = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
             var instance = new Inner() {Property = 1234};
 
@@ -57,7 +57,7 @@ namespace KodeKandy.ReflectionHelpersTests
         public void Given_Two_Node_Field_Chain_Then_Gets_MemberInfos()
         {
             // Arrange
-            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, int>(x => x.InnerField.Field);
+            var memberInfos = ExpressionHelpers.GetMemberInfos<Outter, int>(x => x.InnerField.Field);
             var sut = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
             var instance = new Outter {InnerField = new Inner {Field = 1234}};
 
@@ -74,7 +74,7 @@ namespace KodeKandy.ReflectionHelpersTests
         public void Given_Two_Node_Field_Chain_With_Null_Link_Then_HasResult_False()
         {
             // Arrange
-            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, int>(x => x.InnerField.Field);
+            var memberInfos = ExpressionHelpers.GetMemberInfos<Outter, int>(x => x.InnerField.Field);
             var sut = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
             var instance = new Outter {InnerField = null};
 
@@ -90,7 +90,7 @@ namespace KodeKandy.ReflectionHelpersTests
         public void Given_Two_Node_Property_Chain_Then_Gets_MemberInfos()
         {
             // Arrange
-            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, int>(x => x.InnerProperty.Property);
+            var memberInfos = ExpressionHelpers.GetMemberInfos<Outter, int>(x => x.InnerProperty.Property);
             var sut = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
             var instance = new Outter {InnerProperty = new Inner {Property = 1234}};
 
@@ -107,7 +107,7 @@ namespace KodeKandy.ReflectionHelpersTests
         public void Given_Two_Node_Property_Chain_With_Null_Link_Then_HasResult_False()
         {
             // Arrange
-            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, int>(x => x.InnerProperty.Property);
+            var memberInfos = ExpressionHelpers.GetMemberInfos<Outter, int>(x => x.InnerProperty.Property);
             var sut = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
             var instance = new Outter {InnerProperty = null};
 
@@ -123,7 +123,7 @@ namespace KodeKandy.ReflectionHelpersTests
         public void Given_Zero_Node_Property_Chain_Then_Gets_Root_Instance()
         {
             // Arrange
-            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, Outter>(x => x);
+            var memberInfos = ExpressionHelpers.GetMemberInfos<Outter, Outter>(x => x);
             var sut = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
             var instance = new Outter { InnerProperty = new Inner { Property = 1234 } };
 

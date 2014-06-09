@@ -74,7 +74,7 @@ namespace KodeKandy.Mapnificent.Projections.MemberAccess
         {
             Require.NotNull(fromMember, "fromMember");
 
-            var memberInfos = ExpressionHelpers.GetExpressionChainMemberInfos(fromMember);
+            var memberInfos = ExpressionHelpers.GetMemberInfos(fromMember);
             var fromMemberPath = String.Join(".", memberInfos.Select(x => x.Name));
             var fromMemberGetter = ReflectionHelpers.CreateSafeWeakMemberChainGetter(memberInfos);
 

@@ -97,7 +97,7 @@ namespace KodeKandy
             return nodes.ToArray();
         }
 
-        public static MemberInfo[] GetExpressionChainMemberInfos<TClass, TValue>(Expression<Func<TClass, TValue>> memberChain)
+        public static ReadOnlyCollection<MemberInfo> GetMemberInfos<TClass, TValue>(Expression<Func<TClass, TValue>> memberChain)
         {
             Require.NotNull(memberChain, "memberChain");
 
@@ -129,7 +129,7 @@ namespace KodeKandy
                 currentNode = memberExpression.Expression;
             }
 
-            return nodes.ToArray();
+            return new ReadOnlyCollection<MemberInfo>(nodes);
         }
 
         /// <summary>

@@ -27,7 +27,7 @@ namespace KodeKandy.ExpressionHelpersTests
             var expected = typeof(Inner).GetField("Field");
 
             // Act
-            var res = ExpressionHelpers.GetExpressionChainMemberInfos<Inner, int>(x => x.Field);
+            var res = ExpressionHelpers.GetMemberInfos<Inner, int>(x => x.Field);
 
             // Assert
             Assert.AreEqual(expected, res.Single());
@@ -40,7 +40,7 @@ namespace KodeKandy.ExpressionHelpersTests
             var expected = typeof(Inner).GetProperty("Property");
 
             // Act
-            var res = ExpressionHelpers.GetExpressionChainMemberInfos<Inner, int>(x => x.Property);
+            var res = ExpressionHelpers.GetMemberInfos<Inner, int>(x => x.Property);
 
             // Assert
             Assert.AreEqual(expected, res.Single());
@@ -57,7 +57,7 @@ namespace KodeKandy.ExpressionHelpersTests
             };
 
             // Act
-            var res = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, int>(x => x.InnerField.Field);
+            var res = ExpressionHelpers.GetMemberInfos<Outter, int>(x => x.InnerField.Field);
 
             // Assert
             Assert.AreEqual(expected, res);
@@ -74,7 +74,7 @@ namespace KodeKandy.ExpressionHelpersTests
             };
 
             // Act
-            var res = ExpressionHelpers.GetExpressionChainMemberInfos<Outter, int>(x => x.InnerProperty.Property);
+            var res = ExpressionHelpers.GetMemberInfos<Outter, int>(x => x.InnerProperty.Property);
 
             // Assert
             Assert.AreEqual(expected, res);
