@@ -44,6 +44,8 @@
     <Compile Include="ObservableObject.cs" />
     <Compile Include="CollectionChangeSubject.cs" />
     <Compile Include="NotifyPropertyChangedObservable.cs" />
+    <Compile Include="PropertyChangeEventArgsEx.cs" />
+    <Compile Include="PropertyChangeHelper.cs" />
     <Compile Include="PropertyChangeSubject.cs" />
     <Compile Include="CollectionChange.cs" />
     <Compile Include="Properties\Annotations.cs" />

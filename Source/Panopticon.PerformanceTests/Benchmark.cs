@@ -13,6 +13,7 @@ namespace Panopticon.PerformanceTests
             var res = new List<long>();
             for (var j = 0; j < repeats + 1; ++j)
             {
+                GC.Collect();
                 sw.Reset();
                 sw.Start();
                 timedOperation();
@@ -30,6 +31,7 @@ namespace Panopticon.PerformanceTests
             var res = new List<long>();
             for (var j = 0; j < repeats + 1; ++j)
             {
+                GC.Collect();
                 var suts = sutFactory();
                 sw.Reset();
                 sw.Start();

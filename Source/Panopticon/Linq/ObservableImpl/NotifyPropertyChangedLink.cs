@@ -14,6 +14,7 @@
 using System;
 using System.ComponentModel;
 using System.Reactive.Disposables;
+using System.Threading;
 
 namespace KodeKandy.Panopticon.Linq.ObservableImpl
 {
@@ -23,18 +24,17 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         private readonly IObservable<TIn> source;
         private readonly string propertyName;
         private readonly Func<TIn, TOut> outValueGetter;
-#if USESUBJECT
-        private readonly Subject<TOut> observerSubject = new Subject<TOut>();
-#else
         private IObserver<TOut> observer;
-#endif
         private TIn inValue;
 
         public NotifyPropertyChangedLink(IObservable<TIn> source, string propertyName, Func<TIn, TOut> outValueGetter)
         {
-            Require.NotNull(source, "source");
-            Require.NotNull(propertyName, "propertyName");
-            Require.NotNull(outValueGetter, "outValueGetter");
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (propertyName == null)
+                throw new ArgumentNullException("propertyName");
+            if (outValueGetter == null)
+                throw new ArgumentNullException("outValueGetter");
 
             this.source = source;
             this.propertyName = propertyName;
@@ -46,11 +46,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         /// </summary>
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
-#if USESUBJECT
-            if (propertyChangedEventArgs.PropertyName == propertyName)
-#else
             if (observer != null && propertyChangedEventArgs.PropertyName == propertyName)
-#endif
             {
                 NotifyCurrentValue();
             }
@@ -59,11 +55,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         public void NotifyCurrentValue()
         {
             var outValue = outValueGetter(inValue);
-#if USESUBJECT
-                observerSubject.OnNext(outValue);
-#else
             observer.OnNext(outValue);
-#endif
         }
 
         void IObserver<TIn>.OnNext(TIn value)
@@ -74,15 +66,11 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             if (inValue != null)
                 inValue.PropertyChanged += OnPropertyChanged;
 
-#if !USESUBJECT
             if (observer != null)
-#endif
             {
                 NotifyCurrentValue();
             }
         }
-
-#if !USESUBJECT
 
         void IObserver<TIn>.OnError(Exception error)
         {
@@ -101,22 +89,46 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                 observer = null;
             }
         }
-#endif
 
         public IDisposable Subscribe(IObserver<TOut> observer)
         {
-            Require.NotNull(observer, "observer");
+            if (observer == null)
+                throw new ArgumentNullException("observer");
+           
             if (this.observer != null)
                 throw new Exception("NotifyPropertyChangedLink can only have a single subscriber, and one has already been bound.");
-#if USESUBJECT
-            observerSubject.Subscribe(observer);
-            var sub = source.Subscribe(this.OnNext, observerSubject.OnError, observerSubject.OnCompleted);
-#else
+
             this.observer = observer;
-            //  var sub =  source.Subscribe(this.OnNext, this.OnError, this.OnCompleted);
-            var sub = source.Subscribe(this); // source.Subscribe(this.OnNext, this.OnError, this.OnCompleted);
-#endif
-            return new CompositeDisposable(2) {sub, Disposable.Create(() => observer = null)};
+            var sub = source.Subscribe(this); 
+
+            return new Subscription(this, observer);
+            return Disposable.Create(() =>
+            {
+                sub.Dispose();
+                observer = null;
+            });
+        }
+
+        class Subscription : IDisposable
+        {
+            private NotifyPropertyChangedLink<TIn, TOut> link;
+            private IObserver<TOut> observer;
+
+            public Subscription(NotifyPropertyChangedLink<TIn, TOut> link, IObserver<TOut> observer)
+            {
+                this.link = link;
+                this.observer = observer;
+            }
+
+            public void Dispose()
+            {
+                var currObserver = Interlocked.Exchange(ref this.observer, null);
+                if (currObserver == null)
+                    return;
+
+               // link.Unsubscribe(observer);
+                link = null;
+            }
         }
     }
 }

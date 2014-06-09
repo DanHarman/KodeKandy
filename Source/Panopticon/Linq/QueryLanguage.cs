@@ -1,4 +1,17 @@
-﻿using System;
+﻿// <copyright file="QueryLanguage.cs" company="million miles per hour ltd">
+// Copyright (c) 2013-2014 All Right Reserved
+// 
+// This source is subject to the MIT License.
+// Please see the License.txt file for more information.
+// All other rights reserved.
+// 
+// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY 
+// KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+// PARTICULAR PURPOSE.
+// </copyright>
+
+using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reactive;
@@ -9,7 +22,7 @@ namespace KodeKandy.Panopticon.Linq
     public static class Opticon
     {
         public static IObservable<T> Observe<T>(T source)
-          where T : class
+            where T : class
         {
             if (source == null)
                 throw new ArgumentNullException("source");
@@ -42,13 +55,13 @@ namespace KodeKandy.Panopticon.Linq
         }
 
         public static IObservable<Unit> WhenAny<TIn>(this IObservable<TIn> source)
-    where TIn : INotifyPropertyChanged
+            where TIn : INotifyPropertyChanged
         {
             if (source == null)
                 throw new ArgumentNullException("source");
             // TODO need a specialised notifyProeprtychanged link it would seem if we want to expose the propertyname and type.
             throw new NotImplementedException();
-          //  return new NotifyPropertyChangedLink<TIn, TOut>(source, propertyName, outValueGetter);
+            //  return new NotifyPropertyChangedLink<TIn, TOut>(source, propertyName, outValueGetter);
         }
     }
 }

@@ -27,26 +27,27 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             return (IObservable<TProperty>) currObserver;
         }
 
-        private static Dictionary<Tuple<Type, string>, Delegate> cache = new Dictionary<Tuple<Type, string>, Delegate>();
+        private static Dictionary<MemberInfo, Delegate> cache = new Dictionary<MemberInfo, Delegate>();
+  //      private static Dictionary<Tuple<Type, string>, Delegate> cache = new Dictionary<Tuple<Type, string>, Delegate>();
         private static object gate = new object();
 
         private static Delegate CreateNotifyPropertyChangedLinkMethodDelegate(MemberInfo memberInfo)
         {
             Delegate result;
-            var instanceType = memberInfo.ReflectedType;
-            var key = Tuple.Create(instanceType, memberInfo.Name);
+        //    var key = Tuple.Create(instanceType, memberInfo.Name);
             
             lock (gate)
             {
-                if (cache.TryGetValue(key, out result))
+                if (cache.TryGetValue(memberInfo, out result))
                     return result;
 
+                var instanceType = memberInfo.ReflectedType;
                 var memberType = memberInfo.GetMemberType();
                 var specialisedMethod = CreateNotifyPropertyChangedLinkMethod.MakeGenericMethod(instanceType, memberType);
 
                 result = Delegate.CreateDelegate(typeof(Func<,,>).MakeGenericType(typeof(object), typeof(MemberInfo), typeof(object)),
                     specialisedMethod);
-                cache.Add(key, result);
+                cache.Add(memberInfo, result);
             }
 
             return result;

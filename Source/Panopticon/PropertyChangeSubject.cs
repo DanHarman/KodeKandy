@@ -49,8 +49,6 @@ namespace KodeKandy.Panopticon
             get { return Interlocked.CompareExchange(ref suppressNotificationCount, 0, 0) != 0; }
         }
 
-        #region Implementation of IObservable<out IPropertyChange>
-
         public IDisposable Subscribe(IObserver<IPropertyChange> observer)
         {
             lock (gate)
@@ -186,16 +184,6 @@ namespace KodeKandy.Panopticon
 
             return res;
         }
-
-        #region Nested type: NotifyPropertyChangedObservable
-
-        #endregion
-
-        #region Nested type: WeakEventHandler
-
-        #endregion
-
-        #endregion
 
         #region Implementation of IDisposable
 
