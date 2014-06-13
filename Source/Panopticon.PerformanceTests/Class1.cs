@@ -109,25 +109,12 @@ namespace Panopticon.PerformanceTests
     {
         private const int Repeats = 5;
 
-        [TestCase]
+        [Test]
         public void When_Notifying_Child_Property_100000_Times()
         {
             Console.Error.WriteLine("Subscribing to 1 child property, notifying it 10000x");
             Func<TestObservableObjectL> factory = () => new TestObservableObjectL {Age = 10, Child = new TestObservableObjectL {Age = 20}};
-            var iter = 1000000;
-
-//            Benchmark.TimeOperation(Repeats, "[MarkRx]", () =>
-//            {
-//                var cnt = 0;
-//
-//                    var sut = new TestObservableObject { Age = 10 };
-//                    PropertyObserver.Observe<int>(sut, "Age", v => { ++cnt; });
-//
-//                    for (var j = 0; j < iter; ++j)
-//                        sut.Child.Age = j;
-//
-//                    Assert.AreEqual(iter, cnt);
-//            });
+            const int iterations = 1000000;
 
             Benchmark.TimeOperation(Repeats, "[MarkRx2]", () =>
             {
@@ -137,12 +124,11 @@ namespace Panopticon.PerformanceTests
                 new Observer<TestObservableObjectL, TestObservableObjectL>(sut, x => x.Child, "Child")
                     .Chain(x => x.Age, "Age", v => { ++cnt; });
 
-                for (var j = 0; j < iter; ++j)
+                for (var j = 0; j < iterations; ++j)
                     sut.Child.Age = j;
 
-                Assert.AreEqual(iter + 1, cnt);
+                Assert.AreEqual(iterations + 1, cnt);
             });
-
 
             Benchmark.TimeOperation(5, "[DanRx2]", () =>
             {
@@ -152,11 +138,42 @@ namespace Panopticon.PerformanceTests
 
                 Opticon.Observe(sut).When("Child", x => x.Child).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
 
-                for (var j = 0; j < iter; ++j)
+                for (var j = 0; j < iterations; ++j)
                     sut.Child.Age = j;
 
-                Assert.AreEqual(iter + 1, cnt);
+                Assert.AreEqual(iterations + 1, cnt);
             });
+        }
+
+        [Test]
+        public void When_Disposing_Of_1_Subscription_On_x_Objects()
+        {
+            Console.Error.WriteLine("Disposing of a subscription on each of 10000 obj:");
+
+            Func<IEnumerable<TestObservableObjectL>> factory =
+                () => Enumerable.Repeat(default(object), 10000).Select(x => new TestObservableObjectL());
+
+            Benchmark.TimeOperation(Repeats, "[MarkRx2]", () => factory()
+                .Select(sut => new Observer<TestObservableObjectL, TestObservableObjectL>(sut, x => x.Child, "Child",
+                    _ => { }))
+                .ToArray(), suts =>
+                {
+                    foreach (var sut in suts)
+                    {
+                        sut.Dispose();
+                    }
+                });
+
+
+            Benchmark.TimeOperation(Repeats, "[DanRx2]", () => factory()
+                .Select(sut => Opticon.Observe(sut).When("Age", x => x.Age).Subscribe(_ => { }))
+                .ToArray(), suts =>
+                {
+                    foreach (var sut in suts)
+                    {
+                        sut.Dispose();
+                    }
+                });
         }
 
         [Test]

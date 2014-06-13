@@ -390,7 +390,7 @@ namespace KodeKandy.Panopticon
             Rebind(root);
         }
 
-//        public Observer(TClass root, string propertyName, Action<TValue> action)
+//        public ImmutableMultiObserver(TClass root, string propertyName, Action<TValue> action)
 //            : this(x => (TValue)DelegateCache.GetPropertyGetter(typeof(TClass), propertyName)(x), propertyName, action)
 //        {
 //            Rebind(root);

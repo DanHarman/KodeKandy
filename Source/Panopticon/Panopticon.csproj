@@ -34,6 +34,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ImmutableList.cs" />
+    <Compile Include="Internal\ImmutableList.cs" />
+    <Compile Include="Internal\ImmutableMultiObserver.cs" />
     <Compile Include="IObservableObject.cs" />
     <Compile Include="Linq\ObservableImpl\NotifyPropertyChangedLink.cs" />
     <Compile Include="Linq\ObservableImpl\PropertyObservableFactory.cs" />
