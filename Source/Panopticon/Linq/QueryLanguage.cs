@@ -42,7 +42,7 @@ namespace KodeKandy.Panopticon.Linq
     public static class QueryLanguage
     {
         public static IObservable<TOut> When<TIn, TOut>(this IObservable<TIn> source, string propertyName, Func<TIn, TOut> outValueGetter)
-            where TIn : INotifyPropertyChanged
+            where TIn : class, INotifyPropertyChanged
         {
             if (source == null)
                 throw new ArgumentNullException("source");

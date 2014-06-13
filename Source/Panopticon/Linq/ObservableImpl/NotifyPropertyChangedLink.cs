@@ -19,13 +19,15 @@ using System.Threading;
 namespace KodeKandy.Panopticon.Linq.ObservableImpl
 {
     internal class NotifyPropertyChangedLink<TIn, TOut> : IObserver<TIn>, IObservable<TOut>
-        where TIn : INotifyPropertyChanged
+        where TIn : class, INotifyPropertyChanged
     {
         private readonly IObservable<TIn> source;
+        private IDisposable sourceSubscriptionDisposable = null;
         private readonly string propertyName;
         private readonly Func<TIn, TOut> outValueGetter;
         private IObserver<TOut> observer;
         private TIn inValue;
+        private object gate = new object();
 
         public NotifyPropertyChangedLink(IObservable<TIn> source, string propertyName, Func<TIn, TOut> outValueGetter)
         {
@@ -48,7 +50,10 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         {
             if (observer != null && propertyChangedEventArgs.PropertyName == propertyName)
             {
-                NotifyCurrentValue();
+                lock (gate)
+                {
+                    NotifyCurrentValue();
+                }
             }
         }
 
@@ -60,9 +65,13 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
         void IObserver<TIn>.OnNext(TIn value)
         {
+            // Disconnect from INotifyPropertyChanged on previous source.
             if (inValue != null)
                 inValue.PropertyChanged -= OnPropertyChanged;
+
             inValue = value;
+
+            // Connect to INotifyPropertyChanged on the new source.
             if (inValue != null)
                 inValue.PropertyChanged += OnPropertyChanged;
 
@@ -89,7 +98,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                 observer = null;
             }
         }
-
+        private int refCount;
         public IDisposable Subscribe(IObserver<TOut> observer)
         {
             if (observer == null)
@@ -98,15 +107,24 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             if (this.observer != null)
                 throw new Exception("NotifyPropertyChangedLink can only have a single subscriber, and one has already been bound.");
 
-            this.observer = observer;
-            var sub = source.Subscribe(this); 
-
-            return new Subscription(this, observer);
-            return Disposable.Create(() =>
+            lock (gate)
             {
-                sub.Dispose();
-                observer = null;
-            });
+                this.observer = observer;
+
+                if (Interlocked.Increment(ref refCount) == 1)
+                    sourceSubscriptionDisposable = source.Subscribe(this);
+            }
+            return new Subscription(this, observer);
+
+        }
+
+        private void Unsubscribe(IObserver<TOut> observer)
+        {
+            if (Interlocked.Decrement(ref refCount) == 0)
+            {
+                sourceSubscriptionDisposable.Dispose();
+                sourceSubscriptionDisposable = null;
+            }
         }
 
         class Subscription : IDisposable
@@ -126,7 +144,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                 if (currObserver == null)
                     return;
 
-               // link.Unsubscribe(observer);
+                link.Unsubscribe(observer);
                 link = null;
             }
         }

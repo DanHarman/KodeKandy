@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using KodeKandy;
 using KodeKandy.Panopticon;
@@ -28,7 +27,6 @@ using ReactiveUI;
 
 namespace Panopticon.PerformanceTests
 {
-
     public class ObservableObjectL : INotifyPropertyChanged
     {
         private readonly PropertyChangeHelper propertyChangeHelper;
@@ -38,13 +36,16 @@ namespace Panopticon.PerformanceTests
             propertyChangeHelper = new PropertyChangeHelper(this);
         }
 
+        #region INotifyPropertyChanged Members
+
         public event PropertyChangedEventHandler PropertyChanged
         {
             add { propertyChangeHelper.PropertyChanged += value; }
             remove { propertyChangeHelper.PropertyChanged -= value; }
         }
 
-        
+        #endregion
+
         [NotifyPropertyChangedInvocator("propertyName")]
         public void SetValue<T>(ref T property, T value, [CallerMemberName] string propertyName = null)
         {
@@ -104,8 +105,135 @@ namespace Panopticon.PerformanceTests
     }
 
     [TestFixture]
+    public class Given_ObservingObject
+    {
+        private const int Repeats = 5;
+
+        [TestCase]
+        public void When_Notifying_Child_Property_100000_Times()
+        {
+            Console.Error.WriteLine("Subscribing to 1 child property, notifying it 10000x");
+            Func<TestObservableObjectL> factory = () => new TestObservableObjectL {Age = 10, Child = new TestObservableObjectL {Age = 20}};
+            var iter = 1000000;
+
+//            Benchmark.TimeOperation(Repeats, "[MarkRx]", () =>
+//            {
+//                var cnt = 0;
+//
+//                    var sut = new TestObservableObject { Age = 10 };
+//                    PropertyObserver.Observe<int>(sut, "Age", v => { ++cnt; });
+//
+//                    for (var j = 0; j < iter; ++j)
+//                        sut.Child.Age = j;
+//
+//                    Assert.AreEqual(iter, cnt);
+//            });
+
+            Benchmark.TimeOperation(Repeats, "[MarkRx2]", () =>
+            {
+                var cnt = 0;
+
+                var sut = factory();
+                new Observer<TestObservableObjectL, TestObservableObjectL>(sut, x => x.Child, "Child")
+                    .Chain(x => x.Age, "Age", v => { ++cnt; });
+
+                for (var j = 0; j < iter; ++j)
+                    sut.Child.Age = j;
+
+                Assert.AreEqual(iter + 1, cnt);
+            });
+
+
+            Benchmark.TimeOperation(5, "[DanRx2]", () =>
+            {
+                var cnt = 0;
+
+                var sut = factory();
+
+                Opticon.Observe(sut).When("Child", x => x.Child).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
+
+                for (var j = 0; j < iter; ++j)
+                    sut.Child.Age = j;
+
+                Assert.AreEqual(iter + 1, cnt);
+            });
+        }
+
+        [Test]
+        public void When_Subscribing_To_1_Child_Property_On_10000_Objects()
+        {
+            Console.Error.WriteLine("Subscribing to 1 child property on 10000 obj:");
+            var iter = 10000;
+
+            Func<TestObservableObjectL[]> sutFactory =
+                () =>
+                    Enumerable.Repeat(default(object), iter).Select(
+                        _ => new TestObservableObjectL {Age = 10, Child = new TestObservableObjectL {Age = 20}}).ToArray();
+
+
+            Benchmark.TimeOperation(Repeats, "[MarkRx2]", sutFactory, suts =>
+            {
+                var cnt = 0;
+
+                foreach (var sut in suts)
+                {
+                    new Observer<TestObservableObjectL, TestObservableObjectL>(sut, x => x.Child, "Child")
+                        .Chain(x => x.Age, "Age", v => { ++cnt; });
+                }
+
+                Assert.AreEqual(iter, cnt);
+            });
+
+            Benchmark.TimeOperation(Repeats, "[DanRx2]", sutFactory, suts =>
+            {
+                var cnt = 0;
+
+                foreach (var sut in suts)
+                {
+                    Opticon.Observe(sut).When("Child", x => x.Child).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
+                }
+                Assert.AreEqual(iter, cnt);
+            });
+
+            //Expression<Func<TestObservableObject, int>> cached = x => x.Child.Age§;
+
+            Benchmark.TimeOperation(Repeats, "[DanRx2-Expression]", sutFactory, suts =>
+            {
+                var cnt = 0;
+
+                foreach (var sut in suts)
+                {
+                    Opticon.Observe(sut, x => x.Child.Age).Subscribe(_ => { ++cnt; });
+                    //Opticon.Observe(sut, cached).Subscribe(_ => { ++cnt; });
+                }
+                Assert.AreEqual(iter, cnt);
+            });
+        }
+    }
+
+    [TestFixture]
     public class Class1
     {
+        private class FastReturn<T> : IObservable<T>
+        {
+            private readonly T val;
+
+            public FastReturn(T value)
+            {
+                val = value;
+            }
+
+            #region IObservable<T> Members
+
+            public IDisposable Subscribe(IObserver<T> observer)
+            {
+                observer.OnNext(val);
+                return Disposable.Empty;
+            }
+
+            #endregion
+        }
+
         [Test]
         public void When_Nested_Perf()
         {
@@ -201,6 +329,50 @@ namespace Panopticon.PerformanceTests
 
 
         [Test]
+        public void When_Nested_Perf_Comparison_Extreme()
+        {
+            Console.Error.WriteLine("Subscribing 10000x to 1 nested property:");
+            var iter = 10000;
+            var outter = 10;
+            Benchmark.TimeOperation(outter, "[MarkRx2]", () =>
+            {
+                var cnt = 0;
+
+                var sut = new TestObservableObjectL {Age = 10, Child = new TestObservableObjectL {Age = 20}};
+                for (var i = 0; i < iter; ++i)
+                {
+                    new Observer<TestObservableObjectL, TestObservableObjectL>(sut, x => x.Child, "Child")
+                        .Chain<TestObservableObjectL, TestObservableObjectL, int>(x => x.Age, "Age", v => { ++cnt; });
+                }
+                Assert.AreEqual(iter, cnt);
+            });
+
+            Benchmark.TimeOperation(outter, "[DanRx2]", () =>
+            {
+                var cnt = 0;
+                var sut = new TestObservableObjectL {Age = 10, Child = new TestObservableObjectL {Age = 20}};
+
+                for (var i = 0; i < iter; ++i)
+                {
+                    Opticon.Observe(sut).When("Child", x => x.Child).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
+                }
+                Assert.AreEqual(iter, cnt);
+            });
+
+            Benchmark.TimeOperation(outter, "[DanRx2-slacker]", () =>
+            {
+                var cnt = 0;
+                var sut = new TestObservableObjectL {Age = 10, Child = new TestObservableObjectL {Age = 20}};
+
+                for (var i = 0; i < iter; ++i)
+                {
+                    Opticon.Observe(sut, x => x.Child.Age).Subscribe(_ => { ++cnt; });
+                }
+                Assert.AreEqual(iter, cnt);
+            });
+        }
+
+        [Test]
         public void When_Nested_Perf_Comparison_Fast()
         {
             Console.Error.WriteLine("Subscribing 10000x to 1 property:");
@@ -217,112 +389,6 @@ namespace Panopticon.PerformanceTests
             });
         }
 
-        class FastReturn<T> : IObservable<T>
-        {
-            private T val;
-            public FastReturn(T value)
-            {
-                val = value;
-            }
-
-            public IDisposable Subscribe(IObserver<T> observer)
-            {
-                observer.OnNext(val);
-                return Disposable.Empty;
-            }
-        }
-
-
-        [Test]
-        public void When_Nested_Perf_Comparison_Extreme()
-        {
-            Console.Error.WriteLine("Subscribing 10000x to 1 nested property:");
-            var iter = 10000;
-            var outter = 5;
-            Benchmark.TimeOperation(outter, "[MarkRx2]", () =>
-            {
-                var cnt = 0;
-
-                var sut = new TestObservableObjectL { Age = 10, Child = new TestObservableObjectL { Age = 20 } };
-                for (var i = 0; i < iter; ++i)
-                {
-                    new Observer<TestObservableObjectL, TestObservableObjectL>(sut, x => x.Child, "Child")
-                        .Chain<TestObservableObjectL, TestObservableObjectL, int>(x => x.Age, "Age", v => { ++cnt; });
-                }
-                Assert.AreEqual(iter, cnt);
-            });
-
-            Benchmark.TimeOperation(outter, "[DanRx2]", () =>
-            {
-                var cnt = 0;
-                var sut = new TestObservableObjectL { Age = 10, Child = new TestObservableObjectL { Age = 20 } };
-
-                for (var i = 0; i < iter; ++i)
-                {
-                    Opticon.Observe(sut).When("Child", x => x.Child).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
-                }
-                Assert.AreEqual(iter, cnt);
-            });
-
-            Benchmark.TimeOperation(outter, "[DanRx2-slacker]", () =>
-            {
-                var cnt = 0;
-                var sut = new TestObservableObjectL { Age = 10, Child = new TestObservableObjectL { Age = 20 } };
-
-                for (var i = 0; i < iter; ++i)
-                {
-                    Opticon.Observe(sut, x => x.Child.Age).Subscribe(_ => { ++cnt; });
-                }
-                Assert.AreEqual(iter, cnt);
-            });
-        }
-
-        [Test]
-        public void When_Nested_Perf_Comparison_Extreme_Lotsa_Obj()
-        {
-            Console.Error.WriteLine("Subscribing to 1 child property on 10000 obj:");
-
-            Func<TestObservableObject[]> sutFactory =
-                () =>
-                    Enumerable.Repeat(default(object), 10000).Select(
-                        _ => new TestObservableObject { Age = 10, Child = new TestObservableObject { Age = 20 } }).ToArray();
-
-
-            Benchmark.TimeOperation(5, "[MarkRx2]", sutFactory, suts =>
-            {
-                var cnt = 0;
-
-                foreach (var sut in suts)
-                {
-                    new Observer<TestObservableObject, TestObservableObject>(sut, x => x.Child, "Child")
-                        .Chain<TestObservableObject, TestObservableObject, int>(x => x.Age, "Age", v => { ++cnt; });
-                }
-
-                Assert.AreEqual(10000, cnt);
-            });
-
-            Benchmark.TimeOperation(5, "[DanRx2]", sutFactory, suts =>
-            {
-                var cnt = 0;
-
-                foreach (var sut in suts)
-                {
-                    Opticon.Observe(sut).When("Child", x => x.Child).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
-                }
-                Assert.AreEqual(10000, cnt);
-            });
-
-            Benchmark.TimeOperation(5, "[DanRx2-slack]", sutFactory, suts =>
-            {
-                var cnt = 0;
-
-                foreach (var sut in suts)
-                {
-                    Opticon.Observe(sut, x => x.Child.Age).Subscribe(_ => { ++cnt; });
-                }
-                Assert.AreEqual(10000, cnt);
-            });
-        }
 
         [Test]
         public void When_PropChain()
@@ -401,9 +467,9 @@ namespace Panopticon.PerformanceTests
 
                 for (var i = 0; i < 100; ++i)
                 {
-                    var sut = new TestObservableObject { Age = 10 };
+                    var sut = new TestObservableObject {Age = 10};
                     new Observer<TestObservableObject, int>(sut, x => x.Age, "Age", v => { ++cnt; });
-                      //.Chain<TestObservableObject, TestObservableObject, int>(x => x.Age, "Age", v => { ++cnt; });
+                    //.Chain<TestObservableObject, TestObservableObject, int>(x => x.Age, "Age", v => { ++cnt; });
 
                     for (var j = 0; j < 10000; ++j)
                         sut.Age = j;
@@ -412,7 +478,7 @@ namespace Panopticon.PerformanceTests
                 // Console.Error.WriteLine("  Count: {0}", cnt);
             });
 
-           
+
             Benchmark.TimeOperation(5, "[DanRx-coop]", () =>
             {
                 var cnt = 0;
@@ -447,7 +513,7 @@ namespace Panopticon.PerformanceTests
                 var cnt = 0;
                 for (var i = 0; i < 100; ++i)
                 {
-                    var sut = new TestObservableObject { Age = 10 };
+                    var sut = new TestObservableObject {Age = 10};
                     (new FastReturn<TestObservableObject>(sut)).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
 
                     for (var j = 0; j < 10000; ++j)
@@ -461,7 +527,7 @@ namespace Panopticon.PerformanceTests
                 var cnt = 0;
                 for (var i = 0; i < 100; ++i)
                 {
-                    var sut = new TestObservableObject { Age = 10 };
+                    var sut = new TestObservableObject {Age = 10};
                     PropertyObservableFactory.Create(sut, x => x.Age).Subscribe(_ => { ++cnt; });
 
                     for (var j = 0; j < 10000; ++j)

@@ -27,14 +27,12 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             return (IObservable<TProperty>) currObserver;
         }
 
-        private static Dictionary<MemberInfo, Delegate> cache = new Dictionary<MemberInfo, Delegate>();
-  //      private static Dictionary<Tuple<Type, string>, Delegate> cache = new Dictionary<Tuple<Type, string>, Delegate>();
-        private static object gate = new object();
+        private static readonly Dictionary<MemberInfo, Delegate> cache = new Dictionary<MemberInfo, Delegate>();
+        private static readonly object gate = new object();
 
         private static Delegate CreateNotifyPropertyChangedLinkMethodDelegate(MemberInfo memberInfo)
         {
             Delegate result;
-        //    var key = Tuple.Create(instanceType, memberInfo.Name);
             
             lock (gate)
             {
@@ -55,7 +53,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
         [UsedImplicitly]
         private static object CreateNotifyPropertyChangedLink<TIn, TOut>(object source, MemberInfo outMemberInfo)
-            where TIn : INotifyPropertyChanged
+            where TIn : class, INotifyPropertyChanged
         {
             var getter = ReflectionHelpers.CreatePropertyGetter((PropertyInfo) outMemberInfo);
             return new NotifyPropertyChangedLink<TIn, TOut>((IObservable<TIn>) source, outMemberInfo.Name, (Func<TIn, TOut>) getter);
