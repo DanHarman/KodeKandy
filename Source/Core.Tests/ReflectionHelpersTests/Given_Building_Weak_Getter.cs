@@ -1,4 +1,4 @@
-﻿// <copyright file="Given_WeakGetter.cs" company="million miles per hour ltd">
+﻿// <copyright file="Given_Building_Weak_Getter.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -17,10 +17,10 @@ using NUnit.Framework;
 namespace KodeKandy.ReflectionHelpersTests
 {
     [TestFixture]
-    public class Given_WeakGetter
+    public class Given_Building_Weak_Getter
     {
         [Test]
-        public void Given_WeakFieldGetter_When_Getting_Field_Then_Suceeds()
+        public void When_CreateWeakFieldGetter_Delegate_Used_Then_Suceeds()
         {
             // Arrange
             var fieldInfo = typeof(Shape).GetField("Id");
@@ -36,7 +36,7 @@ namespace KodeKandy.ReflectionHelpersTests
         }
 
         [Test]
-        public void Given_WeakMemberGetter_When_Getting_Field_Then_Suceeds()
+        public void When_CreateWeakMemberGetter_For_Field_Delegate_Used_Then_Suceeds()
         {
             // Arrange
             var fieldInfo = typeof(Shape).GetField("Id");
@@ -52,7 +52,7 @@ namespace KodeKandy.ReflectionHelpersTests
         }
 
         [Test]
-        public void Given_WeakMemberGetter_When_Getting_Property_Then_Suceeds()
+        public void When_CreateWeakMemberGetter_For_Property_Delegate_Used_Then_Suceeds()
         {
             // Arrange
             var propertyInfo = typeof(Shape).GetProperty("Name");
@@ -68,7 +68,7 @@ namespace KodeKandy.ReflectionHelpersTests
         }
 
         [Test]
-        public void Given_WeakPropertyGetter_When_Getting_Property_Then_Suceeds()
+        public void When_CreateWeakPropertyGetter_Delegate_Used_Then_Suceeds()
         {
             // Arrange
             var propertyInfo = typeof(Shape).GetProperty("Name");

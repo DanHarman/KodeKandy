@@ -1,4 +1,4 @@
-// <copyright file="ReturnForever.cs" company="million miles per hour ltd">
+// <copyright file="Forever.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -24,11 +24,11 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
     ///     This is similar to <see cref="Observable.Return{TResult}(TResult)" /> but never completes.
     /// </remarks>
     /// <typeparam name="T">The type of the observable.</typeparam>
-    internal class ReturnForever<T> : IObservable<T>
+    internal class Forever<T> : IObservable<T>
     {
         private readonly T value;
 
-        public ReturnForever(T value)
+        public Forever(T value)
         {
             this.value = value;
         }
@@ -43,9 +43,9 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
         #endregion
 
-        public static ReturnForever<T> Value(T value)
+        public static Forever<T> Value(T value)
         {
-            return new ReturnForever<T>(value);
+            return new Forever<T>(value);
         }
     }
 }

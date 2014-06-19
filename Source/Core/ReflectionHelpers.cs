@@ -276,13 +276,17 @@ namespace KodeKandy
 
 
         /// <summary>
-        /// Creates a strongly typed getter delegate to a property.
-        /// This does not support structs as they require the first param of the delegate to be passed by reference.
+        ///     Create a strongly typed property getter delegate.
         /// </summary>
-        /// <param name="propertyInfo"></param>
-        /// <returns></returns>
+        /// <remarks>
+        ///     This does not support structs as they require the first param of the delegate to be passed by reference so
+        ///     would have a different delegate signature.
+        /// </remarks>
+        /// <returns>A strongly typed delegate of the form Func{TClass, TProperty}</returns>
         public static Delegate CreatePropertyGetter(PropertyInfo propertyInfo)
         {
+            Require.NotNull(propertyInfo, "propertyInfo");
+
             var getterMethodInfo = propertyInfo.GetGetMethod(true);
 
             if (getterMethodInfo == null)
@@ -293,6 +297,45 @@ namespace KodeKandy
             var propertyType = getterMethodInfo.ReturnType;
 
             return Delegate.CreateDelegate(typeof(Func<,>).MakeGenericType(instanceType, propertyType), getterMethodInfo);
+        }
+
+        /// <summary>
+        ///     Create a strongly typed field getter delegate.
+        /// </summary>
+        /// <remarks>
+        ///     This does not support structs as they require the first param of the delegate to be passed by reference so
+        ///     would have a different delegate signature.
+        /// </remarks>
+        /// <returns>A strongly typed delegate of the form Func{TClass, TField}</returns>
+        public static Delegate CreateFieldGetter(FieldInfo fieldInfo)
+        {
+            Require.NotNull(fieldInfo, "fieldInfo");
+
+            var intanceExpression = Expression.Parameter(fieldInfo.ReflectedType);
+            var fieldExpression = Expression.Field(intanceExpression, fieldInfo);
+
+            var lambdaType = typeof(Func<,>).MakeGenericType(fieldInfo.ReflectedType, fieldInfo.FieldType);
+            return Expression.Lambda(lambdaType, fieldExpression, intanceExpression).Compile();
+        }
+
+        /// <summary>
+        ///     Create a strongly typed member getter delegate.
+        /// </summary>
+        /// <remarks>
+        ///     This does not support structs as they require the first param of the delegate to be passed by reference so
+        ///     would have a different delegate signature.
+        /// </remarks>
+        /// <returns>A strongly typed delegate of the form Func{TClass, TMember}</returns>
+        public static Delegate CreateMemberGetter(MemberInfo memberInfo)
+        {
+            Require.NotNull(memberInfo, "memberInfo");
+
+            var propertyInfo = memberInfo as PropertyInfo;
+
+            if (propertyInfo != null)
+                return CreatePropertyGetter(propertyInfo);
+
+            return CreateFieldGetter((FieldInfo) memberInfo);
         }
 
         #region Nested type: SafeWeakMemberGetterResult

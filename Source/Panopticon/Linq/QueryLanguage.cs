@@ -27,7 +27,7 @@ namespace KodeKandy.Panopticon.Linq
             if (source == null)
                 throw new ArgumentNullException("source");
 
-            return new ReturnForever<T>(source);
+            return new Forever<T>(source);
         }
 
         public static IObservable<TProperty> Observe<TClass, TProperty>(TClass source, Expression<Func<TClass, TProperty>> memberPath)
@@ -35,7 +35,7 @@ namespace KodeKandy.Panopticon.Linq
             if (source == null)
                 throw new ArgumentNullException("source");
 
-            return PropertyObservableFactory.Create(source, memberPath);
+            return MemberObservableFactory.Create(source, memberPath);
         }
     }
 

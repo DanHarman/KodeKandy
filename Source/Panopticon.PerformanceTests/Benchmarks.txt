@@ -62,3 +62,18 @@ Change3 Lots of obj event - Average : 1933ms
 3 - 10k RX subcribe calls. - Average : 45.8ms
 3 - 10k event sub subscribe calls. - Average : 1ms
 
+16.06.2014
+
+Disposing of a subscription on each of 10000 obj:
+[MarkRx2] - Average : 3.2ms
+[DanRx2] - Average : 0.2ms
+
+Subscribing to 1 child property, notifying it 10000x
+[MarkRx2] - Average : 161.2ms
+[DanRx2] - Average : 115.2ms
+
+Subscribing to 1 child property on 10000 obj:
+[MarkRx2] - Average : 15.2ms
+[DanRx2] - Average : 4ms
+[DanRx2-Expression] - Average : 189.4ms
+

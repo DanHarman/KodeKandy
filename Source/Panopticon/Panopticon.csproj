@@ -33,22 +33,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CollectionChangedHelper.cs" />
     <Compile Include="ImmutableList.cs" />
     <Compile Include="Internal\ImmutableList.cs" />
     <Compile Include="Internal\ImmutableMultiObserver.cs" />
     <Compile Include="IObservableObject.cs" />
     <Compile Include="Linq\ObservableImpl\NotifyPropertyChangedLink.cs" />
-    <Compile Include="Linq\ObservableImpl\PropertyObservableFactory.cs" />
-    <Compile Include="Linq\ObservableImpl\ReturnForever.cs" />
+    <Compile Include="Linq\ObservableImpl\PocoLink.cs" />
+    <Compile Include="Linq\ObservableImpl\MemberObservableFactory.cs" />
+    <Compile Include="Linq\ObservableImpl\Forever.cs" />
     <Compile Include="Linq\QueryLanguage.cs" />
     <Compile Include="ObservableCommand.cs" />
-    <Compile Include="ObservableList.cs" />
-    <Compile Include="ObservableObject.cs" />
-    <Compile Include="CollectionChangeSubject.cs" />
+    <Compile Include="ObservableListNu.cs" />
     <Compile Include="NotifyPropertyChangedObservable.cs" />
-    <Compile Include="PropertyChangeEventArgsEx.cs" />
+    <Compile Include="ObservableObjectNu.cs" />
+    <Compile Include="PropertyChangedEventArgsEx.cs" />
     <Compile Include="PropertyChangeHelper.cs" />
-    <Compile Include="PropertyChangeSubject.cs" />
     <Compile Include="CollectionChange.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

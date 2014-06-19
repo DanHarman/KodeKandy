@@ -30,23 +30,27 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
     ///     conditinos may occur in terms of notification order etc. It is recommended that observed classes are only modified
     ///     on one thread. This is consistent with most other uses of INotifyPropertyChanged.
     /// </summary>
-    /// <typeparam name="TSource">The class type being obsevered.</typeparam>
+    /// <remarks>
+    ///     We only implement IObserver{TClass} here for efficiency/perf reasons, it is not intended that consumers push into
+    ///     it - the result of that would be messy.
+    /// </remarks>
+    /// <typeparam name="TClass">The class type being obsevered.</typeparam>
     /// <typeparam name="TProperty">The property type being observered on the observed class.</typeparam>
-    internal class NotifyPropertyChangedLink<TSource, TProperty> : IObserver<TSource>, IObservable<TProperty>
-        where TSource : class, INotifyPropertyChanged
+    internal class NotifyPropertyChangedLink<TClass, TProperty> : IObserver<TClass>, IObservable<TProperty>
+        where TClass : class, INotifyPropertyChanged
     {
         private readonly object _gate = new object();
         private readonly string _propertyName;
-        private readonly Func<TSource, TProperty> _propertyValueGetter;
-        private readonly IObservable<TSource> _sourceObservable;
+        private readonly Func<TClass, TProperty> _propertyValueGetter;
+        private readonly IObservable<TClass> _sourceObservable;
         private Exception _error;
         private bool _isStopped;
         private IObserver<TProperty> _observer;
         private TProperty _propertyValue;
-        private TSource _source;
+        private TClass _source;
         private IDisposable _sourceSubscriptionDisposable;
 
-        public NotifyPropertyChangedLink(IObservable<TSource> source, string propertyName, Func<TSource, TProperty> propertyValueGetter)
+        public NotifyPropertyChangedLink(IObservable<TClass> source, string propertyName, Func<TClass, TProperty> propertyValueGetter)
         {
             if (source == null)
                 throw new ArgumentNullException("source");
@@ -67,8 +71,8 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             if (observer == null)
                 throw new ArgumentNullException("observer");
 
-            if (_observer != null)
-                throw new Exception("NotifyPropertyChangedLink can only have a single subscriber, and one has already been bound.");
+//            if (_observer != null)
+//                throw new Exception("NotifyPropertyChangedLink can only have a single subscriber, and one has already been bound.");
 
             Exception error;
 
@@ -94,14 +98,16 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                         }
                         else
                         {
-                            // We didn't have a multiobserver, so we must have just had a single _observer, so replace it with a multiobserver containing
-                            // both the old and new _observer.
+                            // We didn't have a multiobserver, so we must have just had a single observer, so replace it with a multiobserver containing
+                            // both the old and new observer.
                             var oldObserver = _observer;
                             _observer =
                                 new ImmutableMultiObserver<TProperty>(new Internal.ImmutableList<IObserver<TProperty>>(new[] {oldObserver, observer}));
                         }
 
-                        // Send the new observer the current property value.
+                        // Send the new observer the current property value. This is done inside the lock to prevent race conditions around the initial
+                        // value. Behaviour subject does similar, although I'm not sure we need to make this guarantee as it is stronger than the
+                        // guarantee for the property changing once already subscribed (whereby ordering is not guaranteed).
                         observer.OnNext(_propertyValue);
                     }
 
@@ -121,12 +127,13 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
         #endregion
 
-        #region IObserver<TSource> Members
+        #region IObserver<TClass> Members
 
-        void IObserver<TSource>.OnNext(TSource value)
+        void IObserver<TClass>.OnNext(TClass value)
         {
             IObserver<TProperty> currObserver;
-            TSource oldSource;
+            TClass oldSource;
+            TProperty initialPropertyValue;
 
             lock (_gate)
             {
@@ -138,7 +145,8 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                 _source = value;
 
                 // We need to get the current property value from this source value.
-                _propertyValue = _propertyValueGetter(_source);
+                initialPropertyValue = _propertyValueGetter(_source);
+                _propertyValue = initialPropertyValue;
             }
 
             // Connect to INotifyPropertyChanged on the new _source.
@@ -146,15 +154,15 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                 _source.PropertyChanged += OnPropertyChanged;
 
             // Disconnect from INotifyPropertyChanged on previous _source. Because _source has been changed it doesn't matter
-            // if we end up with an event from this old source sneaking through as it will be filtered out.
+            // if we end up with an extra event from this old source sneaking through as it will be filtered out.
             if (oldSource != null)
                 oldSource.PropertyChanged -= OnPropertyChanged;
 
             if (currObserver != null)
-                currObserver.OnNext(_propertyValue);
+                currObserver.OnNext(initialPropertyValue);
         }
 
-        void IObserver<TSource>.OnError(Exception error)
+        void IObserver<TClass>.OnError(Exception error)
         {
             if (error == null)
                 throw new ArgumentNullException("error");
@@ -176,7 +184,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                 currObserver.OnError(error);
         }
 
-        void IObserver<TSource>.OnCompleted()
+        void IObserver<TClass>.OnCompleted()
         {
             IObserver<TProperty> currObserver;
 
@@ -259,10 +267,13 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         private void CleanUp()
         {
             _observer = null;
-            _source = default(TSource);
+            _source = default(TClass);
             _propertyValue = default(TProperty);
-            _sourceSubscriptionDisposable.Dispose();
-            _sourceSubscriptionDisposable = null;
+            if (_sourceSubscriptionDisposable != null)
+            {
+                _sourceSubscriptionDisposable.Dispose();
+                _sourceSubscriptionDisposable = null;
+            }
         }
 
         #region Nested type: Subscription
@@ -273,10 +284,10 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         /// </summary>
         private class Subscription : IDisposable
         {
-            private NotifyPropertyChangedLink<TSource, TProperty> _link;
+            private NotifyPropertyChangedLink<TClass, TProperty> _link;
             private IObserver<TProperty> _observer;
 
-            public Subscription(NotifyPropertyChangedLink<TSource, TProperty> link, IObserver<TProperty> observer)
+            public Subscription(NotifyPropertyChangedLink<TClass, TProperty> link, IObserver<TProperty> observer)
             {
                 _link = link;
                 _observer = observer;

@@ -81,15 +81,19 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="CollectionChangeSubjectTests\Given_CollectionChangeSubject.cs" />
+    <Compile Include="CollectionChangeHelperTests\Given_CollectionChangedHelper.cs" />
+    <Compile Include="CollectionChangeHelperTests\Given_CollectionChangedHelper_As_PropertyChangedHelper.cs" />
+    <Compile Include="Internal\Given_Forever.cs" />
     <Compile Include="Internal\Given_WeakEventHandler.cs" />
     <Compile Include="ObservableListTests\Given_Observing_CollectionChanged_Events.cs" />
-    <Compile Include="ObservableListTests\Given_Observing_CollectionChanges.cs" />
-    <Compile Include="ObservableObjectTests\Given_Observing_PropertyChanged_Events.cs" />
-    <Compile Include="PropertyChangeSubjectTests\Given_PropertyChangeSubject.cs" />
-    <Compile Include="ObservableObjectTests\TestObservableObject.cs" />
-    <Compile Include="ObservableObjectTests\Given_Observing_PropertyChanges.cs" />
+    <Compile Include="ObservableObjectTests\Given_ObservableObject.cs" />
+    <Compile Include="PropertyChangeHelperTests\Given_PropertyChangeHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryLanguageTests\Given_Observe_For_INotifyPropertyChanged_Object.cs" />
+    <Compile Include="QueryLanguageTests\Given_Observe_For_Poco_Object.cs" />
+    <Compile Include="QueryLanguageTests\Given_When.cs" />
+    <Compile Include="TestEntities\TestObservableObject.cs" />
+    <Compile Include="TestEntities\TestPoco.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -104,9 +108,7 @@
       <Name>QualityTools</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Benchmarks.txt" />
-  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

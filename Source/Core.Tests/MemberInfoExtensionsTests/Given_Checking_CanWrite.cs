@@ -1,4 +1,4 @@
-// <copyright file="Given_Checking_CanRWrite.cs" company="million miles per hour ltd">
+// <copyright file="Given_Checking_CanWrite.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -17,7 +17,7 @@ using NUnit.Framework;
 namespace KodeKandy.MemberInfoExtensionsTests
 {
     [TestFixture]
-    public class Given_Checking_CanRWrite
+    public class Given_Checking_CanWrite
     {
         [Test]
         public void When_Field_Then_True()
