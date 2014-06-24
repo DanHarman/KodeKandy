@@ -1,7 +1,7 @@
-// <copyright file="NotifyPropertyChangedLink.cs" company="million miles per hour ltd">
+// <copyright file="NotifyPropertyChangedValueObservable.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
-// This source is subject to the MIT License.
+// This sourceObservable is subject to the MIT License.
 // Please see the License.txt file for more information.
 // All other rights reserved.
 // 
@@ -36,30 +36,28 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
     /// </remarks>
     /// <typeparam name="TClass">The class type being obsevered.</typeparam>
     /// <typeparam name="TProperty">The property type being observered on the observed class.</typeparam>
-    internal class NotifyPropertyChangedLink<TClass, TProperty> : IObserver<TClass>, IObservable<TProperty>
+    internal class NotifyPropertyChangedValueObservable<TClass, TProperty> : IObserver<TClass>, IObservable<TProperty>
         where TClass : class, INotifyPropertyChanged
     {
         private readonly object _gate = new object();
         private readonly string _propertyName;
         private readonly Func<TClass, TProperty> _propertyValueGetter;
         private readonly IObservable<TClass> _sourceObservable;
-        private Exception _error;
-        private bool _isStopped;
-        private IObserver<TProperty> _observer;
+        private IObserver<TProperty> _observer = NopObserver<TProperty>.Instance;
         private TProperty _propertyValue;
         private TClass _source;
         private IDisposable _sourceSubscriptionDisposable;
 
-        public NotifyPropertyChangedLink(IObservable<TClass> source, string propertyName, Func<TClass, TProperty> propertyValueGetter)
+        public NotifyPropertyChangedValueObservable(IObservable<TClass> sourceObservable, string propertyName, Func<TClass, TProperty> propertyValueGetter)
         {
-            if (source == null)
-                throw new ArgumentNullException("source");
+            if (sourceObservable == null)
+                throw new ArgumentNullException("sourceObservable");
             if (propertyName == null)
                 throw new ArgumentNullException("propertyName");
             if (propertyValueGetter == null)
                 throw new ArgumentNullException("propertyValueGetter");
 
-            _sourceObservable = source;
+            _sourceObservable = sourceObservable;
             _propertyName = propertyName;
             _propertyValueGetter = propertyValueGetter;
         }
@@ -71,16 +69,14 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             if (observer == null)
                 throw new ArgumentNullException("observer");
 
-            Exception error;
-
             lock (_gate)
             {
-                if (!_isStopped)
+                if (!(_observer is CompletedObserver<TProperty>))
                 {
-                    if (_observer == null)
+                    if (_observer == NopObserver<TProperty>.Instance)
                     {
                         // If we have no _observer then make it our _observer and subscribe to _sourceObservable. Because there is no
-                        // current value and the source should send us its initial value immediately, we don't need to
+                        // current value and the sourceObservable should send us its initial value immediately, we don't need to
                         // call observer.OnNext().
                         _observer = observer;
                         _sourceSubscriptionDisposable = _sourceObservable.Subscribe(this);
@@ -110,14 +106,15 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
                     return new Subscription(this, observer);
                 }
-
-                error = _error;
             }
 
-            if (error == null)
+            // If we got here we have a completed observer and that means _observer won't be modified so we can work outside the lock safely.
+            var completedObserver = _observer as CompletedObserver<TProperty>;
+
+            if (completedObserver == CompletedObserver<TProperty>.Instance)
                 observer.OnCompleted();
             else
-                observer.OnError(error);
+                observer.OnError(completedObserver.Error);
 
             return Disposable.Empty;
         }
@@ -126,37 +123,36 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
         #region IObserver<TClass> Members
 
-        void IObserver<TClass>.OnNext(TClass value)
+        void IObserver<TClass>.OnNext(TClass newSource)
         {
-            IObserver<TProperty> currObserver;
+            IObserver<TProperty> oldObserver;
             TClass oldSource;
             TProperty initialPropertyValue;
 
             lock (_gate)
             {
-                if (_isStopped)
+                if (_observer is CompletedObserver<TProperty>)
                     return;
 
-                currObserver = _observer;
+                oldObserver = _observer;
                 oldSource = _source;
-                _source = value;
+                _source = newSource;
 
-                // We need to get the current property value from this source value.
+                // We need to get the current property value from this sourceObservable value.
                 initialPropertyValue = _propertyValueGetter(_source);
                 _propertyValue = initialPropertyValue;
             }
 
             // Connect to INotifyPropertyChanged on the new _source.
-            if (_source != null)
-                _source.PropertyChanged += OnPropertyChanged;
+            if (newSource != null)
+                newSource.PropertyChanged += OnPropertyChanged;
 
             // Disconnect from INotifyPropertyChanged on previous _source. Because _source has been changed it doesn't matter
-            // if we end up with an extra event from this old source sneaking through as it will be filtered out.
+            // if we end up with an extra event from this old sourceObservable sneaking through as it will be filtered out.
             if (oldSource != null)
                 oldSource.PropertyChanged -= OnPropertyChanged;
 
-            if (currObserver != null)
-                currObserver.OnNext(initialPropertyValue);
+            oldObserver.OnNext(initialPropertyValue);
         }
 
         void IObserver<TClass>.OnError(Exception error)
@@ -164,51 +160,46 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             if (error == null)
                 throw new ArgumentNullException("error");
 
-            IObserver<TProperty> currObserver;
+            IObserver<TProperty> oldObserver;
 
             lock (_gate)
             {
-                if (_isStopped)
+                if (_observer is CompletedObserver<TProperty>)
                     return;
 
-                currObserver = _observer;
-                CleanUp();
-                _error = error;
-                _isStopped = true;
+                oldObserver = _observer;
+                CleanUp(new CompletedObserver<TProperty>(error));
             }
 
-            if (currObserver != null)
-                currObserver.OnError(error);
+            oldObserver.OnError(error);
         }
 
         void IObserver<TClass>.OnCompleted()
         {
-            IObserver<TProperty> currObserver;
+            IObserver<TProperty> oldObserver;
 
             lock (_gate)
             {
-                if (_isStopped)
+                if (_observer is CompletedObserver<TProperty>)
                     return;
 
-                currObserver = _observer;
-                CleanUp();
-                _isStopped = true;
+                oldObserver = _observer;
+                CleanUp(CompletedObserver<TProperty>.Instance);
             }
 
-            if (currObserver != null)
-                currObserver.OnCompleted();
+            oldObserver.OnCompleted();
         }
 
         #endregion
 
         /// <summary>
         ///     Internal <see cref="PropertyChangedEventHandler" /> to bind to the targets PropertyChanged event.
-        ///     Gets the current property value from the current source and pushes it to the observers.
+        ///     Gets the current property value from the current sourceObservable and pushes it to the observers.
         /// </summary>
         /// <remarks>
-        ///     We keep a local copy of the source value so that we don't end up with concurrency issues which
-        ///     would occur if we pulled it form the source whenever it was needed e.g. when adding a new observer, as
-        ///     we do not have a lock around the source, but we can control when it pushes new values into us with our lock.
+        ///     We keep a local copy of the sourceObservable value so that we don't end up with concurrency issues which
+        ///     would occur if we pulled it form the sourceObservable whenever it was needed e.g. when adding a new observer, as
+        ///     we do not have a lock around the sourceObservable, but we can control when it pushes new values into us with our lock.
         /// </remarks
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
@@ -222,7 +213,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                     _propertyValue = _propertyValueGetter(_source);
                 }
 
-                if (currObserver != null)
+                if (currObserver != NopObserver<TProperty>.Instance)
                     currObserver.OnNext(_propertyValue);
             }
         }
@@ -232,14 +223,14 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         /// </summary>
         /// <remarks>
         ///     This function is intentionally tolerant of observers being supplied that are not subscribed, or
-        ///     the link having already completed.
+        ///     thid observable having already completed.
         /// </remarks>
         /// <param name="observer">The observer to unsubscribe.</param>
         private void Unsubscribe(IObserver<TProperty> observer)
         {
             lock (_gate)
             {
-                if (_isStopped)
+                if (_observer is CompletedObserver<TProperty>)
                     return;
 
                 var multiObserver = _observer as ImmutableMultiObserver<TProperty>;
@@ -253,17 +244,17 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                     return;
 
                 // If we got here we only had one observer, so clear our upstream subscription.
-                CleanUp();
+                CleanUp(NopObserver<TProperty>.Instance);
             }
         }
 
         /// <summary>
-        ///     Cleans up by unsubscribing to the source, and releases references.
+        ///     Cleans up by unsubscribing to the sourceObservable, and releases references.
         /// </summary>
         /// <remarks>Must be called inside the lock.</remarks>
-        private void CleanUp()
+        private void CleanUp(IObserver<TProperty> observer)
         {
-            _observer = null;
+            _observer = observer;
             _source = default(TClass);
             _propertyValue = default(TProperty);
             if (_sourceSubscriptionDisposable != null)
@@ -281,12 +272,12 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         /// </summary>
         private class Subscription : IDisposable
         {
-            private NotifyPropertyChangedLink<TClass, TProperty> _link;
+            private NotifyPropertyChangedValueObservable<TClass, TProperty> _valueObservable;
             private IObserver<TProperty> _observer;
 
-            public Subscription(NotifyPropertyChangedLink<TClass, TProperty> link, IObserver<TProperty> observer)
+            public Subscription(NotifyPropertyChangedValueObservable<TClass, TProperty> valueObservable, IObserver<TProperty> observer)
             {
-                _link = link;
+                _valueObservable = valueObservable;
                 _observer = observer;
             }
 
@@ -298,8 +289,8 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                 if (currObserver == null)
                     return;
 
-                _link.Unsubscribe(currObserver);
-                _link = null;
+                _valueObservable.Unsubscribe(currObserver);
+                _valueObservable = null;
             }
 
             #endregion

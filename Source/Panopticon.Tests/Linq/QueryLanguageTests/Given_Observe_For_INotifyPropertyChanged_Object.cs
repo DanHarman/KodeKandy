@@ -1,8 +1,9 @@
 using KodeKandy.Panopticon.Linq;
+using KodeKandy.Panopticon.Tests.QueryLanguageTests;
 using Microsoft.Reactive.Testing;
 using NUnit.Framework;
 
-namespace KodeKandy.Panopticon.Tests.QueryLanguageTests
+namespace KodeKandy.Panopticon.Tests.Linq.QueryLanguageTests
 {
     [TestFixture]
     public class Given_Observe_For_INotifyPropertyChanged_Object : ReactiveTest

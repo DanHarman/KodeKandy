@@ -88,7 +88,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         {
             var getter = ReflectionHelpers.CreateMemberGetter(outMemberInfo);
 
-            return new NotifyPropertyChangedLink<TClass, TMember>((IObservable<TClass>) source, outMemberInfo.Name, (Func<TClass, TMember>) getter);
+            return new NotifyPropertyChangedValueObservable<TClass, TMember>((IObservable<TClass>) source, outMemberInfo.Name, (Func<TClass, TMember>) getter);
         }
 
         [UsedImplicitly]
@@ -97,7 +97,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         {
             var getter = ReflectionHelpers.CreateMemberGetter(memberInfo);
 
-            return new PocoLink<TClass, TMember>((IObservable<TClass>) source, (Func<TClass, TMember>) getter);
+            return new PocoObservable<TClass, TMember>((IObservable<TClass>) source, (Func<TClass, TMember>) getter);
         }
     }
 }

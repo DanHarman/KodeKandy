@@ -34,7 +34,7 @@ namespace KodeKandy.Panopticon.Linq
             if (outValueGetter == null)
                 throw new ArgumentNullException("outValueGetter");
 
-            return new NotifyPropertyChangedLink<TIn, TOut>(source, propertyName, outValueGetter);
+            return new NotifyPropertyChangedValueObservable<TIn, TOut>(source, propertyName, outValueGetter);
         }
 
         public static IObservable<Unit> WhenAny<TIn>(this IObservable<TIn> source)
@@ -44,7 +44,7 @@ namespace KodeKandy.Panopticon.Linq
                 throw new ArgumentNullException("source");
             // TODO need a specialised notifyProeprtychanged link it would seem if we want to expose the propertyname and type.
             throw new NotImplementedException();
-            //  return new NotifyPropertyChangedLink<TIn, TOut>(source, propertyName, outValueGetter);
+            //  return new NotifyPropertyChangedValueObservable<TIn, TOut>(source, propertyName, outValueGetter);
         }
 
         public static DerivedObservableList<TTargetCollectionItem> Map<TSourceCollection, TSourceCollectionItem, TTargetCollectionItem>(this TSourceCollection source,

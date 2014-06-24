@@ -77,3 +77,60 @@ Subscribing to 1 child property on 10000 obj:
 [DanRx2] - Average : 4ms
 [DanRx2-Expression] - Average : 189.4ms
 
+
+
+24.05.2014 Comparing IObserver pattern impl vs flagged version
+
+with Observer Impl:
+
+Disposing of a subscription on each of 10000 obj:
+[MarkRx2] - Average : 3.3ms
+[DanRx2] - Average : 0.08ms
+
+Subscribing to 1 child property, notifying it 10000x
+[MarkRx2] - Average : 161.8ms
+[DanRx2] - Average : 118.8ms
+
+Subscribing to 1 child property on 10000 obj:
+[MarkRx2] - Average : 13.16ms
+[DanRx2] - Average : 4ms
+[DanRx2-Expression] - Average : 137.72ms
+
+Subscribing to 1 property on 10000 obj:
+[MarkRx2] - Average : 6.16ms
+[DanRx2] - Average : 2.04ms
+[DanRx2-Expression] - Average : 106.28ms
+
+Subscribing to 1 property 1000x on 1 obj:
+[MarkRx2] - Average : 1.7ms
+[DanRx2] - Average : 3.38ms
+[DanRx2-Reuse observable] - Average : 62.3ms
+[DanRx2-Expression] - Average : 105.98ms
+
+
+With prev flag impl:
+
+Disposing of a subscription on each of 10000 obj:
+[MarkRx2] - Average : 3.6ms
+[DanRx2] - Average : 0ms
+
+Subscribing to 1 child property, notifying it 10000x
+[MarkRx2] - Average : 161ms
+[DanRx2] - Average : 118.6ms
+
+Subscribing to 1 child property on 10000 obj:
+[MarkRx2] - Average : 13.4ms
+[DanRx2] - Average : 4ms
+[DanRx2-Expression] - Average : 132.6ms
+
+Subscribing to 1 property on 10000 obj:
+[MarkRx2] - Average : 5.8ms
+[DanRx2] - Average : 2ms
+[DanRx2-Expression] - Average : 108.8ms
+
+Subscribing to 1 property 1000x on 1 obj:
+[MarkRx2] - Average : 1.8ms
+[DanRx2] - Average : 3ms
+[DanRx2-Reuse observable] - Average : 58ms
+[DanRx2-Expression] - Average : 106ms
+

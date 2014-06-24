@@ -3,7 +3,7 @@ using KodeKandy.QualityTools;
 using Microsoft.Reactive.Testing;
 using NUnit.Framework;
 
-namespace KodeKandy.Panopticon.Tests.Internal
+namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
 {
     [TestFixture]
     public class Given_Forever : ReactiveTest

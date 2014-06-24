@@ -39,15 +39,16 @@
     <Compile Include="Internal\ImmutableList.cs" />
     <Compile Include="Internal\ImmutableMultiObserver.cs" />
     <Compile Include="IObservableObject.cs" />
-    <Compile Include="Linq\ObservableImpl\NotifyPropertyChangedLink.cs" />
-    <Compile Include="Linq\ObservableImpl\PocoLink.cs" />
+    <Compile Include="Linq\ObservableImpl\NotifyPropertyChangedObservable.cs" />
+    <Compile Include="Linq\ObservableImpl\NotifyPropertyChangedValueObservable.cs" />
+    <Compile Include="Linq\ObservableImpl\PocoObservable.cs" />
     <Compile Include="Linq\ObservableImpl\MemberObservableFactory.cs" />
     <Compile Include="Linq\ObservableImpl\Forever.cs" />
+    <Compile Include="Linq\ObservableImpl\PropertyChange2.cs" />
     <Compile Include="Linq\Opticon.cs" />
     <Compile Include="Linq\QueryLanguage.cs" />
     <Compile Include="ObservableCommand.cs" />
     <Compile Include="ObservableList.cs" />
-    <Compile Include="NotifyPropertyChangedObservable.cs" />
     <Compile Include="ObservableObject.cs" />
     <Compile Include="PropertyChangedEventArgsEx.cs" />
     <Compile Include="PropertyChangeHelper.cs" />
@@ -56,7 +57,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MarkRx\PropertyChange.cs" />
     <Compile Include="MarkRx\PropertyObserver.cs" />
-    <Compile Include="Internal\WeakEventHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.IO">
