@@ -71,9 +71,6 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             if (observer == null)
                 throw new ArgumentNullException("observer");
 
-//            if (_observer != null)
-//                throw new Exception("NotifyPropertyChangedLink can only have a single subscriber, and one has already been bound.");
-
             Exception error;
 
             lock (_gate)

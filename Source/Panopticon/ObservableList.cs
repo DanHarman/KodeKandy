@@ -1,3 +1,16 @@
+// <copyright file="ObservableList.cs" company="million miles per hour ltd">
+// Copyright (c) 2013-2014 All Right Reserved
+// 
+// This source is subject to the MIT License.
+// Please see the License.txt file for more information.
+// All other rights reserved.
+// 
+// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY 
+// KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+// PARTICULAR PURPOSE.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,16 +21,16 @@ using KodeKandy.Panopticon.Properties;
 
 namespace KodeKandy.Panopticon
 {
-    public class ObservableListNu<T> : Collection<T>, INotifyPropertyChanged, INotifyCollectionChanged
+    public class ObservableList<T> : Collection<T>, IObservableObject, INotifyCollectionChanged
     {
         private readonly CollectionChangedHelper<T> _collectionChangeHelper;
 
-        public ObservableListNu()
+        public ObservableList()
         {
             _collectionChangeHelper = new CollectionChangedHelper<T>(this);
         }
 
-        public ObservableListNu(IEnumerable<T> collection)
+        public ObservableList(IEnumerable<T> collection)
             : base(new List<T>(collection))
         {
             _collectionChangeHelper = new CollectionChangedHelper<T>(this);
@@ -33,7 +46,7 @@ namespace KodeKandy.Panopticon
 
         #endregion
 
-        #region INotifyPropertyChanged Members
+        #region IObservableObject Members
 
         public event PropertyChangedEventHandler PropertyChanged
         {
@@ -41,25 +54,15 @@ namespace KodeKandy.Panopticon
             remove { _collectionChangeHelper.PropertyChanged -= value; }
         }
 
-        #endregion
-
-        #region IObservableObject Members
-
         /// <summary>
-        ///     Suppress all change notifications for the lifetime of the returned disposable.
+        ///     Suppress all PropertyChanged events for the lifetime of the returned disposable.
         ///     Typically used within a 'using' block.
         /// </summary>
         /// <returns>A disposable that should be disposed when notification suppression is over.</returns>
-//        public IDisposable BeginNotificationSuppression()
-//        {
-//            // TODO need to handle collection and property change supression separately I think...
-//            return _collectionChangeHelper.BeginNotificationSuppression(() =>
-//            {
-//                // Once a collection falls out of notification suppression, we must fire a reset/image to all subscribers so they can catch up.
-//                // If you think this should only happy on more than 'n' changes, then count your changes first before calling suppress!
-//                _collectionChangeHelper.NotifyReset();
-//            });
-//        }
+        public IDisposable SuppressPropertyChanged()
+        {
+            return _collectionChangeHelper.SuppressPropertyChanged();
+        }
 
         #endregion
 
@@ -109,11 +112,12 @@ namespace KodeKandy.Panopticon
             _collectionChangeHelper.SetPropertyValue(ref property, value, propertyName, userData);
         }
 
-        public IDisposable SuppressPropertyChanged()
-        {
-            return _collectionChangeHelper.SuppressPropertyChanged();
-        }
-
+        /// <summary>
+        ///     Suppress all CollectionChanged events for the lifetime of the returned disposable.
+        ///     Once the scope is exited a collection Reset event is fired.
+        ///     Typically used within a 'using' block.
+        /// </summary>
+        /// <returns>A disposable that should be disposed when notification suppression is over.</returns>
         public IDisposable SuppressCollectionChanged()
         {
             return _collectionChangeHelper.SuppressCollectionChanged();

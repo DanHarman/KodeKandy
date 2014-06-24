@@ -23,23 +23,22 @@ namespace KodeKandy.Panopticon
         private const string CountName = "Count";
         private const string IndexerName = "Item[]";
         private int suppressCollectionChangedCount;
-        
+
         public CollectionChangedHelper(object source)
             : base(source)
         {
         }
-
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
 
 
         protected bool IsCollectionChangedSuppressed
         {
             get { return Interlocked.CompareExchange(ref suppressCollectionChangedCount, 0, 0) != 0; }
         }
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         private void RaiseCollectionChanged(NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
         {
-            if (IsPropertyChangedSuppressed)
+            if (IsCollectionChangedSuppressed)
                 return;
 
             var handlerSnapshot = CollectionChanged;
@@ -78,14 +77,21 @@ namespace KodeKandy.Panopticon
         }
 
         /// <summary>
-        ///     Suppress all CollectionChanged events for the lifetime of the returned disposable.
+        ///     Suppress all CollectionChanged AND PropertyChanged events for the lifetime of the returned disposable.
+        ///     Once the scope is exited a collection Reset event is fired.
         ///     Typically used within a 'using' block.
         /// </summary>
         /// <returns>A disposable that should be disposed when notification suppression is over.</returns>
         public IDisposable SuppressCollectionChanged()
         {
+            var propertyChangedDisposable = SuppressPropertyChanged();
             Interlocked.Increment(ref suppressCollectionChangedCount);
-            return Disposable.Create(() => Interlocked.Decrement(ref suppressCollectionChangedCount));
+            return Disposable.Create(() =>
+            {
+                propertyChangedDisposable.Dispose();
+                if (Interlocked.Decrement(ref suppressCollectionChangedCount) == 0)
+                    NotifyReset();
+            });
         }
     }
 }

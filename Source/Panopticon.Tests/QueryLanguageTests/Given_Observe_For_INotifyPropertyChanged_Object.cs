@@ -98,7 +98,7 @@ namespace KodeKandy.Panopticon.Tests.QueryLanguageTests
         }
 
         [Test]
-        public void When_Subscribe__Twice_With_Two_Node_Path_To_Property_Then_Correct_Notifications()
+        public void When_Subscribe_Twice_With_Two_Node_Path_To_Property_Then_Correct_Notifications_For_Both_Observers()
         {
             // Arrange
             var obj = new TestObservableObject {Child = new TestObservableObject {Age = 3}};

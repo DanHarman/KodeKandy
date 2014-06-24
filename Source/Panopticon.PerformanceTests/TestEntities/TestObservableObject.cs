@@ -1,6 +1,6 @@
 namespace KodeKandy.Panopticon.Tests.QueryLanguageTests
 {
-    class TestObservableObject : ObservableObjectNu
+    class TestObservableObject : ObservableObject
     {
         private int age;
         private TestObservableObject child;

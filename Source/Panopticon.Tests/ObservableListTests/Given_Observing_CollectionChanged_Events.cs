@@ -25,7 +25,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
         public void When_Add_Then_Action_Add_Raised()
         {
             // Arrange
-            var sut = new ObservableListNu<int>();
+            var sut = new ObservableList<int>();
             var results = new List<NotifyCollectionChangedEventArgs>();
             var expected = new[]
             {
@@ -46,7 +46,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
         public void When_Clear_Then_Action_Reset_Raised()
         {
             // Arrange
-            var sut = new ObservableListNu<int>(new[] { 10, 12, 18, 100 });
+            var sut = new ObservableList<int>(new[] { 10, 12, 18, 100 });
             var results = new List<NotifyCollectionChangedEventArgs>();
             var expected = new[]
             {
@@ -65,7 +65,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
         public void When_Insert_Then_Action_Add_Raised()
         {
             // Arrange
-            var sut = new ObservableListNu<int>(new[] { 10, 12, 18, 100 });
+            var sut = new ObservableList<int>(new[] { 10, 12, 18, 100 });
             var results = new List<NotifyCollectionChangedEventArgs>();
             var expected = new[]
             {
@@ -86,7 +86,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
         public void When_Replace_Then_Action_Replace_Raised()
         {
             // Arrange
-            var sut = new ObservableListNu<int>(new[] { 10, 12, 18, 100 });
+            var sut = new ObservableList<int>(new[] { 10, 12, 18, 100 });
             var results = new List<NotifyCollectionChangedEventArgs>();
             var expected = new[]
             {
@@ -107,7 +107,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
         public void When_RemoveAt_Then_Action_Remove_Raised()
         {
             // Arrange
-            var sut = new ObservableListNu<int>(new[] { 10, 12, 18, 100 });
+            var sut = new ObservableList<int>(new[] { 10, 12, 18, 100 });
             var results = new List<NotifyCollectionChangedEventArgs>();
             var expected = new[]
             {
@@ -128,7 +128,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
         public void When_Remove_Then_Action_Remove_Raised()
         {
             // Arrange
-            var sut = new ObservableListNu<int>(new[] { 10, 12, 18, 100 });
+            var sut = new ObservableList<int>(new[] { 10, 12, 18, 100 });
             var results = new List<NotifyCollectionChangedEventArgs>();
             var expected = new[]
             {

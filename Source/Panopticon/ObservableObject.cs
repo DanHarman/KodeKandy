@@ -1,4 +1,4 @@
-﻿// <copyright file="ObservableObjectNu.cs" company="million miles per hour ltd">
+﻿// <copyright file="ObservableObject.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -18,11 +18,11 @@ using KodeKandy.Panopticon.Properties;
 
 namespace KodeKandy.Panopticon
 {
-    public abstract class ObservableObjectNu : INotifyPropertyChanged
+    public abstract class ObservableObject : IObservableObject
     {
         private readonly PropertyChangeHelper propertyChangeHelper;
 
-        protected ObservableObjectNu()
+        protected ObservableObject()
         {
             propertyChangeHelper = new PropertyChangeHelper(this);
         }
@@ -49,6 +49,11 @@ namespace KodeKandy.Panopticon
             propertyChangeHelper.SetPropertyValue(ref property, value, propertyName, userData);
         }
 
+        /// <summary>
+        ///     Suppress all PropertyChanged events for the lifetime of the returned disposable.
+        ///     Typically used within a 'using' block.
+        /// </summary>
+        /// <returns>A disposable that should be disposed when notification suppression is over.</returns>
         public IDisposable SuppressPropertyChanged()
         {
             return propertyChangeHelper.SuppressPropertyChanged();
