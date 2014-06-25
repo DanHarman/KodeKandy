@@ -23,11 +23,11 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
     ///     An observable link, that returns a stream of INotifyPropertyChangedEventArgs as a PropertyChange object.
     /// </summary>
     /// <typeparam name="TClass">The class whose PropertyChanged event is being observerd.</typeparam>
-    internal class NotifyPropertyChangedObservable<TClass> : IObserver<TClass>, IObservable<PropertyChange2>
+    internal class NotifyPropertyChangedObservable<TClass> : IObserver<TClass>, IObservable<PropertyChange>
         where TClass : class, INotifyPropertyChanged
     {
         private readonly IObservable<TClass> _sourceObservable;
-        private IObserver<PropertyChange2> _observer = NopObserver<PropertyChange2>.Instance;
+        private IObserver<PropertyChange> _observer = NopObserver<PropertyChange>.Instance;
         private TClass _source;
         private IDisposable _sourceSubscriptionDisposable = Disposable.Empty;
 
@@ -39,41 +39,41 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             _sourceObservable = sourceObservable;
         }
 
-        #region IObservable<PropertyChange2> Members
+        #region IObservable<PropertyChange> Members
 
-        public IDisposable Subscribe(IObserver<PropertyChange2> observer)
+        public IDisposable Subscribe(IObserver<PropertyChange> observer)
         {
             if (observer == null)
                 throw new ArgumentNullException("observer");
 
-            IObserver<PropertyChange2> oldObserver;
-            IObserver<PropertyChange2> newObserver;
+            IObserver<PropertyChange> oldObserver;
+            IObserver<PropertyChange> newObserver;
 
             do
             {
                 oldObserver = _observer;
 
-                if (oldObserver == CompletedObserver<PropertyChange2>.Instance)
+                if (oldObserver == CompletedObserver<PropertyChange>.Instance)
                 {
                     observer.OnCompleted();
                     return Disposable.Empty;
                 }
 
-                var completedObserver = oldObserver as CompletedObserver<PropertyChange2>;
+                var completedObserver = oldObserver as CompletedObserver<PropertyChange>;
                 if (completedObserver != null)
                 {
                     observer.OnError(completedObserver.Error);
                     return Disposable.Empty;
                 }
 
-                if (oldObserver == NopObserver<PropertyChange2>.Instance)
+                if (oldObserver == NopObserver<PropertyChange>.Instance)
                 {
                     // If we have no _observer then make it our _observer and later on subscribe to _sourceObservable.
                     newObserver = observer;
                 }
                 else
                 {
-                    var multiObserver = _observer as ImmutableMultiObserver<PropertyChange2>;
+                    var multiObserver = _observer as ImmutableMultiObserver<PropertyChange>;
                     if (multiObserver != null)
                     {
                         // If we already have a ImmutableMultiObserver then add the new _observer to it.
@@ -83,8 +83,8 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                     {
                         // We didn't have a multiobserver, so we must have just had a single observer, so replace it with a multiobserver containing
                         // both the old and new observer.
-                        newObserver = new ImmutableMultiObserver<PropertyChange2>(
-                            new Internal.ImmutableList<IObserver<PropertyChange2>>(new[] {oldObserver, observer}));
+                        newObserver = new ImmutableMultiObserver<PropertyChange>(
+                            new Internal.ImmutableList<IObserver<PropertyChange>>(new[] {oldObserver, observer}));
                     }
                 }
             } while (Interlocked.CompareExchange(ref _observer, newObserver, oldObserver) != oldObserver);
@@ -119,15 +119,15 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
         void IObserver<TClass>.OnError(Exception error)
         {
-            IObserver<PropertyChange2> oldObserver;
-            IObserver<PropertyChange2> newObserver = new CompletedObserver<PropertyChange2>(error);
+            IObserver<PropertyChange> oldObserver;
+            IObserver<PropertyChange> newObserver = new CompletedObserver<PropertyChange>(error);
 
             // Spin in the completed observer.
             do
             {
                 oldObserver = _observer;
 
-                if (oldObserver is CompletedObserver<PropertyChange2>)
+                if (oldObserver is CompletedObserver<PropertyChange>)
                     break;
             } while (Interlocked.CompareExchange(ref _observer, newObserver, oldObserver) != oldObserver);
 
@@ -139,15 +139,15 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
         void IObserver<TClass>.OnCompleted()
         {
-            IObserver<PropertyChange2> oldObserver;
-            IObserver<PropertyChange2> newObserver = CompletedObserver<PropertyChange2>.Instance;
+            IObserver<PropertyChange> oldObserver;
+            IObserver<PropertyChange> newObserver = CompletedObserver<PropertyChange>.Instance;
 
             // Spin in the completed observer.
             do
             {
                 oldObserver = _observer;
 
-                if (oldObserver is CompletedObserver<PropertyChange2>)
+                if (oldObserver is CompletedObserver<PropertyChange>)
                     break;
             } while (Interlocked.CompareExchange(ref _observer, newObserver, oldObserver) != oldObserver);
 
@@ -188,7 +188,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         {
             if (_source == sender)
             {
-                _observer.OnNext(new PropertyChange2(sender, propertyChangedEventArgs));
+                _observer.OnNext(new PropertyChange(sender, propertyChangedEventArgs));
             }
         }
 
@@ -200,19 +200,19 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         ///     thid observable having already completed.
         /// </remarks>
         /// <param name="observer">The observer to unsubscribe.</param>
-        private void Unsubscribe(IObserver<PropertyChange2> observer)
+        private void Unsubscribe(IObserver<PropertyChange> observer)
         {
-            IObserver<PropertyChange2> oldObserver;
-            IObserver<PropertyChange2> newObserver;
+            IObserver<PropertyChange> oldObserver;
+            IObserver<PropertyChange> newObserver;
 
             do
             {
                 oldObserver = _observer;
 
-                if (oldObserver is CompletedObserver<PropertyChange2>)
+                if (oldObserver is CompletedObserver<PropertyChange>)
                     return;
 
-                var multiObserver = oldObserver as ImmutableMultiObserver<PropertyChange2>;
+                var multiObserver = oldObserver as ImmutableMultiObserver<PropertyChange>;
                 if (multiObserver != null)
                 {
                     newObserver = multiObserver.Remove(observer);
@@ -221,7 +221,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                 {
                     if (oldObserver != observer)
                         return;
-                    newObserver = NopObserver<PropertyChange2>.Instance;
+                    newObserver = NopObserver<PropertyChange>.Instance;
                 }
             } while (Interlocked.CompareExchange(ref _observer, newObserver, oldObserver) != oldObserver);
 
@@ -234,10 +234,10 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
         private class Subscription : IDisposable
         {
-            private IObserver<PropertyChange2> _observer;
+            private IObserver<PropertyChange> _observer;
             private NotifyPropertyChangedObservable<TClass> _propertyChangedObservable;
 
-            public Subscription(NotifyPropertyChangedObservable<TClass> propertyChangedObservable, IObserver<PropertyChange2> observer)
+            public Subscription(NotifyPropertyChangedObservable<TClass> propertyChangedObservable, IObserver<PropertyChange> observer)
             {
                 _propertyChangedObservable = propertyChangedObservable;
                 _observer = observer;

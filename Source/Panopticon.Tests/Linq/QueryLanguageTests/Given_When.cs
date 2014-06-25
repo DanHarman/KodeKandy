@@ -1,4 +1,4 @@
-﻿// <copyright file="Given_Observe.cs" company="million miles per hour ltd">
+﻿// <copyright file="Given_When.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -11,7 +11,6 @@
 // PARTICULAR PURPOSE.
 // </copyright>
 
-using System.Reactive.Linq;
 using KodeKandy.Panopticon.Linq;
 using KodeKandy.Panopticon.Tests.TestEntities;
 using Microsoft.Reactive.Testing;
@@ -26,7 +25,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.QueryLanguageTests
         public void When_Subscribe_For_INotifyPropertyChanged_Implementor_Then_OnNext_Values()
         {
             // Arrange
-            var obj = new TestObservableObject { Age = 5 };
+            var obj = new TestObservableObject {Age = 5};
             var scheduler = new TestScheduler();
             var observer = scheduler.CreateObserver<int>();
             var expected = new[]
@@ -35,7 +34,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.QueryLanguageTests
                 OnNext(15, 3),
             };
 
-            var sut = Observable.Return(obj).Concat(Observable.Never<TestObservableObject>()).When("Age", x => x.Age);
+            var sut = Opticon.Forever(obj).When("Age", x => x.Age);
 
             // Act
             sut.Subscribe(observer);

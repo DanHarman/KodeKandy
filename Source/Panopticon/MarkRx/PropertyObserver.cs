@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using KodeKandy.Panopticon.MarkRx;
 
 namespace KodeKandy.Panopticon
 {
@@ -419,10 +420,10 @@ namespace KodeKandy.Panopticon
         public void OnChanged(object sender, PropertyChangedEventArgs args)
         {
             if (args.PropertyName != propertyName) return;
-            Fire(args as PropertyChange<TValue>);
+            Fire(args as LegacyLegacyPropertyChange<TValue>);
         }
 
-        private void Fire(PropertyChange<TValue> args)
+        private void Fire(LegacyLegacyPropertyChange<TValue> args)
         {
             if (action == null) return;            
             var newValue = args == null ? (observed == null ? default(TValue) : getter(observed)) : args.Value;

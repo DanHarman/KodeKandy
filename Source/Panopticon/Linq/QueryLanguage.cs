@@ -1,7 +1,7 @@
 ﻿// <copyright file="QueryLanguage.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
-// This source is subject to the MIT License.
+// This sourceObservable is subject to the MIT License.
 // Please see the License.txt file for more information.
 // All other rights reserved.
 // 
@@ -24,7 +24,7 @@ namespace KodeKandy.Panopticon.Linq
 {
     public static class QueryLanguage
     {
-        public static IObservable<TOut> When<TIn, TOut>(this IObservable<TIn> source, string propertyName, Func<TIn, TOut> outValueGetter)
+        public static IObservable<TOut> When<TIn, TOut>(this TIn source, string propertyName, Func<TIn, TOut> outValueGetter)
             where TIn : class, INotifyPropertyChanged
         {
             if (source == null)
@@ -34,7 +34,20 @@ namespace KodeKandy.Panopticon.Linq
             if (outValueGetter == null)
                 throw new ArgumentNullException("outValueGetter");
 
-            return new NotifyPropertyChangedValueObservable<TIn, TOut>(source, propertyName, outValueGetter);
+            return new NotifyPropertyChangedValueObservable<TIn, TOut>(Opticon.Forever(source), propertyName, outValueGetter);
+        }
+
+        public static IObservable<TOut> When<TIn, TOut>(this IObservable<TIn> sourceObservable, string propertyName, Func<TIn, TOut> outValueGetter)
+            where TIn : class, INotifyPropertyChanged
+        {
+            if (sourceObservable == null)
+                throw new ArgumentNullException("sourceObservable");
+            if (propertyName == null)
+                throw new ArgumentNullException("propertyName");
+            if (outValueGetter == null)
+                throw new ArgumentNullException("outValueGetter");
+
+            return new NotifyPropertyChangedValueObservable<TIn, TOut>(sourceObservable, propertyName, outValueGetter);
         }
 
         public static IObservable<Unit> WhenAny<TIn>(this IObservable<TIn> source)
@@ -44,7 +57,7 @@ namespace KodeKandy.Panopticon.Linq
                 throw new ArgumentNullException("source");
             // TODO need a specialised notifyProeprtychanged link it would seem if we want to expose the propertyname and type.
             throw new NotImplementedException();
-            //  return new NotifyPropertyChangedValueObservable<TIn, TOut>(source, propertyName, outValueGetter);
+            //  return new NotifyPropertyChangedValueObservable<TIn, TOut>(sourceObservable, propertyName, outValueGetter);
         }
 
         public static DerivedObservableList<TTargetCollectionItem> Map<TSourceCollection, TSourceCollectionItem, TTargetCollectionItem>(this TSourceCollection source,
@@ -71,9 +84,9 @@ namespace KodeKandy.Panopticon.Linq
             _sourceCollection = sourceCollection;
             _mapFunc = mapFunc;
             sourceCollection.CollectionChanged += SourceCollectionOnCollectionChanged;
-            // Can we key it to the size of the source collection?
+            // Can we key it to the size of the sourceObservable collection?
             _derivedCollection = new DerivedObservableList<TDerivedItem>();
-            // toto addrange of all current items in source.
+            // toto addrange of all current items in sourceObservable.
         }
 
         private void SourceCollectionOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)

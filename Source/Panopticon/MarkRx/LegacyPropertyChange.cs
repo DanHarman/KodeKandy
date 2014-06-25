@@ -14,9 +14,9 @@
 using System;
 using System.ComponentModel;
 
-namespace KodeKandy.Panopticon
+namespace KodeKandy.Panopticon.MarkRx
 {
-    public interface IPropertyChange
+    public interface ILegacyPropertyChange
     {
         /// <summary>
         ///     The originator of the change notification.
@@ -39,7 +39,7 @@ namespace KodeKandy.Panopticon
         object UserData { get; }
     }
 
-    public interface IPropertyChange<out T> : IPropertyChange
+    public interface ILegacyPropertyChange<out T> : ILegacyPropertyChange
     {
         /// <summary>
         ///     The properties new value.
@@ -47,17 +47,9 @@ namespace KodeKandy.Panopticon
         new T Value { get; }
     }
 
-    public static class PropertyChange
+    public class LegacyLegacyPropertyChange<T> : PropertyChangedEventArgs, ILegacyPropertyChange<T>, IEquatable<LegacyLegacyPropertyChange<T>>
     {
-        public static PropertyChange<T> Create<T>(object source, T value, string propertyNeme, object userData = null)
-        {
-            return new PropertyChange<T>(source, value, propertyNeme, userData);
-        }
-    }
-
-    public class PropertyChange<T> : PropertyChangedEventArgs, IPropertyChange<T>, IEquatable<PropertyChange<T>>
-    {
-        public PropertyChange(object source, T value, string propertyNeme, object userData = null)
+        public LegacyLegacyPropertyChange(object source, T value, string propertyNeme, object userData = null)
             : base(propertyNeme)
         {
             Source = source;
@@ -67,7 +59,7 @@ namespace KodeKandy.Panopticon
 
         #region IEquatable<PropertyChange<T>> Members
 
-        public bool Equals(PropertyChange<T> other)
+        public bool Equals(LegacyLegacyPropertyChange<T> other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -76,7 +68,7 @@ namespace KodeKandy.Panopticon
 
         #endregion
 
-        #region IPropertyChange<T> Members
+        #region ILegacyPropertyChange<T> Members
 
         /// <summary>
         ///     The originator of the change notification.
@@ -86,7 +78,7 @@ namespace KodeKandy.Panopticon
         /// <summary>
         ///     The properties new value.
         /// </summary>
-        object IPropertyChange.Value
+        object ILegacyPropertyChange.Value
         {
             get { return Value; }
         }
@@ -108,7 +100,7 @@ namespace KodeKandy.Panopticon
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((PropertyChange<T>) obj);
+            return Equals((LegacyLegacyPropertyChange<T>) obj);
         }
 
         public override int GetHashCode()
@@ -123,12 +115,12 @@ namespace KodeKandy.Panopticon
             }
         }
 
-        public static bool operator ==(PropertyChange<T> left, PropertyChange<T> right)
+        public static bool operator ==(LegacyLegacyPropertyChange<T> left, LegacyLegacyPropertyChange<T> right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(PropertyChange<T> left, PropertyChange<T> right)
+        public static bool operator !=(LegacyLegacyPropertyChange<T> left, LegacyLegacyPropertyChange<T> right)
         {
             return !Equals(left, right);
         }
