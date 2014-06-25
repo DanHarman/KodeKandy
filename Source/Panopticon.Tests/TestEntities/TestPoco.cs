@@ -1,4 +1,4 @@
-namespace KodeKandy.Panopticon.Tests.QueryLanguageTests
+namespace KodeKandy.Panopticon.Tests.TestEntities
 {
     class TestPoco
     {

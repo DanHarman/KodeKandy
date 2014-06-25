@@ -1,5 +1,5 @@
 using KodeKandy.Panopticon.Linq;
-using KodeKandy.Panopticon.Tests.QueryLanguageTests;
+using KodeKandy.Panopticon.Tests.TestEntities;
 using Microsoft.Reactive.Testing;
 using NUnit.Framework;
 

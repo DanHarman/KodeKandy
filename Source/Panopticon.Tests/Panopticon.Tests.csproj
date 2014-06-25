@@ -84,6 +84,7 @@
     <Compile Include="CollectionChangeHelperTests\Given_CollectionChangedHelper.cs" />
     <Compile Include="CollectionChangeHelperTests\Given_CollectionChangedHelper_As_PropertyChangedHelper.cs" />
     <Compile Include="Linq\ObservableImpl\Given_Forever.cs" />
+    <Compile Include="Linq\ObservableImpl\Given_NotifyPropertyChangedObservable.cs" />
     <Compile Include="Linq\ObservableImpl\Given_NotifyPropertyChangedValueObservable.cs" />
     <Compile Include="Linq\ObservableImpl\Given_PocoObservable.cs" />
     <Compile Include="ObservableListTests\Given_Observing_CollectionChanged_Events.cs" />

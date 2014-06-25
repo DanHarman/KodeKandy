@@ -12,7 +12,7 @@
 // </copyright>
 
 using System.Collections.Generic;
-using KodeKandy.Panopticon.Tests.QueryLanguageTests;
+using KodeKandy.Panopticon.Tests.TestEntities;
 using NUnit.Framework;
 
 namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
