@@ -1,4 +1,4 @@
-// <copyright file="PocoObservable.cs" company="million miles per hour ltd">
+// <copyright file="PocoValueObservable.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -23,13 +23,13 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
     /// </summary>
     /// <typeparam name="TClass">Source class type.</typeparam>
     /// <typeparam name="TMember">Member type on source class.</typeparam>
-    internal class PocoObservable<TClass, TMember> : IObservable<TMember>
+    internal class PocoValueObservable<TClass, TMember> : IObservable<TMember>
         where TClass : class
     {
         private readonly Func<TClass, TMember> _memberValueGetter;
         private readonly IObservable<TClass> _sourceObservable;
 
-        public PocoObservable(IObservable<TClass> source, Func<TClass, TMember> memberValueGetter)
+        public PocoValueObservable(IObservable<TClass> source, Func<TClass, TMember> memberValueGetter)
         {
             if (source == null)
                 throw new ArgumentNullException("source");

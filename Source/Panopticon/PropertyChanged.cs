@@ -1,4 +1,4 @@
-// <copyright file="PropertyChange.cs" company="million miles per hour ltd">
+// <copyright file="PropertyChanged.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -19,18 +19,18 @@ namespace KodeKandy.Panopticon
     /// <summary>
     ///     Captures the info normally provided in a OnPropertyChanged handler.
     /// </summary>
-    public class PropertyChange : IEquatable<PropertyChange>
+    public class PropertyChanged : IEquatable<PropertyChanged>
     {
         private readonly PropertyChangedEventArgs _propertyChangedEventArgs;
         private readonly object _sender;
 
-        public PropertyChange(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+        public PropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
             _sender = sender;
             _propertyChangedEventArgs = propertyChangedEventArgs;
         }
 
-        public PropertyChange(object sender, string propertyName) : this(sender, new PropertyChangedEventArgs(propertyName))
+        public PropertyChanged(object sender, string propertyName) : this(sender, new PropertyChangedEventArgs(propertyName))
         {
         }
 
@@ -43,9 +43,9 @@ namespace KodeKandy.Panopticon
             get { return _propertyChangedEventArgs; }
         }
 
-        #region IEquatable<PropertyChange> Members
+        #region IEquatable<PropertyChanged> Members
 
-        public bool Equals(PropertyChange other)
+        public bool Equals(PropertyChanged other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -59,7 +59,7 @@ namespace KodeKandy.Panopticon
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((PropertyChange) obj);
+            return Equals((PropertyChanged) obj);
         }
 
         public override int GetHashCode()

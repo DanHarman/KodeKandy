@@ -15,67 +15,6 @@ using System;
 
 namespace KodeKandy.Panopticon.Internal
 {
-    internal class NopObserver<T> : IObserver<T>
-    {
-        public static readonly NopObserver<T> Instance = new NopObserver<T>();
-
-        private NopObserver()
-        {
-        }
-
-        #region IObserver<T> Members
-
-        public void OnNext(T value)
-        {
-        }
-
-        public void OnError(Exception error)
-        {
-        }
-
-        public void OnCompleted()
-        {
-        }
-
-        #endregion
-    }
-
-    internal class CompletedObserver<T> : IObserver<T>
-    {
-        public static readonly CompletedObserver<T> Instance = new CompletedObserver<T>();
-        private readonly Exception _error;
-
-        private CompletedObserver()
-        {
-        }
-
-        public CompletedObserver(Exception error)
-        {
-            _error = error;
-        }
-
-        public Exception Error
-        {
-            get { return _error; }
-        }
-
-        #region IObserver<T> Members
-
-        public void OnNext(T value)
-        {
-        }
-
-        public void OnError(Exception error)
-        {
-        }
-
-        public void OnCompleted()
-        {
-        }
-
-        #endregion
-    }
-
     /// <summary>
     ///     An immutable observer that 'multicasts' to the observers it is constructed with. Can be used to allow an
     ///     IObservable implementator to treat many observers as a single one which allows the implementor, when it only has

@@ -29,9 +29,9 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             // Arrange
             var scheduler = new TestScheduler();
             var sourceObs = scheduler.CreateColdObservable(
-                OnNext(10, new TestObservableObject() { Age = 2 }),
-                OnNext(20, new TestObservableObject() { Age = 3 }),
-                OnNext(30, new TestObservableObject() { Age = 4 }),
+                OnNext(10, new TestObservableObject() {Age = 2}),
+                OnNext(20, new TestObservableObject() {Age = 3}),
+                OnNext(30, new TestObservableObject() {Age = 4}),
                 OnCompleted<TestObservableObject>(40)
                 );
             var observer = scheduler.CreateObserver<int>();
@@ -60,9 +60,9 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             var scheduler = new TestScheduler();
             var expectedException = new Exception("Expected");
             var sourceObs = scheduler.CreateColdObservable(
-                OnNext(10, new TestObservableObject() { Age = 2 }),
-                OnNext(20, new TestObservableObject() { Age = 3 }),
-                OnNext(30, new TestObservableObject() { Age = 4 }),
+                OnNext(10, new TestObservableObject() {Age = 2}),
+                OnNext(20, new TestObservableObject() {Age = 3}),
+                OnNext(30, new TestObservableObject() {Age = 4}),
                 OnError<TestObservableObject>(40, expectedException)
                 );
             var observer = scheduler.CreateObserver<int>();
@@ -88,7 +88,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
         public void When_Subscribe_Twice_Then_Correct_Notifications_For_Both_Observers()
         {
             // Arrange
-            var obj = new TestObservableObject { Age = 3 };
+            var obj = new TestObservableObject {Age = 3};
             var scheduler = new TestScheduler();
             var firstObserver = scheduler.CreateObserver<int>();
             var secondObserver = scheduler.CreateObserver<int>();
@@ -126,7 +126,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
         public void When_Subscribed_And_Source_Does_Not_Complete_Then_Returns_Value_At_Time_Of_Subscribe_And_Subsequent_Values()
         {
             // Arrange
-            var obj = new TestObservableObject() { Age = 2 };
+            var obj = new TestObservableObject() {Age = 2};
             var scheduler = new TestScheduler();
             var observer = scheduler.CreateObserver<int>();
             var expected = new[]

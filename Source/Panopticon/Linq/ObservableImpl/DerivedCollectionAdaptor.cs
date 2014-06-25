@@ -1,7 +1,7 @@
-﻿// <copyright file="QueryLanguage.cs" company="million miles per hour ltd">
+// <copyright file="DerivedCollectionAdaptor.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
-// This sourceObservable is subject to the MIT License.
+// This source is subject to the MIT License.
 // Please see the License.txt file for more information.
 // All other rights reserved.
 // 
@@ -12,69 +12,16 @@
 // </copyright>
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Reactive;
-using KodeKandy.Panopticon.Linq.ObservableImpl;
 
-namespace KodeKandy.Panopticon.Linq
+namespace KodeKandy.Panopticon.Linq.ObservableImpl
 {
-    public static class QueryLanguage
-    {
-        public static IObservable<TOut> When<TIn, TOut>(this TIn source, string propertyName, Func<TIn, TOut> outValueGetter)
-            where TIn : class, INotifyPropertyChanged
-        {
-            if (source == null)
-                throw new ArgumentNullException("source");
-            if (propertyName == null)
-                throw new ArgumentNullException("propertyName");
-            if (outValueGetter == null)
-                throw new ArgumentNullException("outValueGetter");
-
-            return new NotifyPropertyChangedValueObservable<TIn, TOut>(Opticon.Forever(source), propertyName, outValueGetter);
-        }
-
-        public static IObservable<TOut> When<TIn, TOut>(this IObservable<TIn> sourceObservable, string propertyName, Func<TIn, TOut> outValueGetter)
-            where TIn : class, INotifyPropertyChanged
-        {
-            if (sourceObservable == null)
-                throw new ArgumentNullException("sourceObservable");
-            if (propertyName == null)
-                throw new ArgumentNullException("propertyName");
-            if (outValueGetter == null)
-                throw new ArgumentNullException("outValueGetter");
-
-            return new NotifyPropertyChangedValueObservable<TIn, TOut>(sourceObservable, propertyName, outValueGetter);
-        }
-
-        public static IObservable<Unit> WhenAny<TIn>(this IObservable<TIn> source)
-            where TIn : INotifyPropertyChanged
-        {
-            if (source == null)
-                throw new ArgumentNullException("source");
-            // TODO need a specialised notifyProeprtychanged link it would seem if we want to expose the propertyname and type.
-            throw new NotImplementedException();
-            //  return new NotifyPropertyChangedValueObservable<TIn, TOut>(sourceObservable, propertyName, outValueGetter);
-        }
-
-        public static DerivedObservableList<TTargetCollectionItem> Map<TSourceCollection, TSourceCollectionItem, TTargetCollectionItem>(this TSourceCollection source,
-            Func<TSourceCollectionItem, TTargetCollectionItem> mapFunc)
-            where TSourceCollection : INotifyCollectionChanged, ICollection<TSourceCollectionItem>
-        {
-            var derivedCollection = new DerivedObservableList<TTargetCollectionItem>();
-
-            return derivedCollection;
-        }
-    }
-
     internal class DerivedCollectionAdaptor<TSourceItem, TDerivedItem>
     {
-        private readonly INotifyCollectionChanged _sourceCollection;
-        private readonly Func<TSourceItem, TDerivedItem> _mapFunc;
         private readonly DerivedObservableList<TDerivedItem> _derivedCollection;
+        private readonly Func<TSourceItem, TDerivedItem> _mapFunc;
+        private readonly INotifyCollectionChanged _sourceCollection;
 
         public DerivedCollectionAdaptor(INotifyCollectionChanged sourceCollection, Func<TSourceItem, TDerivedItem> mapFunc)
         {

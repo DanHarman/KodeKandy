@@ -11,12 +11,12 @@
 // PARTICULAR PURPOSE.
 // </copyright>
 
-using KodeKandy.Panopticon.Linq.ObservableImpl;
+using KodeKandy.Panopticon.Linq;
 using KodeKandy.QualityTools;
 using Microsoft.Reactive.Testing;
 using NUnit.Framework;
 
-namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
+namespace KodeKandy.Panopticon.Tests.Linq
 {
     [TestFixture]
     public class Given_Forever : ReactiveTest
@@ -26,7 +26,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
         {
             // Arrange
             var scheduler = new TestScheduler();
-            var sut = new Forever<int>(100);
+            var sut = 100.Forever();
             var observer = scheduler.CreateObserver<int>();
             var expected = new[]
             {

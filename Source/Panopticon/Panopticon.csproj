@@ -35,17 +35,19 @@
   <ItemGroup>
     <Compile Include="CollectionChangedHelper.cs" />
     <Compile Include="DerivedObservableList.cs" />
+    <Compile Include="Internal\CompletedObserver.cs" />
     <Compile Include="Internal\ImmutableList.cs" />
     <Compile Include="Internal\ImmutableMultiObserver.cs" />
+    <Compile Include="Internal\NopObserver.cs" />
     <Compile Include="IObservableObject.cs" />
+    <Compile Include="Linq\ObservableImpl\DerivedCollectionAdaptor.cs" />
     <Compile Include="Linq\ObservableImpl\NotifyPropertyChangedObservable.cs" />
     <Compile Include="Linq\ObservableImpl\NotifyPropertyChangedValueObservable.cs" />
-    <Compile Include="Linq\ObservableImpl\PocoObservable.cs" />
+    <Compile Include="Linq\ObservableImpl\PocoValueObservable.cs" />
     <Compile Include="Linq\ObservableImpl\MemberObservableFactory.cs" />
     <Compile Include="Linq\ObservableImpl\Forever.cs" />
-    <Compile Include="PropertyChange.cs" />
+    <Compile Include="PropertyChanged.cs" />
     <Compile Include="Linq\Opticon.cs" />
-    <Compile Include="Linq\QueryLanguage.cs" />
     <Compile Include="ObservableCommand.cs" />
     <Compile Include="ObservableList.cs" />
     <Compile Include="ObservableObject.cs" />

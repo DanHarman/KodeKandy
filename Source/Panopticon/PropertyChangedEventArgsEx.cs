@@ -40,6 +40,8 @@ namespace KodeKandy.Panopticon
         /// </summary>
         public object UserData { get; private set; }
 
+        #region IEquatable<PropertyChangedEventArgsEx> Members
+
         public bool Equals(PropertyChangedEventArgsEx other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -47,11 +49,13 @@ namespace KodeKandy.Panopticon
             return Equals(Source, other.Source) && Equals(UserData, other.UserData);
         }
 
+        #endregion
+
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((PropertyChangedEventArgsEx) obj);
         }
 

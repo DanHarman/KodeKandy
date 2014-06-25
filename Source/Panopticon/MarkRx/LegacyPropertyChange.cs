@@ -1,4 +1,4 @@
-﻿// <copyright file="PropertyChange.cs" company="million miles per hour ltd">
+﻿// <copyright file="LegacyPropertyChange.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -34,7 +34,7 @@ namespace KodeKandy.Panopticon.MarkRx
         object Value { get; }
 
         /// <summary>
-        /// Additional user data on the notification. Useful if dealing with re-entrancy issues.
+        ///     Additional user data on the notification. Useful if dealing with re-entrancy issues.
         /// </summary>
         object UserData { get; }
     }
@@ -57,13 +57,14 @@ namespace KodeKandy.Panopticon.MarkRx
             UserData = userData;
         }
 
-        #region IEquatable<PropertyChange<T>> Members
+        #region IEquatable<LegacyLegacyPropertyChange<T>> Members
 
         public bool Equals(LegacyLegacyPropertyChange<T> other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(Source, other.Source) && string.Equals(PropertyName, other.PropertyName) && Equals(Value, other.Value) && Equals(UserData, other.UserData);
+            return Equals(Source, other.Source) && string.Equals(PropertyName, other.PropertyName) && Equals(Value, other.Value) &&
+                   Equals(UserData, other.UserData);
         }
 
         #endregion
@@ -89,7 +90,7 @@ namespace KodeKandy.Panopticon.MarkRx
         public T Value { get; private set; }
 
         /// <summary>
-        /// Additional user data on the notification. Useful if dealing with re-entrancy issues.
+        ///     Additional user data on the notification. Useful if dealing with re-entrancy issues.
         /// </summary>
         public object UserData { get; private set; }
 

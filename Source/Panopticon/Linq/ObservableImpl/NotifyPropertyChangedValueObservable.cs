@@ -1,7 +1,7 @@
 // <copyright file="NotifyPropertyChangedValueObservable.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
-// This sourceObservable is subject to the MIT License.
+// This source is subject to the MIT License.
 // Please see the License.txt file for more information.
 // All other rights reserved.
 // 
@@ -48,7 +48,8 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         private TClass _source;
         private IDisposable _sourceSubscriptionDisposable;
 
-        public NotifyPropertyChangedValueObservable(IObservable<TClass> sourceObservable, string propertyName, Func<TClass, TProperty> propertyValueGetter)
+        public NotifyPropertyChangedValueObservable(IObservable<TClass> sourceObservable, string propertyName,
+            Func<TClass, TProperty> propertyValueGetter)
         {
             if (sourceObservable == null)
                 throw new ArgumentNullException("sourceObservable");
@@ -95,7 +96,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                             // both the old and new observer.
                             var oldObserver = _observer;
                             _observer =
-                                new ImmutableMultiObserver<TProperty>(new Internal.ImmutableList<IObserver<TProperty>>(new[] {oldObserver, observer}));
+                                new ImmutableMultiObserver<TProperty>(new ImmutableList<IObserver<TProperty>>(new[] {oldObserver, observer}));
                         }
 
                         // Send the new observer the current property value. This is done inside the lock to prevent race conditions around the initial
@@ -199,7 +200,8 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         /// <remarks>
         ///     We keep a local copy of the sourceObservable value so that we don't end up with concurrency issues which
         ///     would occur if we pulled it form the sourceObservable whenever it was needed e.g. when adding a new observer, as
-        ///     we do not have a lock around the sourceObservable, but we can control when it pushes new values into us with our lock.
+        ///     we do not have a lock around the sourceObservable, but we can control when it pushes new values into us with our
+        ///     lock.
         /// </remarks
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
@@ -272,8 +274,8 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         /// </summary>
         private class Subscription : IDisposable
         {
-            private NotifyPropertyChangedValueObservable<TClass, TProperty> _valueObservable;
             private IObserver<TProperty> _observer;
+            private NotifyPropertyChangedValueObservable<TClass, TProperty> _valueObservable;
 
             public Subscription(NotifyPropertyChangedValueObservable<TClass, TProperty> valueObservable, IObserver<TProperty> observer)
             {

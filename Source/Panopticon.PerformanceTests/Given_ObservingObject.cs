@@ -1,3 +1,16 @@
+// <copyright file="Given_ObservingObject.cs" company="million miles per hour ltd">
+// Copyright (c) 2013-2014 All Right Reserved
+// 
+// This source is subject to the MIT License.
+// Please see the License.txt file for more information.
+// All other rights reserved.
+// 
+// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY 
+// KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+// PARTICULAR PURPOSE.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +26,37 @@ namespace Panopticon.PerformanceTests
     public class Given_ObservingObject
     {
         private const int Repeats = 5;
+
+        [Test]
+        public void When_Disposing_Of_1_Subscription_On_x_Objects()
+        {
+            Console.Error.WriteLine("Disposing of a subscription on each of 10000 obj:");
+
+            Func<IEnumerable<TestObservableObject>> factory =
+                () => Enumerable.Repeat(default(object), 10000).Select(x => new TestObservableObject());
+
+            Benchmark.TimeOperation(Repeats, "[MarkRx2]", () => factory()
+                .Select(sut => new Observer<TestObservableObject, TestObservableObject>(sut, x => x.Child, "Child",
+                    _ => { }))
+                .ToArray(), suts =>
+                {
+                    foreach (var sut in suts)
+                    {
+                        sut.Dispose();
+                    }
+                });
+
+
+            Benchmark.TimeOperation(Repeats, "[DanRx2]", () => factory()
+                .Select(sut => sut.When("Age", x => x.Age).Subscribe(_ => { }))
+                .ToArray(), suts =>
+                {
+                    foreach (var sut in suts)
+                    {
+                        sut.Dispose();
+                    }
+                });
+        }
 
         [Test]
         public void When_Notifying_Child_Property_100000_Times()
@@ -41,44 +85,13 @@ namespace Panopticon.PerformanceTests
 
                 var sut = factory();
 
-                Opticon.Observe(sut).When("Child", x => x.Child).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
+                sut.When("Child", x => x.Child).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
 
                 for (var j = 0; j < iterations; ++j)
                     sut.Child.Age = j;
 
                 Assert.AreEqual(iterations + 1, cnt);
             });
-        }
-
-        [Test]
-        public void When_Disposing_Of_1_Subscription_On_x_Objects()
-        {
-            Console.Error.WriteLine("Disposing of a subscription on each of 10000 obj:");
-
-            Func<IEnumerable<TestObservableObject>> factory =
-                () => Enumerable.Repeat(default(object), 10000).Select(x => new TestObservableObject());
-
-            Benchmark.TimeOperation(Repeats, "[MarkRx2]", () => factory()
-                .Select(sut => new Observer<TestObservableObject, TestObservableObject>(sut, x => x.Child, "Child",
-                    _ => { }))
-                .ToArray(), suts =>
-                {
-                    foreach (var sut in suts)
-                    {
-                        sut.Dispose();
-                    }
-                });
-
-
-            Benchmark.TimeOperation(Repeats, "[DanRx2]", () => factory()
-                .Select(sut => Opticon.Observe(sut).When("Age", x => x.Age).Subscribe(_ => { }))
-                .ToArray(), suts =>
-                {
-                    foreach (var sut in suts)
-                    {
-                        sut.Dispose();
-                    }
-                });
         }
 
         [Test]
@@ -112,7 +125,7 @@ namespace Panopticon.PerformanceTests
 
                 foreach (var sut in suts)
                 {
-                    Opticon.Observe(sut).When("Child", x => x.Child).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
+                    sut.When("Child", x => x.Child).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
                 }
                 Assert.AreEqual(iter, cnt);
             });
@@ -125,8 +138,8 @@ namespace Panopticon.PerformanceTests
 
                 foreach (var sut in suts)
                 {
-                    //Opticon.Observe(sut, x => x.Child.Age).Subscribe(_ => { ++cnt; });
-                    Opticon.Observe(sut, cached).Subscribe(_ => { ++cnt; });
+                    //Opticon.When(sut, x => x.Child.Age).Subscribe(_ => { ++cnt; });
+                    sut.When(cached).Subscribe(_ => { ++cnt; });
                 }
                 Assert.AreEqual(iter, cnt);
             });
@@ -141,7 +154,7 @@ namespace Panopticon.PerformanceTests
             Func<TestObservableObject[]> sutFactory =
                 () =>
                     Enumerable.Repeat(default(object), iter).Select(
-                        _ => new TestObservableObject { Age = 10 }).ToArray();
+                        _ => new TestObservableObject {Age = 10}).ToArray();
 
 
             Benchmark.TimeOperation(Repeats, "[MarkRx2]", sutFactory, suts =>
@@ -150,7 +163,7 @@ namespace Panopticon.PerformanceTests
 
                 foreach (var sut in suts)
                 {
-                    new Observer<TestObservableObject, int>(sut, x => x.Age, "Age",  v => { ++cnt; });
+                    new Observer<TestObservableObject, int>(sut, x => x.Age, "Age", v => { ++cnt; });
                 }
 
                 Assert.AreEqual(iter, cnt);
@@ -162,7 +175,7 @@ namespace Panopticon.PerformanceTests
 
                 foreach (var sut in suts)
                 {
-                    Opticon.Observe(sut).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
+                    sut.When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
                 }
                 Assert.AreEqual(iter, cnt);
             });
@@ -175,8 +188,8 @@ namespace Panopticon.PerformanceTests
 
                 foreach (var sut in suts)
                 {
-                    Opticon.Observe(sut, x => x.Age).Subscribe(_ => { ++cnt; });
-                    //Opticon.Observe(sut, cached).Subscribe(_ => { ++cnt; });
+                    sut.When(x => x.Age).Subscribe(_ => { ++cnt; });
+                    //Opticon.When(sut, cached).Subscribe(_ => { ++cnt; });
                 }
                 Assert.AreEqual(iter, cnt);
             });
@@ -188,7 +201,7 @@ namespace Panopticon.PerformanceTests
             Console.Error.WriteLine("Subscribing to 1 property 1000x on 1 obj:");
             const int iterations = 10000;
 
-            Func<TestObservableObject> sutFactory = () => new TestObservableObject { Age = 10 };
+            Func<TestObservableObject> sutFactory = () => new TestObservableObject {Age = 10};
 
 
             Benchmark.TimeOperation(Repeats, "[MarkRx2]", sutFactory, sut =>
@@ -211,7 +224,7 @@ namespace Panopticon.PerformanceTests
 
                 for (var i = 0; i < iterations; ++i)
                 {
-                    Opticon.Observe(sut).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
+                    sut.When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
                 }
                 Assert.AreEqual(iterations, cnt);
             });
@@ -220,8 +233,8 @@ namespace Panopticon.PerformanceTests
             Benchmark.TimeOperation(Repeats, "[DanRx2-Reuse observable]", sutFactory, sut =>
             {
                 var cnt = 0;
-                var obs = Opticon.Observe(sut).When("Age", x => x.Age);
-                
+                var obs = sut.When("Age", x => x.Age);
+
                 for (var i = 0; i < iterations; ++i)
                 {
                     obs.Subscribe(_ => { ++cnt; });
@@ -237,8 +250,8 @@ namespace Panopticon.PerformanceTests
 
                 for (var i = 0; i < iterations; ++i)
                 {
-                    Opticon.Observe(sut, x => x.Age).Subscribe(_ => { ++cnt; });
-                    //Opticon.Observe(sut, cached).Subscribe(_ => { ++cnt; });
+                    sut.When(x => x.Age).Subscribe(_ => { ++cnt; });
+                    //Opticon.When(sut, cached).Subscribe(_ => { ++cnt; });
                 }
                 Assert.AreEqual(iterations, cnt);
             });

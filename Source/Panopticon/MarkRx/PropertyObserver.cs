@@ -1,4 +1,17 @@
-﻿#define FAST_DISPOSAL
+﻿// <copyright file="PropertyObserver.cs" company="million miles per hour ltd">
+// Copyright (c) 2013-2014 All Right Reserved
+// 
+// This source is subject to the MIT License.
+// Please see the License.txt file for more information.
+// All other rights reserved.
+// 
+// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY 
+// KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+// PARTICULAR PURPOSE.
+// </copyright>
+
+#define FAST_DISPOSAL
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -66,7 +79,8 @@ namespace KodeKandy.Panopticon
         private static class ObserverCache
         {
 #if FAST_DISPOSAL
-            private static readonly ConditionalWeakTable<INotifyPropertyChanged, ObserverList> Entries = new ConditionalWeakTable<INotifyPropertyChanged, ObserverList>();
+            private static readonly ConditionalWeakTable<INotifyPropertyChanged, ObserverList> Entries =
+                new ConditionalWeakTable<INotifyPropertyChanged, ObserverList>();
 
             public static void Unbind(INotifyPropertyChanged observed, PropertyObserver<TValue> link)
             {
@@ -155,14 +169,14 @@ namespace KodeKandy.Panopticon
                     throw new ArgumentException(string.Format("No setter for property {0} on {1}", sourceProperty, source.GetType()));
                 }
                 ObserverCache.Bind(source, this);
-                whenChanged((TValue)getter(source));
+                whenChanged((TValue) getter(source));
             }
         }
 
         private void OnChange(object sender, PropertyChangedEventArgs e)
         {
             if ((e.PropertyName != sourceProperty && sourceProperty != "*") || source == null || getter == null) return;
-            whenChanged((TValue)getter(source));
+            whenChanged((TValue) getter(source));
         }
 
         public void Dispose()
@@ -199,11 +213,15 @@ namespace KodeKandy.Panopticon
             }
         }
 
+        #region IDisposable Members
+
         public void Dispose()
         {
             rhs.Dispose();
             if (lhs != null) lhs.Dispose();
         }
+
+        #endregion
     }
 
     public interface IPropertyChangeObserver : IDisposable
@@ -214,8 +232,8 @@ namespace KodeKandy.Panopticon
     public interface IPropertyChangeObserver<in TClass, out TValue> : IPropertyChangeObserver
         where TClass : class, INotifyPropertyChanged
     {
-        void Rebind(TClass o);
         Action<TValue> Action { set; }
+        void Rebind(TClass o);
     }
 
     public class ObservableProperty<TClass, TValue>
@@ -231,7 +249,7 @@ namespace KodeKandy.Panopticon
         }
     }
 
-    sealed class ObserverList
+    internal sealed class ObserverList
     {
         private readonly HashSet<IPropertyChangeObserver> observers = new HashSet<IPropertyChangeObserver>();
 
@@ -258,9 +276,10 @@ namespace KodeKandy.Panopticon
         }
     }
 
-    static class ObserverCache
+    internal static class ObserverCache
     {
-        private static readonly ConditionalWeakTable<INotifyPropertyChanged, ObserverList> Entries = new ConditionalWeakTable<INotifyPropertyChanged, ObserverList>();
+        private static readonly ConditionalWeakTable<INotifyPropertyChanged, ObserverList> Entries =
+            new ConditionalWeakTable<INotifyPropertyChanged, ObserverList>();
 
         public static void Unbind(INotifyPropertyChanged observed, IPropertyChangeObserver link)
         {
@@ -284,52 +303,23 @@ namespace KodeKandy.Panopticon
         }
     }
 
-    public class Observer<TClass, TValue> : IPropertyChangeObserver<TClass,TValue>
+    public class Observer<TClass, TValue> : IPropertyChangeObserver<TClass, TValue>
         where TClass : class, INotifyPropertyChanged
     {
-        private readonly string propertyName;
         private readonly Func<TClass, TValue> getter;
+        private readonly string propertyName;
+        private Action<TValue> action;
         private TValue currValue;
         private bool firedAny;
 
         private TClass observed;
-        private Action<TValue> action;
-
-        private TClass Observed
-        {
-            set
-            {
-                if (ReferenceEquals(observed, value)) return;
-                if (observed != null)
-                {
-                    ObserverCache.Unbind(observed, this);
-                }
-                observed = value;
-                if (observed != null)
-                {
-                    ObserverCache.Bind(observed, this);
-                }
-            }
-        }
-
-        public Action<TValue> Action
-        {
-            set
-            {
-                action = value;
-                if (observed != null)
-                {
-                    Fire(null);
-                }
-            }
-        }
 
         public Observer(string propertyName)
         {
             this.propertyName = propertyName;
             getter = (Func<TClass, TValue>) ReflectionHelpers.CreatePropertyGetter(typeof(TClass).GetProperty(propertyName));
 
-           // getter = x => (TValue)DelegateCache.GetPropertyGetter(typeof(TClass), propertyName)(x);
+            // getter = x => (TValue)DelegateCache.GetPropertyGetter(typeof(TClass), propertyName)(x);
             action = null;
         }
 
@@ -411,6 +401,37 @@ namespace KodeKandy.Panopticon
             Rebind(root);
         }
 
+        private TClass Observed
+        {
+            set
+            {
+                if (ReferenceEquals(observed, value)) return;
+                if (observed != null)
+                {
+                    ObserverCache.Unbind(observed, this);
+                }
+                observed = value;
+                if (observed != null)
+                {
+                    ObserverCache.Bind(observed, this);
+                }
+            }
+        }
+
+        #region IPropertyChangeObserver<TClass,TValue> Members
+
+        public Action<TValue> Action
+        {
+            set
+            {
+                action = value;
+                if (observed != null)
+                {
+                    Fire(null);
+                }
+            }
+        }
+
         public void Rebind(TClass o)
         {
             Observed = o;
@@ -423,25 +444,27 @@ namespace KodeKandy.Panopticon
             Fire(args as LegacyLegacyPropertyChange<TValue>);
         }
 
-        private void Fire(LegacyLegacyPropertyChange<TValue> args)
-        {
-            if (action == null) return;            
-            var newValue = args == null ? (observed == null ? default(TValue) : getter(observed)) : args.Value;
-         //   if (firedAny && EqualityComparer<TValue>.Default.Equals(newValue, currValue)) return;
-            firedAny = true;
-            currValue = newValue;
-            action(newValue);
-        }
-
         public void Dispose()
         {
             Observed = null;
+        }
+
+        #endregion
+
+        private void Fire(LegacyLegacyPropertyChange<TValue> args)
+        {
+            if (action == null) return;
+            var newValue = args == null ? (observed == null ? default(TValue) : getter(observed)) : args.Value;
+            //   if (firedAny && EqualityComparer<TValue>.Default.Equals(newValue, currValue)) return;
+            firedAny = true;
+            currValue = newValue;
+            action(newValue);
         }
     }
 
 
     public class ObserverChain<TClass, TMiddle, TRight> : IPropertyChangeObserver<TClass, TRight>
-        where TClass : class, INotifyPropertyChanged 
+        where TClass : class, INotifyPropertyChanged
         where TMiddle : class, INotifyPropertyChanged
     {
         private readonly IPropertyChangeObserver<TClass, TMiddle> lhs;
@@ -450,9 +473,11 @@ namespace KodeKandy.Panopticon
         public ObserverChain(IPropertyChangeObserver<TClass, TMiddle> lhs, Observer<TMiddle, TRight> rhs)
         {
             this.lhs = lhs;
-            this.rhs = rhs;        
+            this.rhs = rhs;
             lhs.Action = rhs.Rebind;
         }
+
+        #region IPropertyChangeObserver<TClass,TRight> Members
 
         public void Dispose()
         {
@@ -474,16 +499,18 @@ namespace KodeKandy.Panopticon
         {
             set { rhs.Action = value; }
         }
+
+        #endregion
     }
 
-    public class ObserverFilter<TClass, TValue> : IPropertyChangeObserver<TClass, TValue> 
-        where TClass : class, INotifyPropertyChanged 
+    public class ObserverFilter<TClass, TValue> : IPropertyChangeObserver<TClass, TValue>
+        where TClass : class, INotifyPropertyChanged
     {
         private readonly IPropertyChangeObserver<TClass, TValue> lhs;
         private readonly Func<TValue, bool> predicate;
         private Action<TValue> action;
 
-        public ObserverFilter(IPropertyChangeObserver<TClass,TValue> lhs, Func<TValue,bool> predicate, Action<TValue> act)
+        public ObserverFilter(IPropertyChangeObserver<TClass, TValue> lhs, Func<TValue, bool> predicate, Action<TValue> act)
         {
             this.lhs = lhs;
             this.predicate = predicate;
@@ -491,13 +518,7 @@ namespace KodeKandy.Panopticon
             action = act;
         }
 
-        private void Fire(TValue v)
-        {
-            if (action != null && predicate(v))
-            {
-                action(v);
-            }
-        }
+        #region IPropertyChangeObserver<TClass,TValue> Members
 
         public void Dispose()
         {
@@ -518,70 +539,88 @@ namespace KodeKandy.Panopticon
         {
             set { action = value; }
         }
+
+        #endregion
+
+        private void Fire(TValue v)
+        {
+            if (action != null && predicate(v))
+            {
+                action(v);
+            }
+        }
     }
 
     public static class ObserverExtensions
     {
-        public static ObserverChain<TClass, TMiddle, TRight> Chain<TClass, TMiddle, TRight>(this IPropertyChangeObserver<TClass, TMiddle> This, string propertyName)
+        public static ObserverChain<TClass, TMiddle, TRight> Chain<TClass, TMiddle, TRight>(this IPropertyChangeObserver<TClass, TMiddle> This,
+            string propertyName)
             where TClass : class, INotifyPropertyChanged
             where TMiddle : class, INotifyPropertyChanged
         {
             return new ObserverChain<TClass, TMiddle, TRight>(This, new Observer<TMiddle, TRight>(propertyName));
         }
 
-        public static ObserverChain<TClass, TMiddle, TRight> Chain<TClass, TMiddle, TRight>(this IPropertyChangeObserver<TClass, TMiddle> This, Func<TMiddle, TRight> func, string propertyName)
+        public static ObserverChain<TClass, TMiddle, TRight> Chain<TClass, TMiddle, TRight>(this IPropertyChangeObserver<TClass, TMiddle> This,
+            Func<TMiddle, TRight> func, string propertyName)
             where TClass : class, INotifyPropertyChanged
             where TMiddle : class, INotifyPropertyChanged
         {
             return new ObserverChain<TClass, TMiddle, TRight>(This, new Observer<TMiddle, TRight>(func, propertyName));
         }
 
-        public static ObserverChain<TClass, TMiddle, TRight> Chain<TClass, TMiddle, TRight>(this IPropertyChangeObserver<TClass, TMiddle> This, ObservableProperty<TMiddle, TRight> property)
+        public static ObserverChain<TClass, TMiddle, TRight> Chain<TClass, TMiddle, TRight>(this IPropertyChangeObserver<TClass, TMiddle> This,
+            ObservableProperty<TMiddle, TRight> property)
             where TClass : class, INotifyPropertyChanged
             where TMiddle : class, INotifyPropertyChanged
         {
             return new ObserverChain<TClass, TMiddle, TRight>(This, new Observer<TMiddle, TRight>(property));
         }
 
-        public static ObserverChain<TClass, TMiddle, TRight> Chain<TClass, TMiddle, TRight>(this IPropertyChangeObserver<TClass, TMiddle> This, string property, Action<TRight> act)
+        public static ObserverChain<TClass, TMiddle, TRight> Chain<TClass, TMiddle, TRight>(this IPropertyChangeObserver<TClass, TMiddle> This,
+            string property, Action<TRight> act)
             where TClass : class, INotifyPropertyChanged
             where TMiddle : class, INotifyPropertyChanged
         {
             return new ObserverChain<TClass, TMiddle, TRight>(This, new Observer<TMiddle, TRight>(property, act));
         }
 
-        public static ObserverChain<TClass, TMiddle, TRight> Chain<TClass, TMiddle, TRight>(this IPropertyChangeObserver<TClass, TMiddle> This, Func<TMiddle, TRight> func, string property, Action<TRight> act)
+        public static ObserverChain<TClass, TMiddle, TRight> Chain<TClass, TMiddle, TRight>(this IPropertyChangeObserver<TClass, TMiddle> This,
+            Func<TMiddle, TRight> func, string property, Action<TRight> act)
             where TClass : class, INotifyPropertyChanged
             where TMiddle : class, INotifyPropertyChanged
         {
             return new ObserverChain<TClass, TMiddle, TRight>(This, new Observer<TMiddle, TRight>(func, property, act));
         }
 
-        public static ObserverChain<TClass, TMiddle, TRight> Chain<TClass, TMiddle, TRight>(this IPropertyChangeObserver<TClass, TMiddle> This, ObservableProperty<TMiddle, TRight> property, Action<TRight> act)
+        public static ObserverChain<TClass, TMiddle, TRight> Chain<TClass, TMiddle, TRight>(this IPropertyChangeObserver<TClass, TMiddle> This,
+            ObservableProperty<TMiddle, TRight> property, Action<TRight> act)
             where TClass : class, INotifyPropertyChanged
             where TMiddle : class, INotifyPropertyChanged
         {
             return new ObserverChain<TClass, TMiddle, TRight>(This, new Observer<TMiddle, TRight>(property, act));
         }
 
-        public static ObserverFilter<TClass, TValue> Where<TClass, TValue>(this IPropertyChangeObserver<TClass, TValue> This, Func<TValue, bool> predicate)
+        public static ObserverFilter<TClass, TValue> Where<TClass, TValue>(this IPropertyChangeObserver<TClass, TValue> This,
+            Func<TValue, bool> predicate)
             where TClass : class, INotifyPropertyChanged
         {
             return new ObserverFilter<TClass, TValue>(This, predicate, null);
         }
 
-        public static ObserverFilter<TClass, TValue> Where<TClass, TValue>(this IPropertyChangeObserver<TClass, TValue> This, Func<TValue, bool> predicate, Action<TValue> action)
+        public static ObserverFilter<TClass, TValue> Where<TClass, TValue>(this IPropertyChangeObserver<TClass, TValue> This,
+            Func<TValue, bool> predicate, Action<TValue> action)
             where TClass : class, INotifyPropertyChanged
         {
             return new ObserverFilter<TClass, TValue>(This, predicate, action);
         }
 
-        public static IPropertyChangeObserver<TClass,TValue> Subscribe<TClass, TValue>(this IPropertyChangeObserver<TClass, TValue> This, Action<TValue> action)
+        public static IPropertyChangeObserver<TClass, TValue> Subscribe<TClass, TValue>(this IPropertyChangeObserver<TClass, TValue> This,
+            Action<TValue> action)
             where TClass : class, INotifyPropertyChanged
         {
             This.Action = action;
             return This;
         }
     }
-
 }

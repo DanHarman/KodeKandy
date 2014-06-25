@@ -46,7 +46,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
         public void When_Clear_Then_Action_Reset_Raised()
         {
             // Arrange
-            var sut = new ObservableList<int>(new[] { 10, 12, 18, 100 });
+            var sut = new ObservableList<int>(new[] {10, 12, 18, 100});
             var results = new List<NotifyCollectionChangedEventArgs>();
             var expected = new[]
             {
@@ -65,7 +65,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
         public void When_Insert_Then_Action_Add_Raised()
         {
             // Arrange
-            var sut = new ObservableList<int>(new[] { 10, 12, 18, 100 });
+            var sut = new ObservableList<int>(new[] {10, 12, 18, 100});
             var results = new List<NotifyCollectionChangedEventArgs>();
             var expected = new[]
             {
@@ -83,31 +83,10 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
         }
 
         [Test]
-        public void When_Replace_Then_Action_Replace_Raised()
-        {
-            // Arrange
-            var sut = new ObservableList<int>(new[] { 10, 12, 18, 100 });
-            var results = new List<NotifyCollectionChangedEventArgs>();
-            var expected = new[]
-            {
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, 777, (object) 100, 3),
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, 101, (object) 10, 0),
-            };
-            sut.CollectionChanged += (o, e) => results.Add(e);
-
-            // Act
-            sut[3] = 777;
-            sut[0] = 101;
-
-            // Assert
-            KKAssert.AreEqualByValue(expected, results);
-        }
-
-        [Test]
         public void When_RemoveAt_Then_Action_Remove_Raised()
         {
             // Arrange
-            var sut = new ObservableList<int>(new[] { 10, 12, 18, 100 });
+            var sut = new ObservableList<int>(new[] {10, 12, 18, 100});
             var results = new List<NotifyCollectionChangedEventArgs>();
             var expected = new[]
             {
@@ -128,7 +107,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
         public void When_Remove_Then_Action_Remove_Raised()
         {
             // Arrange
-            var sut = new ObservableList<int>(new[] { 10, 12, 18, 100 });
+            var sut = new ObservableList<int>(new[] {10, 12, 18, 100});
             var results = new List<NotifyCollectionChangedEventArgs>();
             var expected = new[]
             {
@@ -140,6 +119,27 @@ namespace KodeKandy.Panopticon.Tests.ObservableListTests
             // Act
             sut.Remove(12);
             sut.Remove(100);
+
+            // Assert
+            KKAssert.AreEqualByValue(expected, results);
+        }
+
+        [Test]
+        public void When_Replace_Then_Action_Replace_Raised()
+        {
+            // Arrange
+            var sut = new ObservableList<int>(new[] {10, 12, 18, 100});
+            var results = new List<NotifyCollectionChangedEventArgs>();
+            var expected = new[]
+            {
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, 777, (object) 100, 3),
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, 101, (object) 10, 0),
+            };
+            sut.CollectionChanged += (o, e) => results.Add(e);
+
+            // Act
+            sut[3] = 777;
+            sut[0] = 101;
 
             // Assert
             KKAssert.AreEqualByValue(expected, results);

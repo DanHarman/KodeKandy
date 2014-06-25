@@ -1,3 +1,16 @@
+// <copyright file="PropertyChangeHelper.cs" company="million miles per hour ltd">
+// Copyright (c) 2013-2014 All Right Reserved
+// 
+// This source is subject to the MIT License.
+// Please see the License.txt file for more information.
+// All other rights reserved.
+// 
+// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY 
+// KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+// PARTICULAR PURPOSE.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,16 +20,22 @@ using System.Threading;
 namespace KodeKandy.Panopticon
 {
     /// <summary>
-    /// Helper class for implementing <see cref="INotifyPropertyChanged"/>. To use, compose and instance of this class in, and
-    /// on the property changed event property, delegate the add and remove handler calls onto the event exposed on this class.
+    ///     Helper class for implementing <see cref="INotifyPropertyChanged" />. To use, compose and instance of this class in,
+    ///     and
+    ///     on the property changed event property, delegate the add and remove handler calls onto the event exposed on this
+    ///     class.
     /// </summary>
     /// <remarks>
-    /// When firing, this class sends a custom event type derived from PropertyChangedEventArgs, but with an additional 'UserData'
-    /// field that may be useful for solving re-entrancy problems when change observers need to know whether they triggered the
-    /// change themselves.
+    ///     When firing, this class sends a custom event type derived from PropertyChangedEventArgs, but with an additional
+    ///     'UserData'
+    ///     field that may be useful for solving re-entrancy problems when change observers need to know whether they triggered
+    ///     the
+    ///     change themselves.
     /// </remarks>
     public class PropertyChangeHelper
     {
+        private int suppressPropertyChangedCount;
+
         public PropertyChangeHelper(object source)
         {
             Require.NotNull(source, "source");
@@ -25,7 +44,6 @@ namespace KodeKandy.Panopticon
         }
 
         public object Source { get; private set; }
-        private int suppressPropertyChangedCount;
 
         protected bool IsPropertyChangedSuppressed
         {
@@ -35,7 +53,7 @@ namespace KodeKandy.Panopticon
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
-        /// Set the property and fire a PropertyChanged event, but only if the value has changed.
+        ///     Set the property and fire a PropertyChanged event, but only if the value has changed.
         /// </summary>
         /// <typeparam name="T">The property type.</typeparam>
         /// <param name="property">A reference to the property backing field that may be modified.</param>
@@ -53,8 +71,8 @@ namespace KodeKandy.Panopticon
         }
 
         /// <summary>
-        /// Fires a PropertyChanged event of type PropertyChangedEventArgsEx, which has an addtional, and optional
-        /// UserData field.
+        ///     Fires a PropertyChanged event of type PropertyChangedEventArgsEx, which has an addtional, and optional
+        ///     UserData field.
         /// </summary>
         /// <param name="propertyName">The name of the property that has changed.</param>
         /// <param name="userData">Optional user data.</param>

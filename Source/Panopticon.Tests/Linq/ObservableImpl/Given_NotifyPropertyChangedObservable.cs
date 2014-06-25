@@ -34,10 +34,10 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
                 OnNext(30, new TestObservableObject() {Age = 4}),
                 OnCompleted<TestObservableObject>(40)
                 );
-            var observer = scheduler.CreateObserver<PropertyChange>();
+            var observer = scheduler.CreateObserver<PropertyChanged>();
             var expected = new[]
             {
-                OnCompleted<PropertyChange>(40)
+                OnCompleted<PropertyChanged>(40)
             };
 
             var sut = new NotifyPropertyChangedObservable<TestObservableObject>(sourceObs);
@@ -62,10 +62,10 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
                 OnNext(30, new TestObservableObject() {Age = 4}),
                 OnError<TestObservableObject>(40, expectedException)
                 );
-            var observer = scheduler.CreateObserver<PropertyChange>();
+            var observer = scheduler.CreateObserver<PropertyChanged>();
             var expected = new[]
             {
-                OnError<PropertyChange>(40, expectedException)
+                OnError<PropertyChanged>(40, expectedException)
             };
 
             var sut = new NotifyPropertyChangedObservable<TestObservableObject>(sourceObs);
@@ -85,18 +85,18 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             var obj = new TestObservableObject {Age = 3};
             var sourceObs = Opticon.Forever(obj);
             var scheduler = new TestScheduler();
-            var firstObserver = scheduler.CreateObserver<PropertyChange>();
-            var secondObserver = scheduler.CreateObserver<PropertyChange>();
+            var firstObserver = scheduler.CreateObserver<PropertyChanged>();
+            var secondObserver = scheduler.CreateObserver<PropertyChanged>();
             var firstObservserExpected = new[]
             {
-                OnNext(0, new PropertyChange(obj, "Age")),
-                OnNext(20, new PropertyChange(obj, "Age")),
-                OnNext(50, new PropertyChange(obj, "Age")),
+                OnNext(0, new PropertyChanged(obj, "Age")),
+                OnNext(20, new PropertyChanged(obj, "Age")),
+                OnNext(50, new PropertyChanged(obj, "Age")),
             };
 
             var secondObservserExpected = new[]
             {
-                OnNext(50, new PropertyChange(obj, "Age")),
+                OnNext(50, new PropertyChanged(obj, "Age")),
             };
 
             var sut = new NotifyPropertyChangedObservable<TestObservableObject>(sourceObs);
@@ -122,11 +122,11 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             var obj = new TestObservableObject() {Age = 2};
             var sourceObs = Opticon.Forever(obj);
             var scheduler = new TestScheduler();
-            var observer = scheduler.CreateObserver<PropertyChange>();
+            var observer = scheduler.CreateObserver<PropertyChanged>();
             var expected = new[]
             {
-                OnNext(20, new PropertyChange(obj, "Age")),
-                OnNext(30, new PropertyChange(obj, "Age")),
+                OnNext(20, new PropertyChanged(obj, "Age")),
+                OnNext(30, new PropertyChanged(obj, "Age")),
             };
 
             var sut = new NotifyPropertyChangedObservable<TestObservableObject>(sourceObs);

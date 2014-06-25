@@ -27,12 +27,22 @@ namespace KodeKandy.Panopticon
             propertyChangeHelper = new PropertyChangeHelper(this);
         }
 
-        #region INotifyPropertyChanged Members
+        #region IObservableObject Members
 
         public event PropertyChangedEventHandler PropertyChanged
         {
             add { propertyChangeHelper.PropertyChanged += value; }
             remove { propertyChangeHelper.PropertyChanged -= value; }
+        }
+
+        /// <summary>
+        ///     Suppress all PropertyChanged events for the lifetime of the returned disposable.
+        ///     Typically used within a 'using' block.
+        /// </summary>
+        /// <returns>A disposable that should be disposed when notification suppression is over.</returns>
+        public IDisposable SuppressPropertyChanged()
+        {
+            return propertyChangeHelper.SuppressPropertyChanged();
         }
 
         #endregion
@@ -47,16 +57,6 @@ namespace KodeKandy.Panopticon
         protected void SetValue<TVal>(ref TVal property, TVal value, object userData, [CallerMemberName] string propertyName = null)
         {
             propertyChangeHelper.SetPropertyValue(ref property, value, propertyName, userData);
-        }
-
-        /// <summary>
-        ///     Suppress all PropertyChanged events for the lifetime of the returned disposable.
-        ///     Typically used within a 'using' block.
-        /// </summary>
-        /// <returns>A disposable that should be disposed when notification suppression is over.</returns>
-        public IDisposable SuppressPropertyChanged()
-        {
-            return propertyChangeHelper.SuppressPropertyChanged();
         }
     }
 }

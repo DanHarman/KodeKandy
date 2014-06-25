@@ -16,7 +16,7 @@ using KodeKandy.Panopticon.Tests.TestEntities;
 using Microsoft.Reactive.Testing;
 using NUnit.Framework;
 
-namespace KodeKandy.Panopticon.Tests.Linq.QueryLanguageTests
+namespace KodeKandy.Panopticon.Tests.Linq
 {
     [TestFixture]
     public class Given_When : ReactiveTest
@@ -34,7 +34,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.QueryLanguageTests
                 OnNext(15, 3),
             };
 
-            var sut = Opticon.Forever(obj).When("Age", x => x.Age);
+            var sut = obj.When("Age", x => x.Age);
 
             // Act
             sut.Subscribe(observer);
