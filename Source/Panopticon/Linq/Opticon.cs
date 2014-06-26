@@ -25,7 +25,7 @@ namespace KodeKandy.Panopticon.Linq
     {
         #region When
 
-        public static IObservable<TProperty> When<TClass, TProperty>(this TClass source, string propertyName, Func<TClass, TProperty> outValueGetter)
+        public static IObservable<PropertyValueChanged<TProperty>> When<TClass, TProperty>(this TClass source, string propertyName, Func<TClass, TProperty> outValueGetter)
             where TClass : class, INotifyPropertyChanged
         {
             if (source == null)
@@ -35,10 +35,10 @@ namespace KodeKandy.Panopticon.Linq
             if (outValueGetter == null)
                 throw new ArgumentNullException("outValueGetter");
 
-            return new NotifyPropertyChangedValueObservable<TClass, TProperty>(Forever(source), propertyName, outValueGetter);
+            return new NotifyPropertyValueChangedObservable<TClass, TProperty>(source.ToPropertyValueChanged().Forever(), propertyName, outValueGetter);
         }
 
-        public static IObservable<TProperty> When<TClass, TProperty>(this IObservable<TClass> sourceObservable, string propertyName,
+        public static IObservable<PropertyValueChanged<TProperty>> When<TClass, TProperty>(this IObservable<PropertyValueChanged<TClass>> sourceObservable, string propertyName,
             Func<TClass, TProperty> outValueGetter)
             where TClass : class, INotifyPropertyChanged
         {
@@ -49,52 +49,10 @@ namespace KodeKandy.Panopticon.Linq
             if (outValueGetter == null)
                 throw new ArgumentNullException("outValueGetter");
 
-            return new NotifyPropertyChangedValueObservable<TClass, TProperty>(sourceObservable, propertyName, outValueGetter);
+            return new NotifyPropertyValueChangedObservable<TClass, TProperty>(sourceObservable, propertyName, outValueGetter);
         }
 
-//        public static IObservable<TMember> When<TClass, TMember>(this TClass source, Expression<Func<TClass, TMember>> memberPath)
-//            where TClass : class
-//        {
-//            if (source == null)
-//                throw new ArgumentNullException("source");
-//            if (memberPath == null)
-//                throw new ArgumentNullException("memberPath");
-//
-//            return MemberObservableFactory.CreateValueObserver(source, memberPath);
-//        }
-
-        #endregion
-
-        #region When2
-
-        public static IObservable<PropertyValueChanged<TProperty>> When2<TClass, TProperty>(this TClass source, string propertyName, Func<TClass, TProperty> outValueGetter)
-            where TClass : class, INotifyPropertyChanged
-        {
-            if (source == null)
-                throw new ArgumentNullException("source");
-            if (propertyName == null)
-                throw new ArgumentNullException("propertyName");
-            if (outValueGetter == null)
-                throw new ArgumentNullException("outValueGetter");
-
-            return new NotifyPropertyChangedValueObservable2<TClass, TProperty>(source.ToPropertyValueChanged().Forever(), propertyName, outValueGetter);
-        }
-
-        public static IObservable<PropertyValueChanged<TProperty>> When2<TClass, TProperty>(this IObservable<PropertyValueChanged<TClass>> sourceObservable, string propertyName,
-            Func<TClass, TProperty> outValueGetter)
-            where TClass : class, INotifyPropertyChanged
-        {
-            if (sourceObservable == null)
-                throw new ArgumentNullException("sourceObservable");
-            if (propertyName == null)
-                throw new ArgumentNullException("propertyName");
-            if (outValueGetter == null)
-                throw new ArgumentNullException("outValueGetter");
-
-            return new NotifyPropertyChangedValueObservable2<TClass, TProperty>(sourceObservable, propertyName, outValueGetter);
-        }
-
-        public static IObservable<PropertyValueChanged<TMember>> When2<TClass, TMember>(this TClass source, Expression<Func<TClass, TMember>> memberPath)
+        public static IObservable<PropertyValueChanged<TMember>> When<TClass, TMember>(this TClass source, Expression<Func<TClass, TMember>> memberPath)
             where TClass : class
         {
             if (source == null)

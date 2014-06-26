@@ -11,6 +11,7 @@
 // PARTICULAR PURPOSE.
 // </copyright>
 
+using System;
 using KodeKandy.Panopticon.Linq;
 using KodeKandy.Panopticon.Linq.ObservableImpl;
 using KodeKandy.Panopticon.Tests.TestEntities;
@@ -23,18 +24,100 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
     public class Given_PocoValueObservable : ReactiveTest
     {
         [Test]
-        public void When_Subscribed_Then_Returns_Value_At_Time_Of_Subscribe()
+        public void When_Source_Has_Null_Node_Then_Propagates_ProvertyValueChanged_With_HasValue_False()
+        {
+            // Arrange
+            var scheduler = new TestScheduler();
+            var sourceOne = new TestPoco {Age = 5};
+            var sourceTwo = new TestPoco {Age = 17};
+            var sourceObs = scheduler.CreateColdObservable(
+                OnNext(100, PropertyValueChanged.CreateWithValue(null, "Age", sourceOne)),
+                OnNext(200, PropertyValueChanged.CreateWithoutValue<TestPoco>(null, "Age")),
+                OnNext(300, PropertyValueChanged.CreateWithValue(null, "Age", sourceTwo)),
+                OnCompleted<PropertyValueChanged<TestPoco>>(400)
+                );
+            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
+            var expected = new[]
+            {
+                OnNext(100, PropertyValueChanged.CreateWithValue(sourceOne, "Age", sourceOne.Age)),
+                OnNext(200, PropertyValueChanged.CreateWithoutValue<int>(null, "Age")),
+                OnNext(300, PropertyValueChanged.CreateWithValue(sourceTwo, "Age", sourceTwo.Age)),
+                OnCompleted<PropertyValueChanged<int>>(400),
+            };
+
+            var sut = new PocoValueObservable<TestPoco, int>(sourceObs, "Age", x => x.Age);
+
+            // Act
+            sut.Subscribe(observer);
+            scheduler.Start();
+
+            // Assert
+            observer.Messages.AssertEqual(expected);
+            Assert.IsFalse(observer.Messages[1].Value.Value.HasValue);
+        }
+
+        [Test]
+        public void When_Source_Observable_Completes_Then_Completes()
+        {
+            // Arrange
+            var scheduler = new TestScheduler();
+            var sourceObs = scheduler.CreateColdObservable(
+                OnCompleted<PropertyValueChanged<TestPoco>>(400)
+                );
+            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
+            var expected = new[]
+            {
+                OnCompleted<PropertyValueChanged<int>>(400),
+            };
+
+            var sut = new PocoValueObservable<TestPoco, int>(sourceObs, "Age", x => x.Age);
+
+            // Act
+            sut.Subscribe(observer);
+            scheduler.Start();
+
+            // Assert
+            observer.Messages.AssertEqual(expected);
+        }
+
+        [Test]
+        public void When_Source_Observable_Errors_Then_Errors()
+        {
+            // Arrange
+            var scheduler = new TestScheduler();
+            var expectedException = new Exception("Expected");
+            var sourceObs = scheduler.CreateColdObservable(
+                OnError<PropertyValueChanged<TestPoco>>(400, expectedException)
+                );
+            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
+            var expected = new[]
+            {
+                OnError<PropertyValueChanged<int>>(400, expectedException),
+            };
+
+            var sut = new PocoValueObservable<TestPoco, int>(sourceObs, "Age", x => x.Age);
+
+            // Act
+            sut.Subscribe(observer);
+            scheduler.Start();
+
+            // Assert
+            observer.Messages.AssertEqual(expected);
+        }
+
+        [Test]
+        public void When_Subscribe_Then_Returns_Value_At_Time_Of_Subscribe()
         {
             // Arrange
             var obj = new TestPoco() {Age = 2};
             var scheduler = new TestScheduler();
-            var observer = scheduler.CreateObserver<int>();
+            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
             var expected = new[]
             {
-                OnNext(20, 5),
+                OnNext(20, new PropertyValueChanged<int>(obj, "Age", 5)),
             };
 
-            var sut = new PocoValueObservable<TestPoco, int>(Opticon.Forever(obj), x => x.Age);
+            var sut = new PocoValueObservable<TestPoco, int>(obj.ToPropertyValueChanged().Forever(), "Age", x => x.Age);
 
             // Act
             scheduler.AdvanceTo(10);

@@ -34,7 +34,7 @@ namespace KodeKandy.Panopticon.Tests.Linq
                 OnNext(15, 3),
             };
 
-            var sut = obj.When("Age", x => x.Age);
+            var sut = obj.When("Age", x => x.Age).ToValues();
 
             // Act
             sut.Subscribe(observer);

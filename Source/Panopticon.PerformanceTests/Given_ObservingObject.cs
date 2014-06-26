@@ -101,7 +101,7 @@ namespace Panopticon.PerformanceTests
 
                 var sut = factory();
 
-                sut.When2("Child", x => x.Child).When2("Age", x => x.Age).Subscribe(_ => { ++cnt; });
+                sut.When("Child", x => x.Child).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
 
                 for (var j = 0; j < iterations; ++j)
                     sut.Child.Age = j;
@@ -155,7 +155,7 @@ namespace Panopticon.PerformanceTests
                 foreach (var sut in suts)
                 {
                     //Opticon.When(sut, x => x.Child.Age).Subscribe(_ => { ++cnt; });
-                    sut.When2(cached).Subscribe(_ => { ++cnt; });
+                    sut.When(cached).Subscribe(_ => { ++cnt; });
                 }
                 Assert.AreEqual(iter, cnt);
             });
@@ -204,7 +204,7 @@ namespace Panopticon.PerformanceTests
 
                 foreach (var sut in suts)
                 {
-                    sut.When2(x => x.Age).Subscribe(_ => { ++cnt; });
+                    sut.When(x => x.Age).Subscribe(_ => { ++cnt; });
                     //Opticon.When(sut, cached).Subscribe(_ => { ++cnt; });
                 }
                 Assert.AreEqual(iter, cnt);
@@ -266,7 +266,7 @@ namespace Panopticon.PerformanceTests
 
                 for (var i = 0; i < iterations; ++i)
                 {
-                    sut.When2(x => x.Age).Subscribe(_ => { ++cnt; });
+                    sut.When(x => x.Age).Subscribe(_ => { ++cnt; });
                     //Opticon.When(sut, cached).Subscribe(_ => { ++cnt; });
                 }
                 Assert.AreEqual(iterations, cnt);

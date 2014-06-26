@@ -60,7 +60,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             object currObserver = source.ToPropertyValueChanged().Forever();
             foreach (var memberInfo in memberInfos)
             {
-                var create = (Func<object, MemberInfo, object>) CreateObservableValueDelegate(memberInfo);
+                var create = (Func<object, MemberInfo, object>) CreateObservableMemberValueChangedDelegate(memberInfo);
                 currObserver = create(currObserver, memberInfo);
             }
 
@@ -91,7 +91,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             {
                 ++cnt;
 
-                var create = (Func<object, MemberInfo, object>) CreateObservableValueDelegate(memberInfo);
+                var create = (Func<object, MemberInfo, object>) CreateObservableMemberValueChangedDelegate(memberInfo);
                 currObserver = create(currObserver, memberInfo);
 
                 // For the final member we don't just want its value, we want to Observe its property changes.             
@@ -105,7 +105,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             return (IObservable<PropertyChanged>) currObserver;
         }
 
-        private static Delegate CreateObservableValueDelegate(MemberInfo memberInfo)
+        private static Delegate CreateObservableMemberValueChangedDelegate(MemberInfo memberInfo)
         {
             Delegate result;
 
@@ -156,12 +156,12 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         }
 
         [UsedImplicitly]
-        private static object CreateNotifyPropertyChangedValueObservable<TClass, TMember>(object source, MemberInfo outMemberInfo)
+        private static object CreateNotifyPropertyChangedValueObservable<TClass, TMember>(object source, MemberInfo memberInfo)
             where TClass : class, INotifyPropertyChanged
         {
-            var getter = ReflectionHelpers.CreateMemberGetter(outMemberInfo);
+            var getter = ReflectionHelpers.CreateMemberGetter(memberInfo);
 
-            return new NotifyPropertyChangedValueObservable2<TClass, TMember>((IObservable<PropertyValueChanged<TClass>>) source, outMemberInfo.Name,
+            return new NotifyPropertyValueChangedObservable<TClass, TMember>((IObservable<PropertyValueChanged<TClass>>) source, memberInfo.Name,
                 (Func<TClass, TMember>) getter);
         }
 
@@ -171,7 +171,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         {
             var getter = ReflectionHelpers.CreateMemberGetter(memberInfo);
 
-            return new PocoValueObservable2<TClass, TMember>((IObservable<PropertyValueChanged<TClass>>) source, (Func<TClass, TMember>) getter);
+            return new PocoValueObservable<TClass, TMember>((IObservable<PropertyValueChanged<TClass>>) source, memberInfo.Name, (Func<TClass, TMember>) getter);
         }
 
         [UsedImplicitly]

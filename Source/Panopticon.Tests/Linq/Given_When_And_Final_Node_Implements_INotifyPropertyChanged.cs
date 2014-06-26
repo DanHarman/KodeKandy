@@ -44,7 +44,7 @@ namespace KodeKandy.Panopticon.Tests.Linq
             };
 
             // TODO this should perhaps not use ToValues but verify the actual ProeprtyValueChanged obj.
-            var sut = obj.When2(x => x.ObservableChild.Age).ToValues();
+            var sut = obj.When(x => x.ObservableChild.Age).ToValues();
 
             // Act
             sut.Subscribe(firstObserver);
@@ -70,7 +70,7 @@ namespace KodeKandy.Panopticon.Tests.Linq
                 OnNext(0, 5),
             };
 
-            var sut = obj.When2(x => x.Age).ToValues();
+            var sut = obj.When(x => x.Age).ToValues();
 
             // Act
             sut.Subscribe(observer);
@@ -92,7 +92,7 @@ namespace KodeKandy.Panopticon.Tests.Linq
                 OnNext(10, 5),
             };
 
-            var sut = obj.When2(x => x.ObservableChild.Age).ToValues();
+            var sut = obj.When(x => x.ObservableChild.Age).ToValues();
 
             // Act
             sut.Subscribe(observer);
@@ -116,7 +116,7 @@ namespace KodeKandy.Panopticon.Tests.Linq
                 OnNext(10, 5),
             };
 
-            var sut = obj.When2(x => x.ObservableChild.Age).ToValues();
+            var sut = obj.When(x => x.ObservableChild.Age).ToValues();
 
             // Act
             sut.Subscribe(observer);

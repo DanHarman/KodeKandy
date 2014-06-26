@@ -23,55 +23,37 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
     /// </summary>
     /// <typeparam name="TClass">Source class type.</typeparam>
     /// <typeparam name="TMember">Member type on source class.</typeparam>
-    internal class PocoValueObservable<TClass, TMember> : IObservable<TMember>
+    internal class PocoValueObservable<TClass, TMember> : IObservable<PropertyValueChanged<TMember>>
         where TClass : class
     {
         private readonly Func<TClass, TMember> _memberValueGetter;
-        private readonly IObservable<TClass> _sourceObservable;
-
-        public PocoValueObservable(IObservable<TClass> source, Func<TClass, TMember> memberValueGetter)
-        {
-            if (source == null)
-                throw new ArgumentNullException("source");
-            if (memberValueGetter == null)
-                throw new ArgumentNullException("memberValueGetter");
-
-            _sourceObservable = source;
-            _memberValueGetter = memberValueGetter;
-        }
-
-        #region IObservable<TMember> Members
-
-        public IDisposable Subscribe(IObserver<TMember> observer)
-        {
-            return _sourceObservable.Select(_memberValueGetter).Subscribe(observer);
-        }
-
-        #endregion
-    }
-
-    internal class PocoValueObservable2<TClass, TMember> : IObservable<PropertyValueChanged<TMember>>
-       where TClass : class
-    {
-        private readonly Func<TClass, TMember> _memberValueGetter;
+        private readonly string _propertyName;
         private readonly IObservable<PropertyValueChanged<TClass>> _sourceObservable;
 
-        public PocoValueObservable2(IObservable<PropertyValueChanged<TClass>> source, Func<TClass, TMember> memberValueGetter)
+        public PocoValueObservable(IObservable<PropertyValueChanged<TClass>> sourceObservable, string propertyName,
+            Func<TClass, TMember> memberValueGetter)
         {
-            if (source == null)
-                throw new ArgumentNullException("source");
+            if (sourceObservable == null)
+                throw new ArgumentNullException("sourceObservable");
             if (memberValueGetter == null)
                 throw new ArgumentNullException("memberValueGetter");
 
-            _sourceObservable = source;
+            _sourceObservable = sourceObservable;
+            _propertyName = propertyName;
             _memberValueGetter = memberValueGetter;
         }
 
-        #region IObservable<TMember> Members
+        #region IObservable<PropertyValueChanged<TMember>> Members
 
         public IDisposable Subscribe(IObserver<PropertyValueChanged<TMember>> observer)
         {
-            return _sourceObservable.Select(s => _memberValueGetter(s.Value).ToPropertyValueChanged(s.Value, s.PropertyChangedEventArgs.PropertyName)).Subscribe(observer);
+            // If the source has provided a value then propagate it, otherwise propagate the change without a value (this occurs
+            // when a property chain has a null node for example, so it is not possible to provide a value from the leaf node).
+            return _sourceObservable
+                .Select(newSource => newSource.HasValue
+                    ? PropertyValueChanged.CreateWithValue(newSource.Value, _propertyName, _memberValueGetter(newSource.Value))
+                    : PropertyValueChanged.CreateWithoutValue<TMember>(null, _propertyName))
+                .Subscribe(observer);
         }
 
         #endregion
