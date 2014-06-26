@@ -85,7 +85,7 @@ namespace KodeKandy.Panopticon
 
             if (handlerSnapshot != null)
             {
-                handlerSnapshot(Source, new PropertyChangedEventArgsEx(Source, propertyName, userData));
+                handlerSnapshot(Source, new PropertyChangedEventArgsEx(propertyName, userData));
             }
         }
 

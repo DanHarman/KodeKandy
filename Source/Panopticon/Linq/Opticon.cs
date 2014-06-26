@@ -22,6 +22,8 @@ namespace KodeKandy.Panopticon.Linq
 {
     public static class Opticon
     {
+        #region When
+
         public static IObservable<TProperty> When<TClass, TProperty>(this TClass source, string propertyName, Func<TClass, TProperty> outValueGetter)
             where TClass : class, INotifyPropertyChanged
         {
@@ -60,7 +62,11 @@ namespace KodeKandy.Panopticon.Linq
             return MemberObservableFactory.CreateValueObserver(source, memberPath);
         }
 
-        public static IObservable<PropertyChanged> WhenPropertyChange<TClass>(this TClass source)
+        #endregion
+
+        #region WhenAny
+
+        public static IObservable<PropertyChanged> WhenAny<TClass>(this TClass source)
             where TClass : class, INotifyPropertyChanged
         {
             if (source == null)
@@ -69,7 +75,7 @@ namespace KodeKandy.Panopticon.Linq
             return new NotifyPropertyChangedObservable<TClass>(Forever(source));
         }
 
-        public static IObservable<PropertyChanged> WhenPropertyChange<TClass>(this IObservable<TClass> sourceObservable)
+        public static IObservable<PropertyChanged> WhenAny<TClass>(this IObservable<TClass> sourceObservable)
             where TClass : class, INotifyPropertyChanged
         {
             if (sourceObservable == null)
@@ -78,7 +84,7 @@ namespace KodeKandy.Panopticon.Linq
             return new NotifyPropertyChangedObservable<TClass>(sourceObservable);
         }
 
-        public static IObservable<PropertyChanged> WhenPropertyChange<TClass, TMember>(this TClass source,
+        public static IObservable<PropertyChanged> WhenAny<TClass, TMember>(this TClass source,
             Expression<Func<TClass, TMember>> memberPath)
             where TClass : class
             where TMember : class, INotifyPropertyChanged
@@ -91,6 +97,10 @@ namespace KodeKandy.Panopticon.Linq
             return MemberObservableFactory.CreatePropertyChangedObserver(source, memberPath);
         }
 
+        #endregion
+
+        #region Forever
+
         /// <summary>
         ///     An Observable that always returns a specific value and never completes.
         /// </summary>
@@ -101,6 +111,25 @@ namespace KodeKandy.Panopticon.Linq
         {
             return new Forever<T>(value);
         }
+
+        #endregion
+
+        #region UserDataOrDefault
+
+        /// <summary>
+        ///     Retrieves the UserData from a PropertyChangedEventArgs if it is in fact a PropertyChangedEventArgsEx, otherwise it
+        ///     will return null.
+        /// </summary>
+        /// <param name="change">The change that may have a UserData property.</param>
+        /// <returns>The UserData if present otherwise null.</returns>
+        public static object UserDataOrDefault(this PropertyChangedEventArgs change)
+        {
+            var extended = change as PropertyChangedEventArgsEx;
+
+            return extended != null ? extended.UserData : null;
+        }
+
+        #endregion
 
         public static DerivedObservableList<TTargetCollectionItem> Map<TSourceCollection, TSourceCollectionItem, TTargetCollectionItem>(
             this TSourceCollection source,

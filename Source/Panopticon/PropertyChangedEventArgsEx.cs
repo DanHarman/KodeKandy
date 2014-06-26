@@ -17,23 +17,22 @@ using System.ComponentModel;
 namespace KodeKandy.Panopticon
 {
     /// <summary>
-    ///     Extended version of <see cref="PropertyChangedEventArgs" /> which also captures the source and optionally
-    ///     user data. This former is useful given we may be in deep rx chains or merging many object subscriptions into
-    ///     one. The latter is very useful for certain re-entrancy problems.
+    ///     Extended version of <see cref="PropertyChangedEventArgs" /> which captures a user data field.
+    ///     The can be very useful for certain re-entrancy problems where an observer may want to filter out
+    ///     changes it triggered itself.
     /// </summary>
     public class PropertyChangedEventArgsEx : PropertyChangedEventArgs, IEquatable<PropertyChangedEventArgsEx>
     {
-        public PropertyChangedEventArgsEx(object source, string propertyNeme, object userData = null)
-            : base(propertyNeme)
+        public PropertyChangedEventArgsEx(string propertyNeme)
+            : this(propertyNeme, null)
         {
-            Source = source;
-            UserData = userData;
         }
 
-        /// <summary>
-        ///     The originator of the change notification.
-        /// </summary>
-        public object Source { get; private set; }
+        public PropertyChangedEventArgsEx(string propertyNeme, object userData)
+            : base(propertyNeme)
+        {
+            UserData = userData;
+        }
 
         /// <summary>
         ///     Additional user data on the notification. Useful if dealing with re-entrancy issues.
@@ -46,7 +45,7 @@ namespace KodeKandy.Panopticon
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(Source, other.Source) && Equals(UserData, other.UserData);
+            return Equals(UserData, other.UserData);
         }
 
         #endregion
@@ -63,7 +62,7 @@ namespace KodeKandy.Panopticon
         {
             unchecked
             {
-                return ((Source != null ? Source.GetHashCode() : 0) * 397) ^ (UserData != null ? UserData.GetHashCode() : 0);
+                return (UserData != null ? UserData.GetHashCode() : 0);
             }
         }
     }

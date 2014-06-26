@@ -29,7 +29,7 @@ namespace KodeKandy.Panopticon.Tests.CollectionChangeHelperTests
             var propertyChanges = new List<PropertyChangedEventArgsEx>();
             var sut = new CollectionChangedHelper<int>(this);
             sut.PropertyChanged += (sender, args) => propertyChanges.Add((PropertyChangedEventArgsEx) args);
-            var expectedPropertyChange = new PropertyChangedEventArgsEx(this, "Age", "UserData-2");
+            var expectedPropertyChange = new PropertyChangedEventArgsEx("Age", "UserData-2");
 
             // Act            
             sut.NotifyPropertyChanged("Age", "UserData-2");
@@ -80,7 +80,7 @@ namespace KodeKandy.Panopticon.Tests.CollectionChangeHelperTests
             var sut = new CollectionChangedHelper<int>(this);
             sut.PropertyChanged += (sender, args) => propertyChanges.Add((PropertyChangedEventArgsEx) args);
             var age = 10;
-            var expectedPropertyChange = new PropertyChangedEventArgsEx(this, "Age", "UserData-1");
+            var expectedPropertyChange = new PropertyChangedEventArgsEx("Age", "UserData-1");
 
             // Act            
             sut.SetPropertyValue(ref age, 17, "Age", "UserData-1");

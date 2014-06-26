@@ -12,6 +12,7 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using KodeKandy.Panopticon.Tests.TestEntities;
 using NUnit.Framework;
 
@@ -43,7 +44,7 @@ namespace KodeKandy.Panopticon.Tests.ObservableObjectTests
             var propertyChanges = new List<PropertyChangedEventArgsEx>();
             var sut = new TestObservableObject {Age = 10};
             sut.PropertyChanged += (sender, args) => propertyChanges.Add((PropertyChangedEventArgsEx) args);
-            var expectedPropertyChange = new PropertyChangedEventArgsEx(sut, "Age");
+            var expectedPropertyChange = new PropertyChangedEventArgsEx("Age");
 
             // Act            
             sut.Age = 5;
