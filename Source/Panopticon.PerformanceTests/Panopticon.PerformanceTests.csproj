@@ -7,8 +7,8 @@
     <ProjectGuid>{717C2DC1-249A-4B03-8AC8-7F4AC9D1C830}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Panopticon.PerformanceTests</RootNamespace>
-    <AssemblyName>Panopticon.PerformanceTests</AssemblyName>
+    <RootNamespace>KodeKandy.Panopticon.PerformanceTests</RootNamespace>
+    <AssemblyName>KodeKandy.Panopticon.PerformanceTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -15,8 +15,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reactive.Linq;
 using KodeKandy.Panopticon;
 using KodeKandy.Panopticon.Linq;
+using KodeKandy.Panopticon.Linq.ObservableImpl;
 using KodeKandy.Panopticon.Tests.QueryLanguageTests;
 using NUnit.Framework;
 
@@ -59,9 +61,9 @@ namespace Panopticon.PerformanceTests
         }
 
         [Test]
-        public void When_Notifying_Child_Property_100000_Times()
+        public void When_Notifying_Child_Property_1000000_Times()
         {
-            Console.Error.WriteLine("Subscribing to 1 child property, notifying it 10000x");
+            Console.Error.WriteLine("Subscribing to 1 child property, notifying it 1000000x");
             Func<TestObservableObject> factory = () => new TestObservableObject {Age = 10, Child = new TestObservableObject {Age = 20}};
             const int iterations = 1000000;
 
@@ -86,6 +88,20 @@ namespace Panopticon.PerformanceTests
                 var sut = factory();
 
                 sut.When("Child", x => x.Child).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
+
+                for (var j = 0; j < iterations; ++j)
+                    sut.Child.Age = j;
+
+                Assert.AreEqual(iterations + 1, cnt);
+            });
+
+            Benchmark.TimeOperation(5, "[DanRx2/PropertyValueChanged]", () =>
+            {
+                var cnt = 0;
+
+                var sut = factory();
+
+                (new NotifyPropertyChangedValueObservable2<TestObservableObject, int>(sut.When("Child", x => x.Child), "Age", x => x.Age)).Select(x => x.Value).Subscribe(_ => { ++cnt; });
 
                 for (var j = 0; j < iterations; ++j)
                     sut.Child.Age = j;

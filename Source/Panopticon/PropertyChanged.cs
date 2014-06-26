@@ -12,10 +12,59 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace KodeKandy.Panopticon
 {
+    public class PropertyValueChanged<TProperty> : PropertyChanged, IEquatable<PropertyValueChanged<TProperty>>
+    {
+        private readonly TProperty _value;
+
+        public PropertyValueChanged(object sender, string propertyName, TProperty value)
+            : this(sender, new PropertyChangedEventArgs(propertyName), value)
+        {
+        }
+
+        public PropertyValueChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs, TProperty value)
+            : base(sender, propertyChangedEventArgs)
+        {
+            _value = value;
+        }
+
+        public TProperty Value
+        {
+            get { return _value; }
+        }
+
+        #region IEquatable<PropertyValueChanged<TProperty>> Members
+
+        public bool Equals(PropertyValueChanged<TProperty> other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return base.Equals(other) && EqualityComparer<TProperty>.Default.Equals(_value, other._value);
+        }
+
+        #endregion
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((PropertyValueChanged<TProperty>) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (base.GetHashCode() * 397) ^ EqualityComparer<TProperty>.Default.GetHashCode(_value);
+            }
+        }
+    }
+
     /// <summary>
     ///     Captures the info normally provided in a OnPropertyChanged handler.
     /// </summary>

@@ -43,6 +43,7 @@
     <Compile Include="Linq\ObservableImpl\DerivedCollectionAdaptor.cs" />
     <Compile Include="Linq\ObservableImpl\NotifyPropertyChangedObservable.cs" />
     <Compile Include="Linq\ObservableImpl\NotifyPropertyChangedValueObservable.cs" />
+    <Compile Include="Linq\ObservableImpl\NotifyPropertyChangedValueObservable2.cs" />
     <Compile Include="Linq\ObservableImpl\PocoValueObservable.cs" />
     <Compile Include="Linq\ObservableImpl\MemberObservableFactory.cs" />
     <Compile Include="Linq\ObservableImpl\Forever.cs" />
