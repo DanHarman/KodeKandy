@@ -49,4 +49,31 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
         #endregion
     }
+
+    internal class PocoValueObservable2<TClass, TMember> : IObservable<PropertyValueChanged<TMember>>
+       where TClass : class
+    {
+        private readonly Func<TClass, TMember> _memberValueGetter;
+        private readonly IObservable<PropertyValueChanged<TClass>> _sourceObservable;
+
+        public PocoValueObservable2(IObservable<PropertyValueChanged<TClass>> source, Func<TClass, TMember> memberValueGetter)
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (memberValueGetter == null)
+                throw new ArgumentNullException("memberValueGetter");
+
+            _sourceObservable = source;
+            _memberValueGetter = memberValueGetter;
+        }
+
+        #region IObservable<TMember> Members
+
+        public IDisposable Subscribe(IObserver<PropertyValueChanged<TMember>> observer)
+        {
+            return _sourceObservable.Select(s => _memberValueGetter(s.Value).ToPropertyValueChanged(s.Value, s.PropertyChangedEventArgs.PropertyName)).Subscribe(observer);
+        }
+
+        #endregion
+    }
 }

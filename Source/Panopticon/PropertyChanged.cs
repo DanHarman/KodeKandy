@@ -20,6 +20,7 @@ namespace KodeKandy.Panopticon
     public class PropertyValueChanged<TProperty> : PropertyChanged, IEquatable<PropertyValueChanged<TProperty>>
     {
         private readonly TProperty _value;
+        private readonly bool _hasValue;
 
         public PropertyValueChanged(object sender, string propertyName, TProperty value)
             : this(sender, new PropertyChangedEventArgs(propertyName), value)
@@ -27,14 +28,25 @@ namespace KodeKandy.Panopticon
         }
 
         public PropertyValueChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs, TProperty value)
-            : base(sender, propertyChangedEventArgs)
+            : this(sender, propertyChangedEventArgs)
         {
             _value = value;
+            _hasValue = true;
+        }
+
+        public PropertyValueChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+            : base(sender, propertyChangedEventArgs)
+        {
         }
 
         public TProperty Value
         {
             get { return _value; }
+        }
+
+        public bool HasValue
+        {
+            get { return _hasValue; }
         }
 
         #region IEquatable<PropertyValueChanged<TProperty>> Members

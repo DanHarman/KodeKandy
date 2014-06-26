@@ -6,19 +6,19 @@ using KodeKandy.Panopticon.Internal;
 
 namespace KodeKandy.Panopticon.Linq.ObservableImpl
 {
-    internal class NotifyPropertyChangedValueObservable2<TClass, TProperty> : IObserver<TClass>, IObservable<PropertyValueChanged<TProperty>>
+    internal class NotifyPropertyChangedValueObservable2<TClass, TProperty> : IObserver<PropertyValueChanged<TClass>>, IObservable<PropertyValueChanged<TProperty>>
         where TClass : class, INotifyPropertyChanged
     {
         private readonly object _gate = new object();
         private readonly string _propertyName;
         private readonly Func<TClass, TProperty> _propertyValueGetter;
-        private readonly IObservable<TClass> _sourceObservable;
+        private readonly IObservable<PropertyValueChanged<TClass>> _sourceObservable;
         private IObserver<PropertyValueChanged<TProperty>> _observer = NopObserver<PropertyValueChanged<TProperty>>.Instance;
         private PropertyValueChanged<TProperty> _propertyValueChanged;
         private TClass _source;
         private IDisposable _sourceSubscriptionDisposable;
 
-        public NotifyPropertyChangedValueObservable2(IObservable<TClass> sourceObservable, string propertyName,
+        public NotifyPropertyChangedValueObservable2(IObservable<PropertyValueChanged<TClass>> sourceObservable, string propertyName,
             Func<TClass, TProperty> propertyValueGetter)
         {
             if (sourceObservable == null)
@@ -94,11 +94,11 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
         #region IObserver<TClass> Members
 
-        void IObserver<TClass>.OnNext(TClass newSource)
+        void IObserver<PropertyValueChanged<TClass>>.OnNext(PropertyValueChanged<TClass> newSource)
         {
             IObserver<PropertyValueChanged<TProperty>> oldObserver;
             TClass oldSource;
-            TProperty initialPropertyValue;
+            PropertyValueChanged<TProperty> initialPropertyValueChanged;
 
             lock (_gate)
             {
@@ -107,26 +107,26 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
                 oldObserver = _observer;
                 oldSource = _source;
-                _source = newSource;
+                _source = newSource.Value;
 
                 // We need to get the current property value from this new source.
-                initialPropertyValue = _propertyValueGetter(_source);
-                _propertyValueChanged = new PropertyValueChanged<TProperty>(_source, new PropertyChangedEventArgsEx(_propertyName), initialPropertyValue);
+                initialPropertyValueChanged = new PropertyValueChanged<TProperty>(_source, new PropertyChangedEventArgsEx(_propertyName),_propertyValueGetter(_source));
+                _propertyValueChanged = initialPropertyValueChanged;
             }
 
             // Connect to INotifyPropertyChanged on the new _source.
-            if (newSource != null)
-                newSource.PropertyChanged += OnPropertyChanged;
+            if (newSource.Value != null)
+                newSource.Value.PropertyChanged += OnPropertyChanged;
 
             // Disconnect from INotifyPropertyChanged on previous _source. Because _source has been changed it doesn't matter
             // if we end up with an extra event from this old sourceObservable sneaking through as it will be filtered out.
             if (oldSource != null)
                 oldSource.PropertyChanged -= OnPropertyChanged;
 
-            oldObserver.OnNext(_propertyValueChanged);
+            oldObserver.OnNext(initialPropertyValueChanged);
         }
 
-        void IObserver<TClass>.OnError(Exception error)
+        void IObserver<PropertyValueChanged<TClass>>.OnError(Exception error)
         {
             if (error == null)
                 throw new ArgumentNullException("error");
@@ -145,7 +145,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             oldObserver.OnError(error);
         }
 
-        void IObserver<TClass>.OnCompleted()
+        void IObserver<PropertyValueChanged<TClass>>.OnCompleted()
         {
             IObserver<PropertyValueChanged<TProperty>> oldObserver;
 

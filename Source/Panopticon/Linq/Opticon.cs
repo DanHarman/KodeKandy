@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq.Expressions;
+using System.Reactive.Linq;
 using KodeKandy.Panopticon.Linq.ObservableImpl;
 
 namespace KodeKandy.Panopticon.Linq
@@ -51,7 +52,49 @@ namespace KodeKandy.Panopticon.Linq
             return new NotifyPropertyChangedValueObservable<TClass, TProperty>(sourceObservable, propertyName, outValueGetter);
         }
 
-        public static IObservable<TMember> When<TClass, TMember>(this TClass source, Expression<Func<TClass, TMember>> memberPath)
+//        public static IObservable<TMember> When<TClass, TMember>(this TClass source, Expression<Func<TClass, TMember>> memberPath)
+//            where TClass : class
+//        {
+//            if (source == null)
+//                throw new ArgumentNullException("source");
+//            if (memberPath == null)
+//                throw new ArgumentNullException("memberPath");
+//
+//            return MemberObservableFactory.CreateValueObserver(source, memberPath);
+//        }
+
+        #endregion
+
+        #region When2
+
+        public static IObservable<PropertyValueChanged<TProperty>> When2<TClass, TProperty>(this TClass source, string propertyName, Func<TClass, TProperty> outValueGetter)
+            where TClass : class, INotifyPropertyChanged
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (propertyName == null)
+                throw new ArgumentNullException("propertyName");
+            if (outValueGetter == null)
+                throw new ArgumentNullException("outValueGetter");
+
+            return new NotifyPropertyChangedValueObservable2<TClass, TProperty>(source.ToPropertyValueChanged().Forever(), propertyName, outValueGetter);
+        }
+
+        public static IObservable<PropertyValueChanged<TProperty>> When2<TClass, TProperty>(this IObservable<PropertyValueChanged<TClass>> sourceObservable, string propertyName,
+            Func<TClass, TProperty> outValueGetter)
+            where TClass : class, INotifyPropertyChanged
+        {
+            if (sourceObservable == null)
+                throw new ArgumentNullException("sourceObservable");
+            if (propertyName == null)
+                throw new ArgumentNullException("propertyName");
+            if (outValueGetter == null)
+                throw new ArgumentNullException("outValueGetter");
+
+            return new NotifyPropertyChangedValueObservable2<TClass, TProperty>(sourceObservable, propertyName, outValueGetter);
+        }
+
+        public static IObservable<PropertyValueChanged<TMember>> When2<TClass, TMember>(this TClass source, Expression<Func<TClass, TMember>> memberPath)
             where TClass : class
         {
             if (source == null)
@@ -113,6 +156,16 @@ namespace KodeKandy.Panopticon.Linq
         }
 
         #endregion
+   
+        public static PropertyValueChanged<TClass> ToPropertyValueChanged<TClass>(this TClass value, object source = null, string propertyName = null)
+        {
+            return new PropertyValueChanged<TClass>(source, propertyName, value);
+        }
+
+        public static IObservable<T> ToValues<T>(this IObservable<PropertyValueChanged<T>> source)
+        {
+            return source.Where(pvc => pvc.HasValue).Select( pvc => pvc.Value);
+        }
 
         #region UserDataOrDefault
 

@@ -42,10 +42,5 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         }
 
         #endregion
-
-        public static Forever<T> Value(T value)
-        {
-            return new Forever<T>(value);
-        }
     }
 }

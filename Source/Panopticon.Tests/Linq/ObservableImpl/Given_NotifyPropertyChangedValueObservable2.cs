@@ -35,10 +35,10 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
                 new TestObservableObject() {Age = 4}
             };
             var sourceObs = scheduler.CreateColdObservable(
-                OnNext(10, sourceObj[0]),
-                OnNext(20, sourceObj[1]),
-                OnNext(30, sourceObj[2]),
-                OnCompleted<TestObservableObject>(40)
+                OnNext(10, sourceObj[0].ToPropertyValueChanged()),
+                OnNext(20, sourceObj[1].ToPropertyValueChanged()),
+                OnNext(30, sourceObj[2].ToPropertyValueChanged()),
+                OnCompleted<PropertyValueChanged<TestObservableObject>>(40)
                 );
             var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
             var expected = new[]
@@ -72,10 +72,10 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
                 new TestObservableObject() {Age = 4}
             };
             var sourceObs = scheduler.CreateColdObservable(
-                OnNext(10, sourceObj[0]),
-                OnNext(20, sourceObj[1]),
-                OnNext(30, sourceObj[2]),
-                OnError<TestObservableObject>(40, expectedException)
+                OnNext(10, sourceObj[0].ToPropertyValueChanged()),
+                OnNext(20, sourceObj[1].ToPropertyValueChanged()),
+                OnNext(30, sourceObj[2].ToPropertyValueChanged()),
+                OnError<PropertyValueChanged<TestObservableObject>>(40, expectedException)
                 );
             var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
             var expected = new[]
@@ -117,7 +117,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
                 OnNext(50, new PropertyValueChanged<int>(sourceObj, "Age", 7)),
             };
 
-            var sut = new NotifyPropertyChangedValueObservable2<TestObservableObject, int>(sourceObj.Forever(), "Age", x => x.Age);
+            var sut = new NotifyPropertyChangedValueObservable2<TestObservableObject, int>(sourceObj.ToPropertyValueChanged().Forever(), "Age", x => x.Age);
 
             // Act
             sut.Subscribe(firstObserver);
@@ -146,7 +146,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
                 OnNext(30, new PropertyValueChanged<int>(sourceObj, "Age", 3)),
             };
 
-            var sut = new NotifyPropertyChangedValueObservable2<TestObservableObject, int>(sourceObj.Forever(), "Age", x => x.Age);
+            var sut = new NotifyPropertyChangedValueObservable2<TestObservableObject, int>(sourceObj.ToPropertyValueChanged().Forever(), "Age", x => x.Age);
 
             scheduler.AdvanceTo(10);
             sourceObj.Age = 5;
