@@ -23,15 +23,15 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
     ///     An observable link, that returns a stream of INotifyPropertyChangedEventArgs as a PropertyChanged object.
     /// </summary>
     /// <typeparam name="TClass">The class whose PropertyChanged event is being observerd.</typeparam>
-    internal class NotifyPropertyChangedObservable<TClass> : IObserver<TClass>, IObservable<PropertyChanged>
+    internal class NotifyPropertyChangedObservable<TClass> : IObserver<PropertyValueChanged<TClass>>, IObservable<PropertyChanged>
         where TClass : class, INotifyPropertyChanged
     {
-        private readonly IObservable<TClass> _sourceObservable;
+        private readonly IObservable<PropertyValueChanged<TClass>> _sourceObservable;
         private IObserver<PropertyChanged> _observer = NopObserver<PropertyChanged>.Instance;
         private TClass _source;
         private IDisposable _sourceSubscriptionDisposable = Disposable.Empty;
 
-        public NotifyPropertyChangedObservable(IObservable<TClass> sourceObservable)
+        public NotifyPropertyChangedObservable(IObservable<PropertyValueChanged<TClass>> sourceObservable)
         {
             if (sourceObservable == null)
                 throw new ArgumentNullException("sourceObservable");
@@ -102,22 +102,22 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
         #region IObserver<TClass> Members
 
-        void IObserver<TClass>.OnNext(TClass newSource)
+        void IObserver<PropertyValueChanged<TClass>>.OnNext(PropertyValueChanged<TClass> newSource)
         {
             TClass oldSource;
             do
             {
                 oldSource = _source;
-            } while (Interlocked.CompareExchange(ref _source, newSource, oldSource) != oldSource);
+            } while (Interlocked.CompareExchange(ref _source, newSource.Value, oldSource) != oldSource);
 
-            if (newSource != null)
-                newSource.PropertyChanged += OnPropertyChanged;
+            if (newSource.HasValue)
+                newSource.Value.PropertyChanged += OnPropertyChanged;
 
             if (oldSource != null)
                 oldSource.PropertyChanged -= OnPropertyChanged;
         }
 
-        void IObserver<TClass>.OnError(Exception error)
+        void IObserver<PropertyValueChanged<TClass>>.OnError(Exception error)
         {
             IObserver<PropertyChanged> oldObserver;
             IObserver<PropertyChanged> newObserver = new CompletedObserver<PropertyChanged>(error);
@@ -137,7 +137,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             oldObserver.OnError(error);
         }
 
-        void IObserver<TClass>.OnCompleted()
+        void IObserver<PropertyValueChanged<TClass>>.OnCompleted()
         {
             IObserver<PropertyChanged> oldObserver;
             IObserver<PropertyChanged> newObserver = CompletedObserver<PropertyChanged>.Instance;

@@ -22,7 +22,7 @@ namespace KodeKandy.Panopticon.Tests.Linq
     public class Given_When_And_Final_Node_Poco : ReactiveTest
     {
         [Test]
-        public void When_Subscribe_With_One_Node_Path_To_Property_Then_OnNext_And_No_Complete()
+        public void When_Subscribe_With_One_Node_Path_To_Property_Then_OnNext_Changes()
         {
             // Arrange
             var obj = new TestPoco() {Age = 5};
@@ -44,7 +44,7 @@ namespace KodeKandy.Panopticon.Tests.Linq
         }
 
         [Test]
-        public void When_Subscribe_With_Two_Node_Path_To_Property_And_Modify_Node_One_Then_OnNext_And_No_Complete()
+        public void When_Subscribe_With_Two_Node_Path_To_Property_And_Modify_Node_One_Then_OnNext_Changes()
         {
             // Arrange
             var obj = new TestObservableObject {PocoChild = new TestPoco {Age = 3}};

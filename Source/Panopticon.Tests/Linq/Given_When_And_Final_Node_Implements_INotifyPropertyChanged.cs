@@ -22,44 +22,7 @@ namespace KodeKandy.Panopticon.Tests.Linq
     public class Given_When_And_Final_Node_Implements_INotifyPropertyChanged : ReactiveTest
     {
         [Test]
-        public void When_Subscribe_Twice_With_Two_Node_Path_To_Property_Then_Correct_Notifications_For_Both_Observers()
-        {
-            // Arrange
-            var obj = new TestObservableObject {ObservableChild = new TestObservableObject {Age = 3}};
-            var scheduler = new TestScheduler();
-            var firstObserver = scheduler.CreateObserver<int>();
-            var secondObserver = scheduler.CreateObserver<int>();
-            var firstObservserExpected = new[]
-            {
-                OnNext(0, 3),
-                OnNext(0, 5),
-                OnNext(0, 6),
-                OnNext(0, 7),
-            };
-
-            var secondObservserExpected = new[]
-            {
-                OnNext(0, 6),
-                OnNext(0, 7),
-            };
-
-            // TODO this should perhaps not use ToValues but verify the actual ProeprtyValueChanged obj.
-            var sut = obj.When(x => x.ObservableChild.Age).ToValues();
-
-            // Act
-            sut.Subscribe(firstObserver);
-            obj.ObservableChild.Age = 5;
-            obj.ObservableChild.Age = 6;
-            sut.Subscribe(secondObserver);
-            obj.ObservableChild.Age = 7;
-
-            // Assert
-            Assert.AreEqual(firstObservserExpected, firstObserver.Messages);
-            Assert.AreEqual(secondObservserExpected, secondObserver.Messages);
-        }
-
-        [Test]
-        public void When_Subscribe_With_One_Node_Path_To_Property_Then_OnNext_And_No_Complete()
+        public void When_Subscribe_With_One_Node_Path_To_Property_Then_OnNext_Changes()
         {
             // Arrange
             var obj = new TestObservableObject {Age = 5};
@@ -80,7 +43,7 @@ namespace KodeKandy.Panopticon.Tests.Linq
         }
 
         [Test]
-        public void When_Subscribe_With_Two_Node_Path_To_Property_And_Modify_Node_One_Then_OnNext_And_No_Complete()
+        public void When_Subscribe_With_Two_Node_Path_To_Property_And_Modify_Node_One_Then_OnNext_Changes()
         {
             // Arrange
             var obj = new TestObservableObject {ObservableChild = new TestObservableObject {Age = 3}};
@@ -125,6 +88,38 @@ namespace KodeKandy.Panopticon.Tests.Linq
 
             // Assert
             Assert.AreEqual(expected, observer.Messages);
+        }
+
+        [Test]
+        public void When_Path_Has_Null_Intermediary_Node_Then_Propagates_ProvertyValueChanged_With_HasValue_False()
+        {
+            // Arrange
+            var childOne = new TestObservableObject { Age = 5 };
+            var childTwo = new TestObservableObject { Age = 17 };
+            var obj = new TestObservableObject { ObservableChild = childOne };
+            var scheduler = new TestScheduler();
+           
+            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
+            var expected = new[]
+            {
+                OnNext(000, PropertyValueChanged.CreateWithValue(childOne, "Age", childOne.Age)),
+                OnNext(000, PropertyValueChanged.CreateWithValue(childOne, "Age", 20)),
+                OnNext(100, PropertyValueChanged.CreateWithoutValue<int>(null, "Age")),
+                OnNext(300, PropertyValueChanged.CreateWithValue(childTwo, "Age", childTwo.Age)),
+            };
+
+            var sut = obj.When(x => x.ObservableChild.Age);
+
+            // Act
+            sut.Subscribe(observer);
+            obj.ObservableChild.Age = 20;
+            scheduler.AdvanceTo(100);
+            obj.ObservableChild = null;
+            scheduler.AdvanceTo(300);
+            obj.ObservableChild = childTwo;
+
+            // Assert
+            observer.Messages.AssertEqual(expected);
         }
     }
 }

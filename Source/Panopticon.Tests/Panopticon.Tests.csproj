@@ -96,7 +96,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Linq\Given_When_And_Final_Node_Implements_INotifyPropertyChanged.cs" />
     <Compile Include="Linq\Given_When_And_Final_Node_Poco.cs" />
-    <Compile Include="Linq\Given_When.cs" />
     <Compile Include="TestEntities\TestObservableObject.cs" />
     <Compile Include="TestEntities\TestPoco.cs" />
   </ItemGroup>

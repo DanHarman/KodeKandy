@@ -73,6 +73,36 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
         }
 
         [Test]
+        public void When_Subscribe_Then_Returns_Value_At_Time_Of_Subscribe_And_Subsequent_Values()
+        {
+            // Arrange
+            var sourceObj = new TestObservableObject() {Age = 2};
+            var scheduler = new TestScheduler();
+            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
+            var expected = new[]
+            {
+                OnNext(20, PropertyValueChanged.CreateWithValue(sourceObj, "Age", 5)),
+                OnNext(30, PropertyValueChanged.CreateWithValue(sourceObj, "Age", 3)),
+            };
+
+            var sut = new NotifyPropertyValueChangedObservable<TestObservableObject, int>(sourceObj.ToPropertyValueChangedObservable(), "Age",
+                x => x.Age);
+
+            scheduler.AdvanceTo(10);
+            sourceObj.Age = 5;
+            scheduler.AdvanceTo(20);
+
+            // Act
+
+            sut.Subscribe(observer);
+            scheduler.AdvanceTo(30);
+            sourceObj.Age = 3;
+
+            // Assert
+            Assert.AreEqual(expected, observer.Messages);
+        }
+
+        [Test]
         public void When_Subscribe_Twice_Then_Correct_Notifications_For_Both_Observers()
         {
             // Arrange
@@ -93,7 +123,8 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
                 OnNext(50, PropertyValueChanged.CreateWithValue(sourceObj, "Age", 7)),
             };
 
-            var sut = new NotifyPropertyValueChangedObservable<TestObservableObject, int>(sourceObj.ToPropertyValueChanged().Forever(), "Age", x => x.Age);
+            var sut = new NotifyPropertyValueChangedObservable<TestObservableObject, int>(sourceObj.ToPropertyValueChangedObservable(), "Age",
+                x => x.Age);
 
             // Act
             sut.Subscribe(firstObserver);
@@ -107,35 +138,6 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             // Assert
             Assert.AreEqual(firstObservserExpected, firstObserver.Messages);
             Assert.AreEqual(secondObservserExpected, secondObserver.Messages);
-        }
-
-        [Test]
-        public void When_Subscribed_And_Source_Does_Not_Complete_Then_Returns_Value_At_Time_Of_Subscribe_And_Subsequent_Values()
-        {
-            // Arrange
-            var sourceObj = new TestObservableObject() {Age = 2};
-            var scheduler = new TestScheduler();
-            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
-            var expected = new[]
-            {
-                 OnNext(20, PropertyValueChanged.CreateWithValue(sourceObj, "Age", 5)),
-                OnNext(30, PropertyValueChanged.CreateWithValue(sourceObj, "Age", 3)),
-            };
-
-            var sut = new NotifyPropertyValueChangedObservable<TestObservableObject, int>(sourceObj.ToPropertyValueChanged().Forever(), "Age", x => x.Age);
-
-            scheduler.AdvanceTo(10);
-            sourceObj.Age = 5;
-            scheduler.AdvanceTo(20);
-
-            // Act
-
-            sut.Subscribe(observer);
-            scheduler.AdvanceTo(30);
-            sourceObj.Age = 3;
-
-            // Assert
-            Assert.AreEqual(expected, observer.Messages);
         }
     }
 }

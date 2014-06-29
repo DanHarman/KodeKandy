@@ -18,10 +18,18 @@ namespace KodeKandy.Panopticon.Tests.TestEntities
         private TestObservableObject _observableChild;
         private TestPoco _pocoChild;
         private int age;
+        private string _name;
+
         public int Age
         {
             get { return age; }
             set { SetValue(ref age, value); }
+        }
+
+        public string Name
+        {
+            get { return _name; }
+            set { SetValue(ref _name, value); }
         }
 
         public TestObservableObject ObservableChild

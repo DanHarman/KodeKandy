@@ -111,7 +111,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
                 // We need to get the current property value from this new source if it is not null, but if it is propagate the nullness
                 // with a PropertyValueChanged with HasValue == false.
-                initialPropertyValueChanged = newSource.HasValue
+                initialPropertyValueChanged = _source != null
                     ? PropertyValueChanged.CreateWithValue(_source, _propertyName, _propertyValueGetter(_source))
                     : PropertyValueChanged.CreateWithoutValue<TProperty>(_source, _propertyName);
 
@@ -129,6 +129,13 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
             oldObserver.OnNext(initialPropertyValueChanged);
         }
+
+//        private PropertyValueChanged<TProperty> CreatePropertyValueChanged()
+//        {
+//            var value = _propertyValueGetter(_source);
+//            if (value == null)
+//
+//        }
 
         void IObserver<PropertyValueChanged<TClass>>.OnError(Exception error)
         {

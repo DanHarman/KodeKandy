@@ -117,7 +117,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
                 OnNext(20, new PropertyValueChanged<int>(obj, "Age", 5)),
             };
 
-            var sut = new PocoValueObservable<TestPoco, int>(obj.ToPropertyValueChanged().Forever(), "Age", x => x.Age);
+            var sut = new PocoValueObservable<TestPoco, int>(obj.ToPropertyValueChangedObservable(), "Age", x => x.Age);
 
             // Act
             scheduler.AdvanceTo(10);

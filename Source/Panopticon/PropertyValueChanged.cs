@@ -7,6 +7,11 @@ namespace KodeKandy.Panopticon
 {
     public static class PropertyValueChanged
     {
+        public static PropertyValueChanged<TProperty> CreateWithValue<TProperty>(TProperty value)
+        {
+            return new PropertyValueChanged<TProperty>(null, default(string), value);
+        }
+
         public static PropertyValueChanged<TProperty> CreateWithValue<TProperty>(object source, string propertyName, TProperty value)
         {
             return new PropertyValueChanged<TProperty>(source, propertyName, value);

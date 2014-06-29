@@ -57,7 +57,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         {
             var memberInfos = ExpressionHelpers.GetMemberInfos(memberPath);
 
-            object currObserver = source.ToPropertyValueChanged().Forever();
+            object currObserver = source.ToPropertyValueChangedObservable();
             foreach (var memberInfo in memberInfos)
             {
                 var create = (Func<object, MemberInfo, object>) CreateObservableMemberValueChangedDelegate(memberInfo);
@@ -84,7 +84,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         {
             var memberInfos = ExpressionHelpers.GetMemberInfos(memberPath).ToList();
 
-            object currObserver = source.Forever();
+            object currObserver = source.ToPropertyValueChangedObservable();
 
             var cnt = 0;
             foreach (var memberInfo in memberInfos)
@@ -178,7 +178,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         private static object CreateNotifyPropertyChangedObservable<TClass>(object source)
             where TClass : class, INotifyPropertyChanged
         {
-            return new NotifyPropertyChangedObservable<TClass>((IObservable<TClass>) source);
+            return new NotifyPropertyChangedObservable<TClass>((IObservable<PropertyValueChanged<TClass>>)source);
         }
     }
 }
