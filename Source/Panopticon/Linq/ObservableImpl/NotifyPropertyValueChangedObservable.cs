@@ -130,13 +130,6 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             oldObserver.OnNext(initialPropertyValueChanged);
         }
 
-//        private PropertyValueChanged<TProperty> CreatePropertyValueChanged()
-//        {
-//            var value = _propertyValueGetter(_source);
-//            if (value == null)
-//
-//        }
-
         void IObserver<PropertyValueChanged<TClass>>.OnError(Exception error)
         {
             if (error == null)

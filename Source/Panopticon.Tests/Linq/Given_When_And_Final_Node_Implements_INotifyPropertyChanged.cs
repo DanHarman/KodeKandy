@@ -27,13 +27,13 @@ namespace KodeKandy.Panopticon.Tests.Linq
             // Arrange
             var obj = new TestObservableObject {Age = 5};
             var scheduler = new TestScheduler();
-            var observer = scheduler.CreateObserver<int>();
+            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
             var expected = new[]
             {
-                OnNext(0, 5),
+                OnNext(000, PropertyValueChanged.CreateWithValue(obj, "Age", 5)),
             };
 
-            var sut = obj.When(x => x.Age).ToValues();
+            var sut = obj.When(x => x.Age);
 
             // Act
             sut.Subscribe(observer);
@@ -47,39 +47,40 @@ namespace KodeKandy.Panopticon.Tests.Linq
         {
             // Arrange
             var obj = new TestObservableObject {ObservableChild = new TestObservableObject {Age = 3}};
+            var replacementChild = new TestObservableObject { Age = 5 };
             var scheduler = new TestScheduler();
-            var observer = scheduler.CreateObserver<int>();
+            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
             var expected = new[]
             {
-                OnNext(0, 3),
-                OnNext(10, 5),
+                OnNext(000, PropertyValueChanged.CreateWithValue(obj.ObservableChild, "Age", 3)),
+                OnNext(010, PropertyValueChanged.CreateWithValue(replacementChild, "Age", replacementChild.Age)),
             };
 
-            var sut = obj.When(x => x.ObservableChild.Age).ToValues();
+            var sut = obj.When(x => x.ObservableChild.Age);
 
             // Act
             sut.Subscribe(observer);
             scheduler.AdvanceTo(10);
-            obj.ObservableChild = new TestObservableObject {Age = 5};
+            obj.ObservableChild = replacementChild;
 
             // Assert
             Assert.AreEqual(expected, observer.Messages);
         }
 
         [Test]
-        public void When_Subscribe_With_Two_Node_Path_To_Property_And_Modify_Node_Two_Then_OnNext_Twice_And_No_Complete()
+        public void When_Subscribe_With_Two_Node_Path_To_Property_And_Modify_Property_Then_OnNext_Changes()
         {
             // Arrange
             var obj = new TestObservableObject {ObservableChild = new TestObservableObject {Age = 3}};
             var scheduler = new TestScheduler();
-            var observer = scheduler.CreateObserver<int>();
+            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
             var expected = new[]
             {
-                OnNext(0, 3),
-                OnNext(10, 5),
+                 OnNext(000, PropertyValueChanged.CreateWithValue(obj.ObservableChild, "Age", 3)),
+                 OnNext(010, PropertyValueChanged.CreateWithValue(obj.ObservableChild, "Age", 5)),
             };
 
-            var sut = obj.When(x => x.ObservableChild.Age).ToValues();
+            var sut = obj.When(x => x.ObservableChild.Age);
 
             // Act
             sut.Subscribe(observer);

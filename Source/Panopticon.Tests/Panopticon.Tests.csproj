@@ -86,6 +86,8 @@
     <Compile Include="Given_PropertyValueChanged.cs" />
     <Compile Include="Linq\Given_Forever.cs" />
     <Compile Include="Linq\Given_UserDataOrDefault.cs" />
+    <Compile Include="Linq\Given_WhenAny.cs" />
+    <Compile Include="Linq\Given_WhenValue_And_Final_Node_Implements_INotifyPropertyChanged.cs" />
     <Compile Include="Linq\ObservableImpl\Given_Forever.cs" />
     <Compile Include="Linq\ObservableImpl\Given_NotifyPropertyChangedObservable.cs" />
     <Compile Include="Linq\ObservableImpl\Given_NotifyPropertyValueChangedObservable.cs" />

@@ -12,8 +12,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reactive.Linq;
@@ -68,6 +66,32 @@ namespace KodeKandy.Panopticon.Linq
 
         #endregion
 
+        #region WhenValue
+
+        public static IObservable<TProperty> WhenValue<TClass, TProperty>(this TClass source, string propertyName,
+            Func<TClass, TProperty> outValueGetter)
+            where TClass : class, INotifyPropertyChanged
+        {
+            return source.When(propertyName, outValueGetter).ToValues();
+        }
+
+        public static IObservable<TProperty> WhenValue<TClass, TProperty>(
+            this IObservable<PropertyValueChanged<TClass>> sourceObservable, string propertyName,
+            Func<TClass, TProperty> outValueGetter)
+            where TClass : class, INotifyPropertyChanged
+        {
+            return sourceObservable.When(propertyName, outValueGetter).ToValues();
+        }
+
+        public static IObservable<TMember> WhenValue<TClass, TMember>(this TClass source,
+            Expression<Func<TClass, TMember>> memberPath)
+            where TClass : class
+        {
+            return source.When(memberPath).ToValues();
+        }
+
+        #endregion
+
         #region WhenAny
 
         public static IObservable<PropertyChanged> WhenAny<TClass>(this TClass source)
@@ -117,25 +141,23 @@ namespace KodeKandy.Panopticon.Linq
 
         #endregion
 
+        #region ToPropertyValueChangedObservable
+
         public static IObservable<PropertyValueChanged<TClass>> ToPropertyValueChangedObservable<TClass>(this TClass value)
         {
             return PropertyValueChanged.CreateWithValue(null, default(string), value).Forever();
         }
+
+        #endregion
+
+        #region ToValues
 
         public static IObservable<T> ToValues<T>(this IObservable<PropertyValueChanged<T>> source)
         {
             return source.Where(pvc => pvc.HasValue).Select(pvc => pvc.Value);
         }
 
-        public static DerivedObservableList<TTargetCollectionItem> Map<TSourceCollection, TSourceCollectionItem, TTargetCollectionItem>(
-            this TSourceCollection source,
-            Func<TSourceCollectionItem, TTargetCollectionItem> mapFunc)
-            where TSourceCollection : INotifyCollectionChanged, ICollection<TSourceCollectionItem>
-        {
-            var derivedCollection = new DerivedObservableList<TTargetCollectionItem>();
-
-            return derivedCollection;
-        }
+        #endregion
 
         #region UserDataOrDefault
 
@@ -153,5 +175,15 @@ namespace KodeKandy.Panopticon.Linq
         }
 
         #endregion
+
+//        public static DerivedObservableList<TTargetCollectionItem> Map<TSourceCollection, TSourceCollectionItem, TTargetCollectionItem>(
+//            this TSourceCollection source,
+//            Func<TSourceCollectionItem, TTargetCollectionItem> mapFunc)
+//            where TSourceCollection : INotifyCollectionChanged, ICollection<TSourceCollectionItem>
+//        {
+//            var derivedCollection = new DerivedObservableList<TTargetCollectionItem>();
+//
+//            return derivedCollection;
+//        }
     }
 }
