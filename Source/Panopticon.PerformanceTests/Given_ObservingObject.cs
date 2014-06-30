@@ -87,7 +87,7 @@ namespace Panopticon.PerformanceTests
 
                 var sut = factory();
 
-                sut.When("Child", x => x.Child).When("Age", x => x.Age).Subscribe(_ => { ++cnt; });
+                sut.When("Child", x => x.Child).When("Age", x => x.Age).ToValues().Subscribe(_ => { ++cnt; });
 
                 for (var j = 0; j < iterations; ++j)
                     sut.Child.Age = j;

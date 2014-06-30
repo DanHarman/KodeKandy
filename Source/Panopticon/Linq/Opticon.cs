@@ -154,7 +154,12 @@ namespace KodeKandy.Panopticon.Linq
 
         public static IObservable<T> ToValues<T>(this IObservable<PropertyValueChanged<T>> source)
         {
-            return source.Where(pvc => pvc.HasValue).Select(pvc => pvc.Value);
+            if (source == null)
+                throw new ArgumentNullException("source");
+
+            // This is a tiny bit faster than composing where and select.
+            return Observable.Create<T>(obs => source.Subscribe(x => { if (x.HasValue) obs.OnNext(x.Value); }, obs.OnError, obs.OnCompleted));
+            //return source.Where(pvc => pvc.HasValue).Select(pvc => pvc.Value);
         }
 
         #endregion
