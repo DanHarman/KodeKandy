@@ -89,6 +89,9 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                 }
             } while (Interlocked.CompareExchange(ref _observer, newObserver, oldObserver) != oldObserver);
 
+            // Fire off an initial update to the subscriber.
+        //    observer.OnNext(new PropertyChanged(sender, propertyChangedEventArgs));
+
             // Need to kick off the source observable subscription if we are the first subscriber.
             if (newObserver == observer)
             {

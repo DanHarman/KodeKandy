@@ -1,3 +1,16 @@
+// <copyright file="NotifyPropertyValueChangedObservable.cs" company="million miles per hour ltd">
+// Copyright (c) 2013-2014 All Right Reserved
+// 
+// This source is subject to the MIT License.
+// Please see the License.txt file for more information.
+// All other rights reserved.
+// 
+// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY 
+// KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+// PARTICULAR PURPOSE.
+// </copyright>
+
 using System;
 using System.ComponentModel;
 using System.Reactive.Disposables;
@@ -6,7 +19,25 @@ using KodeKandy.Panopticon.Internal;
 
 namespace KodeKandy.Panopticon.Linq.ObservableImpl
 {
-    internal class NotifyPropertyValueChangedObservable<TClass, TProperty> : IObserver<PropertyValueChanged<TClass>>, IObservable<PropertyValueChanged<TProperty>>
+    /// <summary>
+    ///     An observable that watches a class implementing <see cref="INotifyPropertyChanged" /> so that a stream of changes
+    ///     for a specific property may be observed. It is highly optimised for this purpose so much higher performance than
+    ///     solutions built upon composing FromEventPattern etc.
+    /// 
+    ///     The returned <see cref="PropertyValueChanged{TProperty}" /> captures whether or not the source is null, so when
+    ///     these observables are composed together, you can subscribe to a property path from a root node, and be notified if
+    ///     this path is broken.
+    /// </summary>
+    /// <remarks>
+    ///     Conceptually, this could have been composed on top of <see cref="NotifyPropertyChangedObservable{TClass}" /> but
+    ///     performance and complexity would suffer as
+    ///     the thread locking requirements are different and that is very deep in the implementation, making sharing the code
+    ///     impractical.
+    /// </remarks>
+    /// <typeparam name="TClass">The type of the observered clas.</typeparam>
+    /// <typeparam name="TProperty">The type of the observered property.</typeparam>
+    internal class NotifyPropertyValueChangedObservable<TClass, TProperty> : IObserver<PropertyValueChanged<TClass>>,
+        IObservable<PropertyValueChanged<TProperty>>
         where TClass : class, INotifyPropertyChanged
     {
         private readonly object _gate = new object();
@@ -33,7 +64,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             _propertyValueGetter = propertyValueGetter;
         }
 
-        #region IObservable<TProperty> Members
+        #region IObservable<PropertyValueChanged<TProperty>> Members
 
         public IDisposable Subscribe(IObserver<PropertyValueChanged<TProperty>> observer)
         {
@@ -66,7 +97,8 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                             // both the old and new observer.
                             var oldObserver = _observer;
                             _observer =
-                                new ImmutableMultiObserver<PropertyValueChanged<TProperty>>(new ImmutableList<IObserver<PropertyValueChanged<TProperty>>>(new[] { oldObserver, observer }));
+                                new ImmutableMultiObserver<PropertyValueChanged<TProperty>>(
+                                    new ImmutableList<IObserver<PropertyValueChanged<TProperty>>>(new[] {oldObserver, observer}));
                         }
 
                         // Send the new observer the current property value. This is done inside the lock to prevent race conditions around the initial
@@ -92,7 +124,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
         #endregion
 
-        #region IObserver<TClass> Members
+        #region IObserver<PropertyValueChanged<TClass>> Members
 
         void IObserver<PropertyValueChanged<TClass>>.OnNext(PropertyValueChanged<TClass> newSource)
         {
@@ -187,10 +219,11 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                 lock (_gate)
                 {
                     currObserver = _observer;
-                    propertyValueChanged = new PropertyValueChanged<TProperty>(_source, propertyChangedEventArgs, _propertyValueGetter(_source));
+                    propertyValueChanged = PropertyValueChanged.CreateWithValue<TProperty>(_source, propertyChangedEventArgs,
+                        _propertyValueGetter(_source));
                     _propertyValueChanged = propertyValueChanged;
                 }
-                
+
                 currObserver.OnNext(propertyValueChanged);
             }
         }
@@ -252,7 +285,8 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             private IObserver<PropertyValueChanged<TProperty>> _observer;
             private NotifyPropertyValueChangedObservable<TClass, TProperty> _valueObservable;
 
-            public Subscription(NotifyPropertyValueChangedObservable<TClass, TProperty> valueObservable, IObserver<PropertyValueChanged<TProperty>> observer)
+            public Subscription(NotifyPropertyValueChangedObservable<TClass, TProperty> valueObservable,
+                IObserver<PropertyValueChanged<TProperty>> observer)
             {
                 _valueObservable = valueObservable;
                 _observer = observer;

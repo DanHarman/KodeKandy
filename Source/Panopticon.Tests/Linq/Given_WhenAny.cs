@@ -81,20 +81,19 @@ namespace KodeKandy.Panopticon.Tests.Linq
             var obj = new TestObservableObject {ObservableChild = new TestObservableObject {Age = 3}};
             var replacementChild = new TestObservableObject {Age = 5};
             var scheduler = new TestScheduler();
-            var observer = scheduler.CreateObserver<int>();
+            var observer = scheduler.CreateObserver<PropertyChanged>();
             var expected = new[]
             {
-                OnNext(000, 3),
-                OnNext(010, replacementChild.Age),
+                OnNext(010, new PropertyChanged(obj, "Age")),
             };
 
-            var sut = obj.WhenValue(x => x.ObservableChild.Age);
+            var sut = obj.WhenAny(x => x.ObservableChild);
 
             // Act
             sut.Subscribe(observer);
             scheduler.AdvanceTo(10);
             obj.ObservableChild = replacementChild;
-
+        
             // Assert
             Assert.AreEqual(expected, observer.Messages);
         }
