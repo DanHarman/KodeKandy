@@ -50,7 +50,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             // If the source has provided a value then propagate it, otherwise propagate the change without a value (this occurs
             // when a property chain has a null node for example, so it is not possible to provide a value from the leaf node).
             return _sourceObservable
-                .Select(newSource => newSource.HasValue
+                .Select(newSource => newSource.Value != null
                     ? PropertyValueChanged.CreateWithValue(newSource.Value, _propertyName, _memberValueGetter(newSource.Value))
                     : PropertyValueChanged.CreateWithoutValue<TMember>(null, _propertyName))
                 .Subscribe(observer);

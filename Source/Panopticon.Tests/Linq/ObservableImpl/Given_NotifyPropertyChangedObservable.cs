@@ -82,6 +82,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             var secondObserver = scheduler.CreateObserver<PropertyChanged>();
             var firstObservserExpected = new[]
             {
+                OnNext(0, new PropertyChanged(obj)),
                 OnNext(0, new PropertyChanged(obj, "Age")),
                 OnNext(20, new PropertyChanged(obj, "Age")),
                 OnNext(50, new PropertyChanged(obj, "Age")),
@@ -89,6 +90,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
 
             var secondObservserExpected = new[]
             {
+                OnNext(50, new PropertyChanged(obj)),
                 OnNext(50, new PropertyChanged(obj, "Age")),
             };
 
@@ -104,12 +106,12 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             obj.Age = 7;
 
             // Assert
-            firstObserver.Messages.AssertEqual(firstObservserExpected);
-            secondObserver.Messages.AssertEqual(secondObservserExpected);
+            Assert.AreEqual(firstObservserExpected, firstObserver.Messages);
+            Assert.AreEqual(secondObservserExpected, secondObserver.Messages);
         }
 
         [Test]
-        public void When_Subscribe_Then_Returns_Value_At_Time_Of_Subscribe_And_Subsequent_Values()
+        public void When_Subscribe_Then_Returns_Default_Value_At_Time_Of_Subscribe_And_Subsequent_Values()
         {
             // Arrange
             var obj = new TestObservableObject() {Age = 2};
@@ -117,6 +119,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             var observer = scheduler.CreateObserver<PropertyChanged>();
             var expected = new[]
             {
+                OnNext(00, new PropertyChanged(obj)),
                 OnNext(20, new PropertyChanged(obj, "Age")),
                 OnNext(30, new PropertyChanged(obj, "Age")),
                 OnNext(40, new PropertyChanged(obj, "Name")),
@@ -134,7 +137,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             obj.Name = "Fi";
 
             // Assert
-            observer.Messages.AssertEqual(expected);
+            Assert.AreEqual(expected, observer.Messages);
         }
     }
 }

@@ -16,5 +16,8 @@ namespace KodeKandy.Panopticon.Tests.TestEntities
     internal class TestPoco
     {
         public int Age { get; set; }
+        public string Name { get; set; }
+        public TestObservableObject ObservableChild { get; set; }
+        public TestPoco PocoChild { get; set; }
     }
 }

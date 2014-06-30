@@ -24,14 +24,24 @@ namespace KodeKandy.Panopticon
         private readonly PropertyChangedEventArgs _propertyChangedEventArgs;
         private readonly object _source;
 
+        /// <summary>
+        ///     Constructs a property change indicating that the source has been refreshed so all properties may be different.
+        /// </summary>
+        /// <param name="source">The source of the change.</param>
+        public PropertyChanged(object source)
+            : this(source, PropertyChangedEventArgsEx.Default)
+        {
+        }
+
+        public PropertyChanged(object source, string propertyName)
+            : this(source, new PropertyChangedEventArgsEx(propertyName))
+        {
+        }
+
         public PropertyChanged(object source, PropertyChangedEventArgs propertyChangedEventArgs)
         {
             _source = source;
             _propertyChangedEventArgs = propertyChangedEventArgs;
-        }
-
-        public PropertyChanged(object source, string propertyName) : this(source, new PropertyChangedEventArgs(propertyName))
-        {
         }
 
         public PropertyChangedEventArgs PropertyChangedEventArgs
@@ -70,6 +80,12 @@ namespace KodeKandy.Panopticon
                 return ((_source != null ? _source.GetHashCode() : 0) * 397) ^
                        (_propertyChangedEventArgs != null ? _propertyChangedEventArgs.GetHashCode() : 0);
             }
+        }
+
+        public override string ToString()
+        {
+            return string.Format("PropertyChanged: SourceHash='{0}', PropertyChangedEventArgs='{1}'", Source == null ? 0 : Source.GetHashCode(),
+                PropertyChangedEventArgs);
         }
     }
 }

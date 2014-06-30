@@ -26,6 +26,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
     internal class NotifyPropertyChangedObservable<TClass> : IObserver<PropertyValueChanged<TClass>>, IObservable<PropertyChanged>
         where TClass : class, INotifyPropertyChanged
     {
+        private readonly object _gate = new object();
         private readonly IObservable<PropertyValueChanged<TClass>> _sourceObservable;
         private IObserver<PropertyChanged> _observer = NopObserver<PropertyChanged>.Instance;
         private TClass _source;
@@ -46,72 +47,64 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             if (observer == null)
                 throw new ArgumentNullException("observer");
 
-            IObserver<PropertyChanged> oldObserver;
-            IObserver<PropertyChanged> newObserver;
+            CompletedObserver<PropertyChanged> completedObserver;
 
-            do
+            lock (_gate)
             {
-                oldObserver = _observer;
+                completedObserver = _observer as CompletedObserver<PropertyChanged>;
 
-                if (oldObserver == CompletedObserver<PropertyChanged>.Instance)
+                if (completedObserver == null)
                 {
-                    observer.OnCompleted();
-                    return Disposable.Empty;
-                }
-
-                var completedObserver = oldObserver as CompletedObserver<PropertyChanged>;
-                if (completedObserver != null)
-                {
-                    observer.OnError(completedObserver.Error);
-                    return Disposable.Empty;
-                }
-
-                if (oldObserver == NopObserver<PropertyChanged>.Instance)
-                {
-                    // If we have no _observer then make it our _observer and later on subscribe to _sourceObservable.
-                    newObserver = observer;
-                }
-                else
-                {
-                    var multiObserver = _observer as ImmutableMultiObserver<PropertyChanged>;
-                    if (multiObserver != null)
+                    if (_observer == NopObserver<PropertyChanged>.Instance)
                     {
-                        // If we already have a ImmutableMultiObserver then add the new _observer to it.
-                        newObserver = multiObserver.Add(observer);
+                        // If we have no _observer then make it our _observer and later on subscribe to _sourceObservable.
+                        _observer = observer;
+                        _sourceSubscriptionDisposable = _sourceObservable.Subscribe(this);
                     }
                     else
                     {
-                        // We didn't have a multiobserver, so we must have just had a single observer, so replace it with a multiobserver containing
-                        // both the old and new observer.
-                        newObserver = new ImmutableMultiObserver<PropertyChanged>(
-                            new ImmutableList<IObserver<PropertyChanged>>(new[] {oldObserver, observer}));
+                        var multiObserver = _observer as ImmutableMultiObserver<PropertyChanged>;
+                        if (multiObserver != null)
+                        {
+                            // If we already have a ImmutableMultiObserver then add the new _observer to it.
+                            _observer = multiObserver.Add(observer);
+                        }
+                        else
+                        {
+                            // We didn't have a multiobserver, so we must have just had a single observer, so replace it with a multiobserver containing
+                            // both the old and new observer.
+                            _observer = new ImmutableMultiObserver<PropertyChanged>(
+                                new ImmutableList<IObserver<PropertyChanged>>(new[] {_observer, observer}));
+                        }
+
+                        observer.OnNext(new PropertyChanged(_source));
                     }
+
+                    return new Subscription(this, observer);
                 }
-            } while (Interlocked.CompareExchange(ref _observer, newObserver, oldObserver) != oldObserver);
-
-            // Fire off an initial update to the subscriber.
-        //    observer.OnNext(new PropertyChanged(sender, propertyChangedEventArgs));
-
-            // Need to kick off the source observable subscription if we are the first subscriber.
-            if (newObserver == observer)
-            {
-                _sourceSubscriptionDisposable = _sourceObservable.Subscribe(this);
             }
 
-            return new Subscription(this, observer);
+            if (completedObserver == CompletedObserver<PropertyChanged>.Instance)
+                observer.OnCompleted();
+            else
+                observer.OnError(completedObserver.Error);
+
+            return Disposable.Empty;
         }
 
         #endregion
 
-        #region IObserver<TClass> Members
+        #region IObserver<PropertyValueChanged<TClass>> Members
 
         void IObserver<PropertyValueChanged<TClass>>.OnNext(PropertyValueChanged<TClass> newSource)
         {
             TClass oldSource;
-            do
+            lock (_gate)
             {
                 oldSource = _source;
-            } while (Interlocked.CompareExchange(ref _source, newSource.Value, oldSource) != oldSource);
+                _source = newSource.Value;
+                _observer.OnNext(new PropertyChanged(_source));
+            }
 
             if (newSource.HasValue)
                 newSource.Value.PropertyChanged += OnPropertyChanged;
@@ -125,18 +118,17 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             IObserver<PropertyChanged> oldObserver;
             IObserver<PropertyChanged> newObserver = new CompletedObserver<PropertyChanged>(error);
 
-            // Spin in the completed observer.
-            do
+
+            lock (_gate)
             {
+                if (_observer is CompletedObserver<PropertyChanged>)
+                    return;
+
                 oldObserver = _observer;
+                _observer = newObserver;
+                CleanUp();
+            }
 
-                if (oldObserver is CompletedObserver<PropertyChanged>)
-                    break;
-            } while (Interlocked.CompareExchange(ref _observer, newObserver, oldObserver) != oldObserver);
-
-            CleanUp();
-
-            // Fire OnCompleted on the old oberver. If it happens to be a completed one, its effectively a nop.
             oldObserver.OnError(error);
         }
 
@@ -146,15 +138,15 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             IObserver<PropertyChanged> newObserver = CompletedObserver<PropertyChanged>.Instance;
 
             // Spin in the completed observer.
-            do
+            lock (_gate)
             {
+                if (_observer is CompletedObserver<PropertyChanged>)
+                    return;
+
                 oldObserver = _observer;
-
-                if (oldObserver is CompletedObserver<PropertyChanged>)
-                    break;
-            } while (Interlocked.CompareExchange(ref _observer, newObserver, oldObserver) != oldObserver);
-
-            CleanUp();
+                _observer = newObserver;
+                CleanUp();
+            }
 
             // Fire OnCompleted on the old oberver. If it happens to be a completed one, its effectively a nop.
             oldObserver.OnCompleted();
@@ -162,30 +154,24 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
         #endregion
 
+        /// <summary>
+        ///     Cleans up by unsubscribing to the sourceObservable, and releases references.
+        /// </summary>
+        /// <remarks>Must be called inside the lock.</remarks>
         private void CleanUp()
         {
-            // Clear the source observable subscription.
-            IDisposable oldSourceSubscriptionDisposable;
-            do
+            if (_source != null)
             {
-                oldSourceSubscriptionDisposable = _sourceSubscriptionDisposable;
-// ReSharper disable once PossibleUnintendedReferenceComparison
-            } while (Interlocked.CompareExchange(ref _sourceSubscriptionDisposable, Disposable.Empty, oldSourceSubscriptionDisposable) !=
-                     oldSourceSubscriptionDisposable);
-
-            if (!ReferenceEquals(oldSourceSubscriptionDisposable, Disposable.Empty))
-                oldSourceSubscriptionDisposable.Dispose();
-
-            // Clear the current source event subscription.
-            TClass oldSource;
-            do
+                _source.PropertyChanged -= OnPropertyChanged;
+                _source = null;
+            }
+            if (_sourceSubscriptionDisposable != null)
             {
-                oldSource = _source;
-            } while (Interlocked.CompareExchange(ref _source, null, oldSource) != oldSource);
-
-            if (oldSource != null)
-                oldSource.PropertyChanged -= OnPropertyChanged;
+                _sourceSubscriptionDisposable.Dispose();
+                _sourceSubscriptionDisposable = null;
+            }
         }
+
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {

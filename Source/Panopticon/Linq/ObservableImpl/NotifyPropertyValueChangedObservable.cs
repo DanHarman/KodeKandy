@@ -71,9 +71,13 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             if (observer == null)
                 throw new ArgumentNullException("observer");
 
+            CompletedObserver<PropertyValueChanged<TProperty>> completedObserver;
+
             lock (_gate)
             {
-                if (!(_observer is CompletedObserver<PropertyValueChanged<TProperty>>))
+                completedObserver = _observer as CompletedObserver<PropertyValueChanged<TProperty>>;
+
+                if (completedObserver == null)
                 {
                     if (_observer == NopObserver<PropertyValueChanged<TProperty>>.Instance)
                     {
@@ -95,10 +99,9 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                         {
                             // We didn't have a multiobserver, so we must have just had a single observer, so replace it with a multiobserver containing
                             // both the old and new observer.
-                            var oldObserver = _observer;
                             _observer =
                                 new ImmutableMultiObserver<PropertyValueChanged<TProperty>>(
-                                    new ImmutableList<IObserver<PropertyValueChanged<TProperty>>>(new[] {oldObserver, observer}));
+                                    new ImmutableList<IObserver<PropertyValueChanged<TProperty>>>(new[] { _observer, observer }));
                         }
 
                         // Send the new observer the current property value. This is done inside the lock to prevent race conditions around the initial
@@ -111,10 +114,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                 }
             }
 
-            // If we got here we have a completed observer and that means _observer won't be modified so we can work outside the lock safely.
-            var completedObserver = _observer as CompletedObserver<TProperty>;
-
-            if (completedObserver == CompletedObserver<TProperty>.Instance)
+            if (completedObserver == CompletedObserver<PropertyValueChanged<TProperty>>.Instance)
                 observer.OnCompleted();
             else
                 observer.OnError(completedObserver.Error);

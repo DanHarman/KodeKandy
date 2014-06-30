@@ -21,39 +21,29 @@ namespace KodeKandy.Panopticon.Tests.Linq
     [TestFixture]
     public class Given_WhenAny : ReactiveTest
     {
-//        [Test]
-//        public void When_Path_Has_Null_Intermediary_Node_Then_Skips_When_Invalid_Path()
-//        {
-//            // Arrange
-//            var childOne = new TestObservableObject {Age = 5};
-//            var childTwo = new TestObservableObject {Age = 17};
-//            var obj = new TestObservableObject {ObservableChild = childOne};
-//            var scheduler = new TestScheduler();
-//
-//            var observer = scheduler.CreateObserver<int>();
-//            var expected = new[]
-//            {
-//                OnNext(000, childOne.Age),
-//                OnNext(000, 20),
-//                OnNext(300, childTwo.Age),
-//            };
-//
-//            var sut = obj.WhenValue(x => x.ObservableChild.Age);
-//
-//            // Act
-//            sut.Subscribe(observer);
-//            obj.ObservableChild.Age = 20;
-//            scheduler.AdvanceTo(100);
-//            obj.ObservableChild = null;
-//            scheduler.AdvanceTo(300);
-//            obj.ObservableChild = childTwo;
-//
-//            // Assert
-//            observer.Messages.AssertEqual(expected);
-//        }
+        [Test]
+        public void When_Subscribe_To_Property_With_Broken_Path_Then_OnNext_Initial_Image_With_Null_Source()
+        {
+            // Arrange
+            var obj = new TestObservableObject();
+            var scheduler = new TestScheduler();
+            var observer = scheduler.CreateObserver<PropertyChanged>();
+            var expected = new[]
+            {
+                OnNext(000, new PropertyChanged(null)),
+            };
+
+            var sut = obj.WhenAny(x => x.PocoChild.ObservableChild);
+
+            // Act
+            sut.Subscribe(observer);
+
+            // Assert
+            Assert.AreEqual(expected, observer.Messages);
+        }
 
         [Test]
-        public void When_Subscribe_With_One_Node_Path_To_Property_Then_OnNext_Changes()
+        public void When_Subscribe_With_One_Node_Path_To_Property_Then_OnNext_Initial_Image_And_Changes()
         {
             // Arrange
             var obj = new TestObservableObject {Age = 5};
@@ -61,6 +51,7 @@ namespace KodeKandy.Panopticon.Tests.Linq
             var observer = scheduler.CreateObserver<PropertyChanged>();
             var expected = new[]
             {
+                OnNext(000, new PropertyChanged(obj)),
                 OnNext(000, new PropertyChanged(obj, "Age")),
             };
 
@@ -84,7 +75,9 @@ namespace KodeKandy.Panopticon.Tests.Linq
             var observer = scheduler.CreateObserver<PropertyChanged>();
             var expected = new[]
             {
-                OnNext(010, new PropertyChanged(obj, "Age")),
+                OnNext(000, new PropertyChanged(obj.ObservableChild)),
+                OnNext(010, new PropertyChanged(replacementChild)),
+                OnNext(010, new PropertyChanged(replacementChild, "Age")),
             };
 
             var sut = obj.WhenAny(x => x.ObservableChild);
@@ -93,7 +86,8 @@ namespace KodeKandy.Panopticon.Tests.Linq
             sut.Subscribe(observer);
             scheduler.AdvanceTo(10);
             obj.ObservableChild = replacementChild;
-        
+            obj.ObservableChild.Age = 17;
+
             // Assert
             Assert.AreEqual(expected, observer.Messages);
         }
@@ -104,14 +98,14 @@ namespace KodeKandy.Panopticon.Tests.Linq
             // Arrange
             var obj = new TestObservableObject {ObservableChild = new TestObservableObject {Age = 3}};
             var scheduler = new TestScheduler();
-            var observer = scheduler.CreateObserver<int>();
+            var observer = scheduler.CreateObserver<PropertyChanged>();
             var expected = new[]
             {
-                OnNext(000, 3),
-                OnNext(010, 5),
+                OnNext(000, new PropertyChanged(obj.ObservableChild)),
+                OnNext(010, new PropertyChanged(obj.ObservableChild, "Age")),
             };
 
-            var sut = obj.WhenValue(x => x.ObservableChild.Age);
+            var sut = obj.WhenAny(x => x.ObservableChild);
 
             // Act
             sut.Subscribe(observer);

@@ -23,6 +23,8 @@ namespace KodeKandy.Panopticon
     /// </summary>
     public class PropertyChangedEventArgsEx : PropertyChangedEventArgs, IEquatable<PropertyChangedEventArgsEx>
     {
+        public static readonly PropertyChangedEventArgsEx Default = new PropertyChangedEventArgsEx(string.Empty);
+
         public PropertyChangedEventArgsEx(string propertyNeme)
             : this(propertyNeme, null)
         {
@@ -64,6 +66,11 @@ namespace KodeKandy.Panopticon
             {
                 return (UserData != null ? UserData.GetHashCode() : 0);
             }
+        }
+
+        public override string ToString()
+        {
+            return string.Format("PropertyChangedEventArgsEx: PropertyName='{0}', UserData='{1}'", PropertyName, UserData);
         }
     }
 }
