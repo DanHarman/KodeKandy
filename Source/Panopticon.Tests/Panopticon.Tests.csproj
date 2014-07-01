@@ -105,16 +105,18 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Panopticon\Panopticon.csproj">
+    <ProjectReference Include="..\Panopticon.Portable\Panopticon.Portable.csproj">
       <Project>{cf86e617-096f-472b-80ea-525b7abd21b2}</Project>
-      <Name>Panopticon</Name>
+      <Name>Panopticon.Portable</Name>
     </ProjectReference>
     <ProjectReference Include="..\QualityTools\QualityTools.csproj">
       <Project>{87212236-C4EE-43E0-8B64-F69765EF415B}</Project>
       <Name>QualityTools</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

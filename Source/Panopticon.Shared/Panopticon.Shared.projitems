@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>2ff35776-71d2-4096-9cfd-fa78bc992e8d</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>KodeKandy.Panopticon</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CollectionChange.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CollectionChangedHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CompilerServices.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DerivedObservableList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Internal\CompletedObserver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Internal\ImmutableList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Internal\ImmutableMultiObserver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Internal\NopObserver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IObservableObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\DerivedCollectionAdaptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\Forever.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\MemberObservableFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\NotifyPropertyChangedObservable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\NotifyPropertyValueChangedObservable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\PocoValueObservable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Linq\Opticon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObservableCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObservableList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObservableObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertyChanged.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertyChangedEventArgsEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertyChangeHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertyValueChanged.cs" />
+  </ItemGroup>
+</Project>

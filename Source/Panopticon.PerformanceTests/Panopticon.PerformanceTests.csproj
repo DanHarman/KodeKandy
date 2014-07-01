@@ -83,9 +83,9 @@
       <Project>{8C39CCA4-F76C-4EE8-B27D-A0A1CCB91300}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Panopticon\Panopticon.csproj">
+    <ProjectReference Include="..\Panopticon.Portable\Panopticon.Portable.csproj">
       <Project>{cf86e617-096f-472b-80ea-525b7abd21b2}</Project>
-      <Name>Panopticon</Name>
+      <Name>Panopticon.Portable</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

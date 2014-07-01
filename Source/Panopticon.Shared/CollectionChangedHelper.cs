@@ -29,7 +29,6 @@ namespace KodeKandy.Panopticon
         {
         }
 
-
         protected bool IsCollectionChangedSuppressed
         {
             get { return Interlocked.CompareExchange(ref suppressCollectionChangedCount, 0, 0) != 0; }
