@@ -15,10 +15,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reactive.Linq;
 using KodeKandy.Panopticon;
 using KodeKandy.Panopticon.Linq;
-using KodeKandy.Panopticon.Linq.ObservableImpl;
 using KodeKandy.Panopticon.Tests.QueryLanguageTests;
 using NUnit.Framework;
 
@@ -63,7 +61,7 @@ namespace Panopticon.PerformanceTests
         [Test]
         public void When_Notifying_Child_Property_1000000_Times()
         {
-            Console.Error.WriteLine("Subscribing to 1 child property, notifying it 1000000x");
+            Console.Error.WriteLine("Subscribing to 1 child property, notifying it 1,000,000x");
             Func<TestObservableObject> factory = () => new TestObservableObject {Age = 10, Child = new TestObservableObject {Age = 20}};
             const int iterations = 1000000;
 
@@ -87,7 +85,7 @@ namespace Panopticon.PerformanceTests
 
                 var sut = factory();
 
-                sut.When("Child", x => x.Child).When("Age", x => x.Age).ToValues().Subscribe(_ => { ++cnt; });
+                sut.When("Child", x => x.Child).WhenValue("Age", x => x.Age).Subscribe(_ => { ++cnt; });
 
                 for (var j = 0; j < iterations; ++j)
                     sut.Child.Age = j;

@@ -29,12 +29,12 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             // Arrange
             var scheduler = new TestScheduler();
             var sourceObs = scheduler.CreateColdObservable(
-                OnCompleted<PropertyValueChanged<TestObservableObject>>(40)
+                OnCompleted<IPropertyValueChanged<TestObservableObject>>(40)
                 );
-            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
+            var observer = scheduler.CreateObserver<IPropertyValueChanged<int>>();
             var expected = new[]
             {
-                OnCompleted<PropertyValueChanged<int>>(40)
+                OnCompleted<IPropertyValueChanged<int>>(40)
             };
 
             var sut = new NotifyPropertyValueChangedObservable<TestObservableObject, int>(sourceObs, "Age", x => x.Age);
@@ -54,12 +54,12 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             var scheduler = new TestScheduler();
             var expectedException = new Exception("Expected");
             var sourceObs = scheduler.CreateColdObservable(
-                OnError<PropertyValueChanged<TestObservableObject>>(40, expectedException)
+                OnError<IPropertyValueChanged<TestObservableObject>>(40, expectedException)
                 );
-            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
+            var observer = scheduler.CreateObserver<IPropertyValueChanged<int>>();
             var expected = new[]
             {
-                OnError<PropertyValueChanged<int>>(40, expectedException)
+                OnError<IPropertyValueChanged<int>>(40, expectedException)
             };
 
             var sut = new NotifyPropertyValueChangedObservable<TestObservableObject, int>(sourceObs, "Age", x => x.Age);
@@ -78,7 +78,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             // Arrange
             var sourceObj = new TestObservableObject() {Age = 2};
             var scheduler = new TestScheduler();
-            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
+            var observer = scheduler.CreateObserver<IPropertyValueChanged<int>>();
             var expected = new[]
             {
                 OnNext(20, PropertyValueChanged.CreateWithValue(sourceObj, "Age", 5)),
@@ -108,8 +108,8 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             // Arrange
             var sourceObj = new TestObservableObject {Age = 3};
             var scheduler = new TestScheduler();
-            var firstObserver = scheduler.CreateObserver<PropertyValueChanged<int>>();
-            var secondObserver = scheduler.CreateObserver<PropertyValueChanged<int>>();
+            var firstObserver = scheduler.CreateObserver<IPropertyValueChanged<int>>();
+            var secondObserver = scheduler.CreateObserver<IPropertyValueChanged<int>>();
             var firstObservserExpected = new[]
             {
                 OnNext(0, PropertyValueChanged.CreateWithValue(sourceObj, "Age", 3)),

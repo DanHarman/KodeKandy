@@ -23,14 +23,14 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
     /// </summary>
     /// <typeparam name="TClass">Source class type.</typeparam>
     /// <typeparam name="TMember">Member type on source class.</typeparam>
-    internal class PocoValueObservable<TClass, TMember> : IObservable<PropertyValueChanged<TMember>>
+    internal class PocoValueObservable<TClass, TMember> : IObservable<IPropertyValueChanged<TMember>>
         where TClass : class
     {
         private readonly Func<TClass, TMember> _memberValueGetter;
         private readonly string _propertyName;
-        private readonly IObservable<PropertyValueChanged<TClass>> _sourceObservable;
+        private readonly IObservable<IPropertyValueChanged<TClass>> _sourceObservable;
 
-        public PocoValueObservable(IObservable<PropertyValueChanged<TClass>> sourceObservable, string propertyName,
+        public PocoValueObservable(IObservable<IPropertyValueChanged<TClass>> sourceObservable, string propertyName,
             Func<TClass, TMember> memberValueGetter)
         {
             if (sourceObservable == null)
@@ -43,9 +43,9 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             _memberValueGetter = memberValueGetter;
         }
 
-        #region IObservable<PropertyValueChanged<TMember>> Members
+        #region IObservable<IPropertyValueChanged<TMember>> Members
 
-        public IDisposable Subscribe(IObserver<PropertyValueChanged<TMember>> observer)
+        public IDisposable Subscribe(IObserver<IPropertyValueChanged<TMember>> observer)
         {
             // If the source has provided a value then propagate it, otherwise propagate the change without a value (this occurs
             // when a property chain has a null node for example, so it is not possible to provide a value from the leaf node).

@@ -12,7 +12,6 @@
 // </copyright>
 
 using System.Collections.Generic;
-using System.ComponentModel;
 using KodeKandy.Panopticon.Tests.TestEntities;
 using NUnit.Framework;
 

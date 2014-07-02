@@ -1,3 +1,16 @@
+// <copyright file="PropertyValueChanged.cs" company="million miles per hour ltd">
+// Copyright (c) 2013-2014 All Right Reserved
+// 
+// This source is subject to the MIT License.
+// Please see the License.txt file for more information.
+// All other rights reserved.
+// 
+// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY 
+// KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+// PARTICULAR PURPOSE.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,21 +20,34 @@ namespace KodeKandy.Panopticon
 {
     public static class PropertyValueChanged
     {
-        public static PropertyValueChanged<TProperty> CreateWithValue<TProperty>(object source, string propertyName, TProperty value)
+        public static IPropertyValueChanged<TProperty> CreateWithValue<TProperty>(object source, string propertyName, TProperty value)
         {
             return new PropertyValueChanged<TProperty>(source, propertyName, value);
         }
 
-        public static PropertyValueChanged<TProperty> CreateWithValue<TProperty>(object source, PropertyChangedEventArgs propertyChangedEventArgs, TProperty value)
+        public static IPropertyValueChanged<TProperty> CreateWithValue<TProperty>(object source, PropertyChangedEventArgs propertyChangedEventArgs,
+            TProperty value)
         {
             return new PropertyValueChanged<TProperty>(source, propertyChangedEventArgs, value);
         }
 
 
-        public static PropertyValueChanged<TProperty> CreateWithoutValue<TProperty>(object source, string propertyName)
+        public static IPropertyValueChanged<TProperty> CreateWithoutValue<TProperty>(object source, string propertyName)
         {
             return new PropertyValueChanged<TProperty>(source, propertyName);
         }
+    }
+
+    /// <summary>
+    ///     Represents a property value change and ensures co-variance is supported.
+    /// </summary>
+    /// <remarks>This was introduced as otherwise subscribing to properties on base classes cauaesd covariance problems.</remarks>
+    /// <typeparam name="TProperty">The type of the property being observed.</typeparam>
+    public interface IPropertyValueChanged<out TProperty>
+    {
+        TProperty Value { get; }
+
+        bool HasValue { get; }
     }
 
     /// <summary>
@@ -29,7 +55,7 @@ namespace KodeKandy.Panopticon
     ///     obtainable, which may not be the case if we are observing a property chain with a null node.
     /// </summary>
     /// <typeparam name="TProperty">The observered properties type.</typeparam>
-    public class PropertyValueChanged<TProperty> : PropertyChanged, IEquatable<PropertyValueChanged<TProperty>>
+    public class PropertyValueChanged<TProperty> : PropertyChanged, IPropertyValueChanged<TProperty>, IEquatable<PropertyValueChanged<TProperty>>
     {
         private readonly bool _hasValue;
         private readonly TProperty _value;
@@ -56,6 +82,19 @@ namespace KodeKandy.Panopticon
         {
         }
 
+        #region IEquatable<PropertyValueChanged<TProperty>> Members
+
+        public bool Equals(PropertyValueChanged<TProperty> other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return base.Equals(other) && EqualityComparer<TProperty>.Default.Equals(_value, other._value);
+        }
+
+        #endregion
+
+        #region IPropertyValueChanged<TProperty> Members
+
         public TProperty Value
         {
             get { return _value; }
@@ -64,15 +103,6 @@ namespace KodeKandy.Panopticon
         public bool HasValue
         {
             get { return _hasValue; }
-        }
-
-        #region IEquatable<PropertyValueChanged<TProperty>> Members
-
-        public bool Equals(PropertyValueChanged<TProperty> other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return base.Equals(other) && EqualityComparer<TProperty>.Default.Equals(_value, other._value);
         }
 
         #endregion

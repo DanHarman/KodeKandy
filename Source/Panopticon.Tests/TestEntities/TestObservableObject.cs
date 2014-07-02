@@ -15,10 +15,10 @@ namespace KodeKandy.Panopticon.Tests.TestEntities
 {
     internal class TestObservableObject : ObservableObject
     {
+        private string _name;
         private TestObservableObject _observableChild;
         private TestPoco _pocoChild;
         private int age;
-        private string _name;
 
         public int Age
         {

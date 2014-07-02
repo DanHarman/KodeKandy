@@ -73,6 +73,36 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
         }
 
         [Test]
+        public void When_Subscribe_Then_Returns_Default_Value_At_Time_Of_Subscribe_And_Subsequent_Values()
+        {
+            // Arrange
+            var obj = new TestObservableObject() {Age = 2};
+            var scheduler = new TestScheduler();
+            var observer = scheduler.CreateObserver<PropertyChanged>();
+            var expected = new[]
+            {
+                OnNext(00, new PropertyChanged(obj)),
+                OnNext(20, new PropertyChanged(obj, "Age")),
+                OnNext(30, new PropertyChanged(obj, "Age")),
+                OnNext(40, new PropertyChanged(obj, "Name")),
+            };
+
+            var sut = new NotifyPropertyChangedObservable<TestObservableObject>(obj.ToPropertyValueChangedObservable());
+
+            // Act
+            sut.Subscribe(observer);
+            scheduler.AdvanceTo(20);
+            obj.Age = 3;
+            scheduler.AdvanceTo(30);
+            obj.Age = 7;
+            scheduler.AdvanceTo(40);
+            obj.Name = "Fi";
+
+            // Assert
+            Assert.AreEqual(expected, observer.Messages);
+        }
+
+        [Test]
         public void When_Subscribe_Twice_Then_Correct_Notifications_For_Both_Observers()
         {
             // Arrange
@@ -108,36 +138,6 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             // Assert
             Assert.AreEqual(firstObservserExpected, firstObserver.Messages);
             Assert.AreEqual(secondObservserExpected, secondObserver.Messages);
-        }
-
-        [Test]
-        public void When_Subscribe_Then_Returns_Default_Value_At_Time_Of_Subscribe_And_Subsequent_Values()
-        {
-            // Arrange
-            var obj = new TestObservableObject() {Age = 2};
-            var scheduler = new TestScheduler();
-            var observer = scheduler.CreateObserver<PropertyChanged>();
-            var expected = new[]
-            {
-                OnNext(00, new PropertyChanged(obj)),
-                OnNext(20, new PropertyChanged(obj, "Age")),
-                OnNext(30, new PropertyChanged(obj, "Age")),
-                OnNext(40, new PropertyChanged(obj, "Name")),
-            };
-
-            var sut = new NotifyPropertyChangedObservable<TestObservableObject>(obj.ToPropertyValueChangedObservable());
-
-            // Act
-            sut.Subscribe(observer);
-            scheduler.AdvanceTo(20);
-            obj.Age = 3;
-            scheduler.AdvanceTo(30);
-            obj.Age = 7;
-            scheduler.AdvanceTo(40);
-            obj.Name = "Fi";
-
-            // Assert
-            Assert.AreEqual(expected, observer.Messages);
         }
     }
 }

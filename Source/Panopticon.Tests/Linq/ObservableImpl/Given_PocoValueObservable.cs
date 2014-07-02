@@ -34,15 +34,15 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
                 OnNext(100, PropertyValueChanged.CreateWithValue(null, "Age", sourceOne)),
                 OnNext(200, PropertyValueChanged.CreateWithoutValue<TestPoco>(null, "Age")),
                 OnNext(300, PropertyValueChanged.CreateWithValue(null, "Age", sourceTwo)),
-                OnCompleted<PropertyValueChanged<TestPoco>>(400)
+                OnCompleted<IPropertyValueChanged<TestPoco>>(400)
                 );
-            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
+            var observer = scheduler.CreateObserver<IPropertyValueChanged<int>>();
             var expected = new[]
             {
                 OnNext(100, PropertyValueChanged.CreateWithValue(sourceOne, "Age", sourceOne.Age)),
                 OnNext(200, PropertyValueChanged.CreateWithoutValue<int>(null, "Age")),
                 OnNext(300, PropertyValueChanged.CreateWithValue(sourceTwo, "Age", sourceTwo.Age)),
-                OnCompleted<PropertyValueChanged<int>>(400),
+                OnCompleted<IPropertyValueChanged<int>>(400),
             };
 
             var sut = new PocoValueObservable<TestPoco, int>(sourceObs, "Age", x => x.Age);
@@ -52,7 +52,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             scheduler.Start();
 
             // Assert
-            observer.Messages.AssertEqual(expected);
+            Assert.AreEqual(expected, observer.Messages);
             Assert.IsFalse(observer.Messages[1].Value.Value.HasValue);
         }
 
@@ -62,12 +62,12 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             // Arrange
             var scheduler = new TestScheduler();
             var sourceObs = scheduler.CreateColdObservable(
-                OnCompleted<PropertyValueChanged<TestPoco>>(400)
+                OnCompleted<IPropertyValueChanged<TestPoco>>(400)
                 );
-            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
+            var observer = scheduler.CreateObserver<IPropertyValueChanged<int>>();
             var expected = new[]
             {
-                OnCompleted<PropertyValueChanged<int>>(400),
+                OnCompleted<IPropertyValueChanged<int>>(400),
             };
 
             var sut = new PocoValueObservable<TestPoco, int>(sourceObs, "Age", x => x.Age);
@@ -77,7 +77,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             scheduler.Start();
 
             // Assert
-            observer.Messages.AssertEqual(expected);
+            Assert.AreEqual(expected, observer.Messages);
         }
 
         [Test]
@@ -87,12 +87,12 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             var scheduler = new TestScheduler();
             var expectedException = new Exception("Expected");
             var sourceObs = scheduler.CreateColdObservable(
-                OnError<PropertyValueChanged<TestPoco>>(400, expectedException)
+                OnError<IPropertyValueChanged<TestPoco>>(400, expectedException)
                 );
-            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
+            var observer = scheduler.CreateObserver<IPropertyValueChanged<int>>();
             var expected = new[]
             {
-                OnError<PropertyValueChanged<int>>(400, expectedException),
+                OnError<IPropertyValueChanged<int>>(400, expectedException),
             };
 
             var sut = new PocoValueObservable<TestPoco, int>(sourceObs, "Age", x => x.Age);
@@ -102,7 +102,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             scheduler.Start();
 
             // Assert
-            observer.Messages.AssertEqual(expected);
+            Assert.AreEqual(expected, observer.Messages);
         }
 
         [Test]
@@ -111,10 +111,10 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             // Arrange
             var obj = new TestPoco() {Age = 2};
             var scheduler = new TestScheduler();
-            var observer = scheduler.CreateObserver<PropertyValueChanged<int>>();
+            var observer = scheduler.CreateObserver<IPropertyValueChanged<int>>();
             var expected = new[]
             {
-                OnNext(20, new PropertyValueChanged<int>(obj, "Age", 5)),
+                OnNext(20, PropertyValueChanged.CreateWithValue(obj, "Age", 5)),
             };
 
             var sut = new PocoValueObservable<TestPoco, int>(obj.ToPropertyValueChangedObservable(), "Age", x => x.Age);

@@ -23,7 +23,7 @@ namespace KodeKandy.Panopticon.Linq
     {
         #region When
 
-        public static IObservable<PropertyValueChanged<TProperty>> When<TClass, TProperty>(this TClass source, string propertyName,
+        public static IObservable<IPropertyValueChanged<TProperty>> When<TClass, TProperty>(this TClass source, string propertyName,
             Func<TClass, TProperty> outValueGetter)
             where TClass : class, INotifyPropertyChanged
         {
@@ -37,8 +37,8 @@ namespace KodeKandy.Panopticon.Linq
             return new NotifyPropertyValueChangedObservable<TClass, TProperty>(source.ToPropertyValueChangedObservable(), propertyName, outValueGetter);
         }
 
-        public static IObservable<PropertyValueChanged<TProperty>> When<TClass, TProperty>(
-            this IObservable<PropertyValueChanged<TClass>> sourceObservable, string propertyName,
+        public static IObservable<IPropertyValueChanged<TProperty>> When<TClass, TProperty>(
+            this IObservable<IPropertyValueChanged<TClass>> sourceObservable, string propertyName,
             Func<TClass, TProperty> outValueGetter)
             where TClass : class, INotifyPropertyChanged
         {
@@ -52,7 +52,7 @@ namespace KodeKandy.Panopticon.Linq
             return new NotifyPropertyValueChangedObservable<TClass, TProperty>(sourceObservable, propertyName, outValueGetter);
         }
 
-        public static IObservable<PropertyValueChanged<TMember>> When<TClass, TMember>(this TClass source,
+        public static IObservable<IPropertyValueChanged<TMember>> When<TClass, TMember>(this TClass source,
             Expression<Func<TClass, TMember>> memberPath)
             where TClass : class
         {
@@ -76,7 +76,7 @@ namespace KodeKandy.Panopticon.Linq
         }
 
         public static IObservable<TProperty> WhenValue<TClass, TProperty>(
-            this IObservable<PropertyValueChanged<TClass>> sourceObservable, string propertyName,
+            this IObservable<IPropertyValueChanged<TClass>> sourceObservable, string propertyName,
             Func<TClass, TProperty> outValueGetter)
             where TClass : class, INotifyPropertyChanged
         {
@@ -143,7 +143,7 @@ namespace KodeKandy.Panopticon.Linq
 
         #region ToPropertyValueChangedObservable
 
-        public static IObservable<PropertyValueChanged<TClass>> ToPropertyValueChangedObservable<TClass>(this TClass value)
+        public static IObservable<IPropertyValueChanged<TClass>> ToPropertyValueChangedObservable<TClass>(this TClass value)
         {
             return PropertyValueChanged.CreateWithValue(null, default(string), value).Forever();
         }
@@ -152,7 +152,7 @@ namespace KodeKandy.Panopticon.Linq
 
         #region ToValues
 
-        public static IObservable<T> ToValues<T>(this IObservable<PropertyValueChanged<T>> source)
+        public static IObservable<T> ToValues<T>(this IObservable<IPropertyValueChanged<T>> source)
         {
             if (source == null)
                 throw new ArgumentNullException("source");

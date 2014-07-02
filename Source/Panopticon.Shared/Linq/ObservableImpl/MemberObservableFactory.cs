@@ -53,7 +53,8 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         /// <param name="source">The source instance.</param>
         /// <param name="memberPath">The path to the final member.</param>
         /// <returns>An <see cref="IObservable{TMember}" /></returns>
-        public static IObservable<PropertyValueChanged<TMember>> CreateValueObserver<TClass, TMember>(TClass source, Expression<Func<TClass, TMember>> memberPath)
+        public static IObservable<IPropertyValueChanged<TMember>> CreateValueObserver<TClass, TMember>(TClass source,
+            Expression<Func<TClass, TMember>> memberPath)
         {
             var memberInfos = ExpressionHelpers.GetMemberInfos(memberPath);
 
@@ -64,7 +65,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                 currObserver = create(currObserver, memberInfo);
             }
 
-            return (IObservable<PropertyValueChanged<TMember>>) currObserver;
+            return (IObservable<IPropertyValueChanged<TMember>>) currObserver;
         }
 
         /// <summary>
@@ -161,7 +162,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         {
             var getter = ReflectionHelpers.CreateMemberGetter(memberInfo);
 
-            return new NotifyPropertyValueChangedObservable<TClass, TMember>((IObservable<PropertyValueChanged<TClass>>) source, memberInfo.Name,
+            return new NotifyPropertyValueChangedObservable<TClass, TMember>((IObservable<IPropertyValueChanged<TClass>>) source, memberInfo.Name,
                 (Func<TClass, TMember>) getter);
         }
 
@@ -171,14 +172,15 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         {
             var getter = ReflectionHelpers.CreateMemberGetter(memberInfo);
 
-            return new PocoValueObservable<TClass, TMember>((IObservable<PropertyValueChanged<TClass>>) source, memberInfo.Name, (Func<TClass, TMember>) getter);
+            return new PocoValueObservable<TClass, TMember>((IObservable<IPropertyValueChanged<TClass>>) source, memberInfo.Name,
+                (Func<TClass, TMember>) getter);
         }
 
         [UsedImplicitly]
         private static object CreateNotifyPropertyChangedObservable<TClass>(object source)
             where TClass : class, INotifyPropertyChanged
         {
-            return new NotifyPropertyChangedObservable<TClass>((IObservable<PropertyValueChanged<TClass>>)source);
+            return new NotifyPropertyChangedObservable<TClass>((IObservable<IPropertyValueChanged<TClass>>) source);
         }
     }
 }
