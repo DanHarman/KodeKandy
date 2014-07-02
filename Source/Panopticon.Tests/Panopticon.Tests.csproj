@@ -92,6 +92,7 @@
     <Compile Include="Linq\ObservableImpl\Given_NotifyPropertyChangedObservable.cs" />
     <Compile Include="Linq\ObservableImpl\Given_NotifyPropertyValueChangedObservable.cs" />
     <Compile Include="Linq\ObservableImpl\Given_PocoValueObservable.cs" />
+    <Compile Include="Linq\When_ForProperty.cs" />
     <Compile Include="ObservableListTests\Given_Observing_CollectionChanged_Events.cs" />
     <Compile Include="ObservableObjectTests\Given_ObservableObject.cs" />
     <Compile Include="PropertyChangeHelperTests\Given_PropertyChangeHelper.cs" />

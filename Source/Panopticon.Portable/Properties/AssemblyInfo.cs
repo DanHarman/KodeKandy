@@ -15,7 +15,7 @@ using System.Reflection;
 using System.Resources;
 using System.Runtime.CompilerServices;
 
-[assembly: AssemblyTitle("KodeKandy.Panopticon")]
+[assembly: AssemblyTitle("KodeKandy.Panopticon.Portable")]
 [assembly: AssemblyDescription("High speed reactive object and collection library.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("million miles per hour ltd")]
@@ -36,7 +36,7 @@ using System.Runtime.CompilerServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("0.5.0.0")]
-[assembly: AssemblyFileVersion("0.5.0.0")]
+[assembly: AssemblyVersion("0.6.0.0")]
+[assembly: AssemblyFileVersion("0.6.0.0")]
 [assembly: InternalsVisibleTo("KodeKandy.Panopticon.Tests")]
 [assembly: InternalsVisibleTo("KodeKandy.Panopticon.PerformanceTests")]

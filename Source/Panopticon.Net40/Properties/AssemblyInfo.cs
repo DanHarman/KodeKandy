@@ -12,20 +12,23 @@
 // </copyright>
 
 using System.Reflection;
+using System.Resources;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("Panopticon.net40")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("KodeKandy.Panopticon.Net40")]
+[assembly: AssemblyDescription("High speed reactive object and collection library.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Panopticon.net40")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
+[assembly: AssemblyCompany("million miles per hour ltd")]
+[assembly: AssemblyProduct("Panopticon")]
+[assembly: AssemblyCopyright("Copyright © 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+[assembly: NeutralResourcesLanguage("en")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -48,5 +51,7 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.6.0.0")]
+[assembly: AssemblyFileVersion("0.6.0.0")]
+[assembly: InternalsVisibleTo("KodeKandy.Panopticon.Tests")]
+[assembly: InternalsVisibleTo("KodeKandy.Panopticon.PerformanceTests")]

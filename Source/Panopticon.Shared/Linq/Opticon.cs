@@ -13,6 +13,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Linq;
 using KodeKandy.Panopticon.Linq.ObservableImpl;
@@ -137,6 +138,28 @@ namespace KodeKandy.Panopticon.Linq
         public static IObservable<T> Forever<T>(this T value)
         {
             return new Forever<T>(value);
+        }
+
+        #endregion
+
+        #region ForProperty
+
+        public static IObservable<TClass> ForProperty<TClass>(this IObservable<PropertyChanged> source, params string[] propertyNames)
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (propertyNames == null)
+                throw new ArgumentNullException("propertyNames");
+
+            // We need to fire on String.Empty for propertyName too as by convention that indicates a reset.
+            var allNames = new string[propertyNames.Length + 1];
+            Array.Copy(propertyNames, allNames, propertyNames.Length);
+            allNames[propertyNames.Length] = String.Empty;
+
+            return Observable.Create<TClass>(obs =>
+                source.Subscribe(pc => { if (allNames.Contains(pc.PropertyChangedEventArgs.PropertyName)) obs.OnNext((TClass) pc.Source); },
+                    obs.OnError,
+                    obs.OnCompleted));
         }
 
         #endregion

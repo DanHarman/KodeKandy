@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>KodeKandy.Panopticon</id>
-        <version>0.5.0.0</version>
+        <version>0.6.0-alpha</version>
         <title>KodeKandy.Panopticon</title>
         <authors>million miles per hour ltd</authors>
         <owners>million miles per hour ltd</owners>
@@ -19,9 +19,9 @@
         </dependencies>
     </metadata>
     <files>
-        <file src="lib\net40\KodeKandy.Core.dll" target="lib\net40\KodeKandy.Core.dll" />
-        <file src="lib\net40\KodeKandy.Panopticon.dll" target="lib\net40\KodeKandy.Panopticon.dll" />
-        <file src="lib\portable-net45+sl50+win+wp80\KodeKandy.Core.dll" target="lib\portable-net45+sl50+win+wp80\KodeKandy.Core.dll" />
-        <file src="lib\portable-net45+sl50+win+wp80\KodeKandy.Panopticon.dll" target="lib\portable-net45+sl50+win+wp80\KodeKandy.Panopticon.dll" />
+        <file src="lib\net40\KodeKandy.*.dll" target="lib\net40\" />
+        <file src="lib\net40\KodeKandy.*.pdb" target="lib\net40\" />
+        <file src="lib\portable-net45+sl50+win+wp80\KodeKandy.*.dll" target="lib\portable-net45+sl50+win+wp80\" />
+        <file src="lib\portable-net45+sl50+win+wp80\KodeKandy.*.pdb" target="lib\portable-net45+sl50+win+wp80\" />
     </files>
 </package>
