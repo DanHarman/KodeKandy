@@ -27,6 +27,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ObservableCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObservableList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObservableObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Properties\SharedAssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyChanged.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyChangedEventArgsEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyChangeHelper.cs" />
