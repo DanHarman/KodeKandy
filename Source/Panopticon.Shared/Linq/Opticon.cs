@@ -95,7 +95,7 @@ namespace KodeKandy.Panopticon.Linq
 
         #region WhenAny
 
-        public static IObservable<PropertyChanged> WhenAny<TClass>(this TClass source)
+        public static IObservable<IPropertyChanged<TClass>> WhenAny<TClass>(this TClass source)
             where TClass : class, INotifyPropertyChanged
         {
             if (source == null)
@@ -104,7 +104,7 @@ namespace KodeKandy.Panopticon.Linq
             return new NotifyPropertyChangedObservable<TClass>(source.ToPropertyValueChangedObservable());
         }
 
-        public static IObservable<PropertyChanged> WhenAny<TClass>(this IObservable<PropertyValueChanged<TClass>> sourceObservable)
+        public static IObservable<IPropertyChanged<TClass>> WhenAny<TClass>(this IObservable<PropertyValueChanged<object, TClass>> sourceObservable)
             where TClass : class, INotifyPropertyChanged
         {
             if (sourceObservable == null)
@@ -113,7 +113,7 @@ namespace KodeKandy.Panopticon.Linq
             return new NotifyPropertyChangedObservable<TClass>(sourceObservable);
         }
 
-        public static IObservable<PropertyChanged> WhenAny<TClass, TMember>(this TClass source, Expression<Func<TClass, TMember>> memberPath)
+        public static IObservable<IPropertyChanged<TMember>> WhenAny<TClass, TMember>(this TClass source, Expression<Func<TClass, TMember>> memberPath)
             where TClass : class
             where TMember : class, INotifyPropertyChanged
         {
@@ -144,7 +144,8 @@ namespace KodeKandy.Panopticon.Linq
 
         #region ForProperty
 
-        public static IObservable<TClass> ForProperty<TClass>(this IObservable<PropertyChanged> source, params string[] propertyNames)
+        public static IObservable<TClass> ForProperty<TClass>(this IObservable<IPropertyChanged<TClass>> source, params string[] propertyNames)
+            where TClass : class
         {
             if (source == null)
                 throw new ArgumentNullException("source");
@@ -168,20 +169,20 @@ namespace KodeKandy.Panopticon.Linq
 
         public static IObservable<IPropertyValueChanged<TClass>> ToPropertyValueChangedObservable<TClass>(this TClass value)
         {
-            return PropertyValueChanged.CreateWithValue(null, default(string), value).Forever();
+            return PropertyValueChanged.CreateWithValue(default(object), default(string), value).Forever();
         }
 
         #endregion
 
         #region ToValues
 
-        public static IObservable<T> ToValues<T>(this IObservable<IPropertyValueChanged<T>> source)
+        public static IObservable<TMember> ToValues<TMember>(this IObservable<IPropertyValueChanged<TMember>> source)
         {
             if (source == null)
                 throw new ArgumentNullException("source");
 
             // This is a tiny bit faster than composing where and select.
-            return Observable.Create<T>(obs => source.Subscribe(x => { if (x.HasValue) obs.OnNext(x.Value); }, obs.OnError, obs.OnCompleted));
+            return Observable.Create<TMember>(obs => source.Subscribe(x => { if (x.HasValue) obs.OnNext(x.Value); }, obs.OnError, obs.OnCompleted));
             //return source.Where(pvc => pvc.HasValue).Select(pvc => pvc.Value);
         }
 

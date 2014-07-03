@@ -27,10 +27,10 @@ namespace KodeKandy.Panopticon.Tests.Linq
             // Arrange
             var obj = new TestObservableObject();
             var scheduler = new TestScheduler();
-            var observer = scheduler.CreateObserver<PropertyChanged>();
+            var observer = scheduler.CreateObserver<IPropertyChanged<TestObservableObject>>();
             var expected = new[]
             {
-                OnNext(000, new PropertyChanged(null)),
+                OnNext(000, PropertyChanged.Create(default(TestObservableObject))),
             };
 
             var sut = obj.WhenAny(x => x.PocoChild.ObservableChild);
@@ -48,11 +48,11 @@ namespace KodeKandy.Panopticon.Tests.Linq
             // Arrange
             var obj = new TestObservableObject {Age = 5};
             var scheduler = new TestScheduler();
-            var observer = scheduler.CreateObserver<PropertyChanged>();
+            var observer = scheduler.CreateObserver<IPropertyChanged<TestObservableObject>>();
             var expected = new[]
             {
-                OnNext(000, new PropertyChanged(obj)),
-                OnNext(000, new PropertyChanged(obj, "Age")),
+                OnNext(000, PropertyChanged.Create(obj)),
+                OnNext(000, PropertyChanged.Create(obj, "Age")),
             };
 
             var sut = obj.WhenAny();
@@ -72,12 +72,12 @@ namespace KodeKandy.Panopticon.Tests.Linq
             var obj = new TestObservableObject {ObservableChild = new TestObservableObject {Age = 3}};
             var replacementChild = new TestObservableObject {Age = 5};
             var scheduler = new TestScheduler();
-            var observer = scheduler.CreateObserver<PropertyChanged>();
+            var observer = scheduler.CreateObserver<IPropertyChanged<TestObservableObject>>();
             var expected = new[]
             {
-                OnNext(000, new PropertyChanged(obj.ObservableChild)),
-                OnNext(010, new PropertyChanged(replacementChild)),
-                OnNext(010, new PropertyChanged(replacementChild, "Age")),
+                OnNext(000, PropertyChanged.Create(obj.ObservableChild)),
+                OnNext(010, PropertyChanged.Create(replacementChild)),
+                OnNext(010, PropertyChanged.Create(replacementChild, "Age")),
             };
 
             var sut = obj.WhenAny(x => x.ObservableChild);
@@ -98,11 +98,11 @@ namespace KodeKandy.Panopticon.Tests.Linq
             // Arrange
             var obj = new TestObservableObject {ObservableChild = new TestObservableObject {Age = 3}};
             var scheduler = new TestScheduler();
-            var observer = scheduler.CreateObserver<PropertyChanged>();
+            var observer = scheduler.CreateObserver<IPropertyChanged<TestObservableObject>>();
             var expected = new[]
             {
-                OnNext(000, new PropertyChanged(obj.ObservableChild)),
-                OnNext(010, new PropertyChanged(obj.ObservableChild, "Age")),
+                OnNext(000, PropertyChanged.Create(obj.ObservableChild)),
+                OnNext(010, PropertyChanged.Create(obj.ObservableChild, "Age")),
             };
 
             var sut = obj.WhenAny(x => x.ObservableChild);

@@ -20,21 +20,24 @@ namespace KodeKandy.Panopticon
 {
     public static class PropertyValueChanged
     {
-        public static IPropertyValueChanged<TProperty> CreateWithValue<TProperty>(object source, string propertyName, TProperty value)
+        public static IPropertyValueChanged<TProperty> CreateWithValue<TClass, TProperty>(TClass source, string propertyName, TProperty value)
+            where TClass : class
         {
-            return new PropertyValueChanged<TProperty>(source, propertyName, value);
+            return new PropertyValueChanged<TClass, TProperty>(source, propertyName, value);
         }
 
-        public static IPropertyValueChanged<TProperty> CreateWithValue<TProperty>(object source, PropertyChangedEventArgs propertyChangedEventArgs,
+        public static IPropertyValueChanged<TProperty> CreateWithValue<TClass, TProperty>(TClass source, PropertyChangedEventArgs propertyChangedEventArgs,
             TProperty value)
+            where TClass : class 
         {
-            return new PropertyValueChanged<TProperty>(source, propertyChangedEventArgs, value);
+            return new PropertyValueChanged<TClass, TProperty>(source, propertyChangedEventArgs, value);
         }
 
 
-        public static IPropertyValueChanged<TProperty> CreateWithoutValue<TProperty>(object source, string propertyName)
+        public static IPropertyValueChanged<TProperty> CreateWithoutValue<TClass, TProperty>(TClass source, string propertyName)
+            where TClass : class
         {
-            return new PropertyValueChanged<TProperty>(source, propertyName);
+            return new PropertyValueChanged<TClass, TProperty>(source, propertyName);
         }
     }
 
@@ -43,7 +46,7 @@ namespace KodeKandy.Panopticon
     /// </summary>
     /// <remarks>This was introduced as otherwise subscribing to properties on base classes cauaesd covariance problems.</remarks>
     /// <typeparam name="TProperty">The type of the property being observed.</typeparam>
-    public interface IPropertyValueChanged<out TProperty>
+    public interface IPropertyValueChanged<out TProperty> : IPropertyChanged
     {
         TProperty Value { get; }
 
@@ -51,44 +54,46 @@ namespace KodeKandy.Panopticon
     }
 
     /// <summary>
-    ///     Captures the info normally found on a PropetyChagnedEventArgs AND the current value of a property, if it is
+    ///     Captures the info normally found on a PropetyChangedEventArgs AND the current value of a property, if it is
     ///     obtainable, which may not be the case if we are observing a property chain with a null node.
     /// </summary>
     /// <typeparam name="TProperty">The observered properties type.</typeparam>
-    public class PropertyValueChanged<TProperty> : PropertyChanged, IPropertyValueChanged<TProperty>, IEquatable<PropertyValueChanged<TProperty>>
+    /// <typeparam name="TClass">The property declaring type's class.</typeparam>
+    public class PropertyValueChanged<TClass, TProperty> : PropertyChanged<TClass>, IPropertyValueChanged<TProperty>, IEquatable<IPropertyValueChanged<TProperty>>
+        where TClass : class
     {
         private readonly bool _hasValue;
         private readonly TProperty _value;
 
-        public PropertyValueChanged(object source, string propertyName, TProperty value)
+        public PropertyValueChanged(TClass source, string propertyName, TProperty value)
             : this(source, new PropertyChangedEventArgsEx(propertyName), value)
         {
         }
 
-        public PropertyValueChanged(object source, [NotNull] PropertyChangedEventArgs propertyChangedEventArgs, TProperty value)
+        public PropertyValueChanged(TClass source, [NotNull] PropertyChangedEventArgs propertyChangedEventArgs, TProperty value)
             : this(source, propertyChangedEventArgs)
         {
             _value = value;
             _hasValue = true;
         }
 
-        public PropertyValueChanged(object source, string propertyName)
+        public PropertyValueChanged(TClass source, string propertyName)
             : this(source, new PropertyChangedEventArgsEx(propertyName))
         {
         }
 
-        public PropertyValueChanged(object source, [NotNull] PropertyChangedEventArgs propertyChangedEventArgs)
+        public PropertyValueChanged(TClass source, [NotNull] PropertyChangedEventArgs propertyChangedEventArgs)
             : base(source, propertyChangedEventArgs)
         {
         }
 
         #region IEquatable<PropertyValueChanged<TProperty>> Members
 
-        public bool Equals(PropertyValueChanged<TProperty> other)
+        public bool Equals(IPropertyValueChanged<TProperty> other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return base.Equals(other) && EqualityComparer<TProperty>.Default.Equals(_value, other._value);
+            return base.Equals(other) && EqualityComparer<TProperty>.Default.Equals(_value, other.Value);
         }
 
         #endregion
@@ -112,7 +117,7 @@ namespace KodeKandy.Panopticon
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((PropertyValueChanged<TProperty>) obj);
+            return Equals((IPropertyValueChanged<TProperty>) obj);
         }
 
         public override int GetHashCode()
@@ -125,7 +130,7 @@ namespace KodeKandy.Panopticon
 
         public override string ToString()
         {
-            return string.Format("PropertyValueChanged<{0}>: HasValue='{1}', Value='{2}', PropertyChangedEventArgs='{3}'", typeof(TProperty).Name,
+            return string.Format("PropertyValueChanged<{0},{1}>: HasValue='{2}', Value='{3}', PropertyChangedEventArgs='{4}'", typeof(TClass).Name, typeof(TProperty).Name,
                 HasValue, Value, PropertyChangedEventArgs);
         }
     }

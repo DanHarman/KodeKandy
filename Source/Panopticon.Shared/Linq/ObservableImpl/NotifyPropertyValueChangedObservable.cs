@@ -32,7 +32,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
     ///     Conceptually, this could have been composed on top of <see cref="NotifyPropertyChangedObservable{TClass}" /> but
     ///     performance and complexity would suffer as
     ///     the thread locking requirements are different and that is very deep in the implementation, making sharing the code
-    ///     impractical.
+    ///     impractical. This may be subject to revision though as both very similar so probably possible to extract an abstract base.
     /// </remarks>
     /// <typeparam name="TClass">The type of the observered clas.</typeparam>
     /// <typeparam name="TProperty">The type of the observered property.</typeparam>
@@ -145,7 +145,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                 // with a PropertyValueChanged with HasValue == false.
                 initialPropertyValueChanged = _source != null
                     ? PropertyValueChanged.CreateWithValue(_source, _propertyName, _propertyValueGetter(_source))
-                    : PropertyValueChanged.CreateWithoutValue<TProperty>(_source, _propertyName);
+                    : PropertyValueChanged.CreateWithoutValue<TClass, TProperty>(_source, _propertyName);
 
                 _propertyValueChanged = initialPropertyValueChanged;
             }
@@ -169,7 +169,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             if (error == null)
                 throw new ArgumentNullException("error");
 
-            IObserver<PropertyValueChanged<TProperty>> oldObserver;
+            IObserver<PropertyValueChanged<TClass, TProperty>> oldObserver;
 
             lock (_gate)
             {
@@ -213,21 +213,21 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         /// </remarks>
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
-            if (_source == sender && _propertyName == propertyChangedEventArgs.PropertyName)
+            IObserver<IPropertyValueChanged<TProperty>> currObserver;
+            IPropertyValueChanged<TProperty> propertyValueChanged;
+
+            lock (_gate)
             {
-                IObserver<IPropertyValueChanged<TProperty>> currObserver;
-                IPropertyValueChanged<TProperty> propertyValueChanged;
-
-                lock (_gate)
-                {
-                    currObserver = _observer;
-                    propertyValueChanged = PropertyValueChanged.CreateWithValue<TProperty>(_source, propertyChangedEventArgs,
-                        _propertyValueGetter(_source));
-                    _propertyValueChanged = propertyValueChanged;
-                }
-
-                currObserver.OnNext(propertyValueChanged);
+                if (_source != sender || _propertyName != propertyChangedEventArgs.PropertyName) 
+                    return;
+               
+                currObserver = _observer;
+                propertyValueChanged = PropertyValueChanged.CreateWithValue(_source, propertyChangedEventArgs,
+                    _propertyValueGetter(_source));
+                _propertyValueChanged = propertyValueChanged;   
             }
+
+            currObserver.OnNext(propertyValueChanged);
         }
 
         /// <summary>

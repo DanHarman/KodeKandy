@@ -33,8 +33,11 @@ namespace KodeKandy.Panopticon.Tests.Linq
             var scheduler = new TestScheduler();
             var observer = scheduler.CreateObserver<IPropertyValueChanged<int>>();
             var expected = new[]
-            {
-                OnNext(000, PropertyValueChanged.CreateWithValue(obj, "Age", 100)),
+            { 
+                // Since reflection is used, the PropertyValueChange is typed to the property declaring class not the derived one.
+                // This impacts the test assert as they are IEquatable=false if the TClass types disagree. So make it TestPoco not
+                // DerivedTestPoco.
+                OnNext(000, PropertyValueChanged.CreateWithValue((TestPoco) obj, "Age", 100)),
             };
 
             var sut = obj.When(x => x.Age);

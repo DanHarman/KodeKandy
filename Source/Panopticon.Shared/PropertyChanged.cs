@@ -16,51 +16,95 @@ using System.ComponentModel;
 
 namespace KodeKandy.Panopticon
 {
+    public interface IPropertyChanged
+    {
+        object Source { get; }
+
+        PropertyChangedEventArgs PropertyChangedEventArgs { get; }
+    }
+
+    public interface IPropertyChanged<out TClass> : IPropertyChanged
+        where TClass : class
+    {
+        new TClass Source { get; }
+    }
+
+    public static class PropertyChanged
+    {
+        public static IPropertyChanged<TClass> Create<TClass>(TClass source)
+            where TClass : class
+        {
+            return new PropertyChanged<TClass>(source);
+        }
+
+        public static IPropertyChanged<TClass> Create<TClass>(TClass source, string propertyName)
+            where TClass : class
+        {
+            return new PropertyChanged<TClass>(source, propertyName);
+        }
+
+        public static IPropertyChanged<TClass> Create<TClass>(TClass source, PropertyChangedEventArgs propertyChangedEventArgs)
+            where TClass : class
+        {
+            return new PropertyChanged<TClass>(source, propertyChangedEventArgs);
+        }
+    }
+
     /// <summary>
     ///     Captures the info normally provided in a OnPropertyChanged handler.
     /// </summary>
-    public class PropertyChanged : IEquatable<PropertyChanged>
+    public class PropertyChanged<TClass> : IPropertyChanged<TClass>, IEquatable<PropertyChanged<TClass>>
+        where TClass : class
     {
         private readonly PropertyChangedEventArgs _propertyChangedEventArgs;
-        private readonly object _source;
+        private readonly TClass _source;
 
         /// <summary>
         ///     Constructs a property change indicating that the source has been refreshed so all properties may be different.
         /// </summary>
         /// <param name="source">The source of the change.</param>
-        public PropertyChanged(object source)
+        internal PropertyChanged(TClass source)
             : this(source, PropertyChangedEventArgsEx.Default)
         {
         }
 
-        public PropertyChanged(object source, string propertyName)
+        internal PropertyChanged(TClass source, string propertyName)
             : this(source, new PropertyChangedEventArgsEx(propertyName))
         {
         }
 
-        public PropertyChanged(object source, PropertyChangedEventArgs propertyChangedEventArgs)
+        internal PropertyChanged(TClass source, PropertyChangedEventArgs propertyChangedEventArgs)
         {
             _source = source;
             _propertyChangedEventArgs = propertyChangedEventArgs;
         }
+
+        #region IEquatable<PropertyChanged<TClass>> Members
+
+        public bool Equals(PropertyChanged<TClass> other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(_source, other.Source) && Equals(_propertyChangedEventArgs.PropertyName, other.PropertyChangedEventArgs.PropertyName);
+        }
+
+        #endregion
+
+        #region IPropertyChanged<TClass> Members
 
         public PropertyChangedEventArgs PropertyChangedEventArgs
         {
             get { return _propertyChangedEventArgs; }
         }
 
-        public object Source
+        object IPropertyChanged.Source
         {
             get { return _source; }
         }
 
-        #region IEquatable<PropertyChanged> Members
-
-        public bool Equals(PropertyChanged other)
+        public TClass Source
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return Equals(_source, other._source) && Equals(_propertyChangedEventArgs.PropertyName, other._propertyChangedEventArgs.PropertyName);
+            get { return _source; }
         }
 
         #endregion
@@ -70,7 +114,7 @@ namespace KodeKandy.Panopticon
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((PropertyChanged) obj);
+            return Equals((PropertyChanged<TClass>) obj);
         }
 
         public override int GetHashCode()

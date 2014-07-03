@@ -27,7 +27,7 @@ namespace KodeKandy.Panopticon.Tests
             const string expectedPropertyValue = "Ana";
 
             // Act
-            var sut = new PropertyValueChanged<string>(expectedSource, expectedPropertyName, expectedPropertyValue);
+            var sut = PropertyValueChanged.CreateWithValue(expectedSource, expectedPropertyName, expectedPropertyValue);
 
             // Assert
             Assert.AreEqual(expectedSource, sut.Source);
@@ -44,7 +44,7 @@ namespace KodeKandy.Panopticon.Tests
             const string expectedPropertyName = "Name";
 
             // Act
-            var sut = new PropertyValueChanged<string>(expectedSource, expectedPropertyName);
+            var sut = PropertyValueChanged.CreateWithoutValue<object, string>(expectedSource, expectedPropertyName);
 
             // Assert
             Assert.AreEqual(expectedSource, sut.Source);
@@ -57,8 +57,8 @@ namespace KodeKandy.Panopticon.Tests
         {
             // Arrange
             var expectedSource = new object();
-            var a = new PropertyValueChanged<string>(expectedSource, "Name", "Rose");
-            var b = new PropertyValueChanged<string>(expectedSource, "Name", "Belle");
+            var a = PropertyValueChanged.CreateWithValue(expectedSource, "Name", "Rose");
+            var b = PropertyValueChanged.CreateWithValue(expectedSource, "Name", "Belle");
 
             // Act
             var res = a.Equals(b);
@@ -72,8 +72,8 @@ namespace KodeKandy.Panopticon.Tests
         {
             // Arrange
             var expectedSource = new object();
-            var a = new PropertyValueChanged<string>(expectedSource, "Name", "Rose");
-            var b = new PropertyValueChanged<string>(expectedSource, "Name");
+            var a = PropertyValueChanged.CreateWithValue(expectedSource, "Name", "Rose");
+            var b = PropertyValueChanged.CreateWithoutValue<object, string>(expectedSource, "Name");
 
             // Act
             var res = a.Equals(b);
@@ -87,8 +87,8 @@ namespace KodeKandy.Panopticon.Tests
         {
             // Arrange
             var expectedSource = new object();
-            var a = new PropertyValueChanged<string>(expectedSource, "Name", "Rose");
-            var b = new PropertyValueChanged<string>(expectedSource, "Name", "Rose");
+            var a = PropertyValueChanged.CreateWithValue(expectedSource, "Name", "Rose");
+            var b = PropertyValueChanged.CreateWithValue(expectedSource, "Name", "Rose");
 
             // Act
             var res = a.Equals(b);

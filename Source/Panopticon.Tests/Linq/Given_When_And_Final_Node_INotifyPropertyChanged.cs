@@ -35,7 +35,7 @@ namespace KodeKandy.Panopticon.Tests.Linq
             {
                 OnNext(000, PropertyValueChanged.CreateWithValue(childOne, "Age", childOne.Age)),
                 OnNext(000, PropertyValueChanged.CreateWithValue(childOne, "Age", 20)),
-                OnNext(100, PropertyValueChanged.CreateWithoutValue<int>(null, "Age")),
+                OnNext(100, PropertyValueChanged.CreateWithoutValue<TestObservableObject, int>(null, "Age")),
                 OnNext(300, PropertyValueChanged.CreateWithValue(childTwo, "Age", childTwo.Age)),
             };
 
@@ -66,8 +66,11 @@ namespace KodeKandy.Panopticon.Tests.Linq
             var observer = scheduler.CreateObserver<IPropertyValueChanged<int>>();
             var expected = new[]
             {
-                OnNext(000, PropertyValueChanged.CreateWithValue(obj, "Age", 100)),
-                OnNext(000, PropertyValueChanged.CreateWithValue(obj, "Age", 20)),
+                // Since reflection is used, the PropertyValueChange is typed to the property declaring class not the derived one.
+                // This impacts the test assert as they are IEquatable=false if the TClass types disagree. So make it TestPoco not
+                // DerivedTestPoco.
+                OnNext(000, PropertyValueChanged.CreateWithValue((TestObservableObject) obj, "Age", 100)),
+                OnNext(000, PropertyValueChanged.CreateWithValue((TestObservableObject) obj, "Age", 20)),
             };
 
             var sut = obj.When(x => x.Age);
