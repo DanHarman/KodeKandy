@@ -38,7 +38,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
     /// <typeparam name="TProperty">The type of the observered property.</typeparam>
     internal class NotifyPropertyValueChangedObservable<TClass, TProperty> : IObserver<IPropertyValueChanged<TClass>>,
         IObservable<IPropertyValueChanged<TProperty>>
-        where TClass : class, INotifyPropertyChanged
+        where TClass : class
     {
         private readonly object _gate = new object();
         private readonly string _propertyName;
@@ -126,7 +126,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
         #region IObserver<IPropertyValueChanged<TClass>> Members
 
-        void IObserver<IPropertyValueChanged<TClass>>.OnNext(IPropertyValueChanged<TClass> newSource)
+        void IObserver<IPropertyValueChanged<TClass>>.OnNext(IPropertyValueChanged<TClass> newSourcePropertyValueChanged)
         {
             IObserver<IPropertyValueChanged<TProperty>> oldObserver;
             TClass oldSource;
@@ -139,7 +139,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
                 oldObserver = _observer;
                 oldSource = _source;
-                _source = newSource.Value;
+                _source = newSourcePropertyValueChanged.Value;
 
                 // We need to get the current property value from this new source if it is not null, but if it is propagate the nullness
                 // with a PropertyValueChanged with HasValue == false.
@@ -151,13 +151,15 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             }
 
             // Connect to INotifyPropertyChanged on the new _source.
-            if (newSource.Value != null)
-                newSource.Value.PropertyChanged += OnPropertyChanged;
+            var newSourceAsNotifyPropertyChanged = newSourcePropertyValueChanged.Value as INotifyPropertyChanged;
+            if (newSourceAsNotifyPropertyChanged != null)
+                newSourceAsNotifyPropertyChanged.PropertyChanged += OnPropertyChanged;
 
             // Disconnect from INotifyPropertyChanged on previous _source. Because _source has been changed it doesn't matter
             // if we end up with an extra event from this old sourceObservable sneaking through as it will be filtered out.
-            if (oldSource != null)
-                oldSource.PropertyChanged -= OnPropertyChanged;
+            var oldSourceAsNotifyPropertyChanged = oldSource as INotifyPropertyChanged;
+            if (oldSourceAsNotifyPropertyChanged != null)
+                oldSourceAsNotifyPropertyChanged.PropertyChanged -= OnPropertyChanged;
 
             oldObserver.OnNext(initialPropertyValueChanged);
         }

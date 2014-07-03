@@ -1,4 +1,4 @@
-// <copyright file="Given_When_And_Final_Node_Implements_INotifyPropertyChanged.cs" company="million miles per hour ltd">
+// <copyright file="Given_When_And_Final_Node_INotifyPropertyChanged.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -19,7 +19,7 @@ using NUnit.Framework;
 namespace KodeKandy.Panopticon.Tests.Linq
 {
     [TestFixture]
-    public class Given_When_And_Final_Node_Implements_INotifyPropertyChanged : ReactiveTest
+    public class Given_When_And_Final_Node_INotifyPropertyChanged : ReactiveTest
     {
         [Test]
         public void When_Path_Has_Null_Intermediary_Node_Then_Propagates_ProvertyValueChanged_With_HasValue_False()
@@ -75,6 +75,30 @@ namespace KodeKandy.Panopticon.Tests.Linq
             // Act
             sut.Subscribe(observer);
             obj.Age = 20;
+
+            // Assert
+            Assert.AreEqual(expected, observer.Messages);
+        }
+
+        [Test]
+        public void When_Subscribe_Via_Interface_To_Source_That_Impl_INotifyPropertyChanged_Then_OnNext_Changes()
+        {
+            // Arrange
+            var obj = new TestObservableObject {Age = 3} as ITestObject;
+            var scheduler = new TestScheduler();
+            var observer = scheduler.CreateObserver<IPropertyValueChanged<int>>();
+            var expected = new[]
+            {
+                OnNext(000, PropertyValueChanged.CreateWithValue(obj, "Age", 3)),
+                OnNext(010, PropertyValueChanged.CreateWithValue(obj, "Age", 5)),
+            };
+
+            var sut = obj.When(x => x.Age);
+
+            // Act
+            sut.Subscribe(observer);
+            scheduler.AdvanceTo(10);
+            obj.Age = 5;
 
             // Assert
             Assert.AreEqual(expected, observer.Messages);

@@ -11,7 +11,6 @@
 // PARTICULAR PURPOSE.
 // </copyright>
 
-using System.Reactive.Linq;
 using KodeKandy.Panopticon.Linq;
 using KodeKandy.Panopticon.Tests.TestEntities;
 using Microsoft.Reactive.Testing;

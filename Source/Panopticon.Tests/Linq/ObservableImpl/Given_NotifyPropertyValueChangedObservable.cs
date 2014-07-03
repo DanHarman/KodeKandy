@@ -21,7 +21,7 @@ using NUnit.Framework;
 namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
 {
     [TestFixture]
-    public class Given_NotifyPropertyValueChangedObservable : ReactiveTest
+    public class Given_NotifyPropertyValueChangedObservable_On_INotifyPropertyChanged_Source : ReactiveTest
     {
         [Test]
         public void When_Source_Observable_Completes_Then_Completes()
@@ -138,6 +138,37 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             // Assert
             Assert.AreEqual(firstObservserExpected, firstObserver.Messages);
             Assert.AreEqual(secondObservserExpected, secondObserver.Messages);
+        }
+
+        [Test]
+        public void When_Subscribe_Via_Interface_Not_Implementing_INotifyPropertyChanged_Then_Returns_Value_At_Time_Of_Subscribe_And_Subsequent_Values
+            ()
+        {
+            // Arrange
+            var sourceObj = new TestObservableObject() {Age = 2} as ITestObject;
+            var scheduler = new TestScheduler();
+            var observer = scheduler.CreateObserver<IPropertyValueChanged<int>>();
+            var expected = new[]
+            {
+                OnNext(20, PropertyValueChanged.CreateWithValue(sourceObj, "Age", 5)),
+                OnNext(30, PropertyValueChanged.CreateWithValue(sourceObj, "Age", 3)),
+            };
+
+            var sut = new NotifyPropertyValueChangedObservable<ITestObject, int>(sourceObj.ToPropertyValueChangedObservable(), "Age",
+                x => x.Age);
+
+            scheduler.AdvanceTo(10);
+            sourceObj.Age = 5;
+            scheduler.AdvanceTo(20);
+
+            // Act
+
+            sut.Subscribe(observer);
+            scheduler.AdvanceTo(30);
+            sourceObj.Age = 3;
+
+            // Assert
+            Assert.AreEqual(expected, observer.Messages);
         }
     }
 }

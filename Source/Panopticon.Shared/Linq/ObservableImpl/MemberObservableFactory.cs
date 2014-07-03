@@ -32,10 +32,6 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             typeof(MemberObservableFactory).GetMethod("CreateNotifyPropertyChangedValueObservable",
                 BindingFlags.Static | BindingFlags.NonPublic);
 
-        private static readonly MethodInfo _createPocoObservable =
-            typeof(MemberObservableFactory).GetMethod("CreatePocoObservable",
-                BindingFlags.Static | BindingFlags.NonPublic);
-
         private static readonly MethodInfo _createNotifyPropertyChangedObservable =
             typeof(MemberObservableFactory).GetMethod("CreateNotifyPropertyChangedObservable",
                 BindingFlags.Static | BindingFlags.NonPublic);
@@ -119,13 +115,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                 var instanceType = memberInfo.ReflectedType;
                 var memberType = memberInfo.GetMemberType();
 
-                MethodInfo specialisedMethod;
-
-                // Create the appropriate Link type.
-                if (typeof(INotifyPropertyChanged).IsAssignableFrom(instanceType))
-                    specialisedMethod = _createNotifyPropertyChangedValueObservable.MakeGenericMethod(instanceType, memberType);
-                else
-                    specialisedMethod = _createPocoObservable.MakeGenericMethod(instanceType, memberType);
+                var specialisedMethod = _createNotifyPropertyChangedValueObservable.MakeGenericMethod(instanceType, memberType);
 
                 result = Delegate.CreateDelegate(typeof(Func<,,>).MakeGenericType(typeof(object), typeof(MemberInfo), typeof(object)),
                     specialisedMethod);
@@ -158,21 +148,11 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
         [UsedImplicitly]
         private static object CreateNotifyPropertyChangedValueObservable<TClass, TMember>(object source, MemberInfo memberInfo)
-            where TClass : class, INotifyPropertyChanged
-        {
-            var getter = ReflectionHelpers.CreateMemberGetter(memberInfo);
-
-            return new NotifyPropertyValueChangedObservable<TClass, TMember>((IObservable<IPropertyValueChanged<TClass>>) source, memberInfo.Name,
-                (Func<TClass, TMember>) getter);
-        }
-
-        [UsedImplicitly]
-        private static object CreatePocoObservable<TClass, TMember>(object source, MemberInfo memberInfo)
             where TClass : class
         {
             var getter = ReflectionHelpers.CreateMemberGetter(memberInfo);
 
-            return new PocoValueObservable<TClass, TMember>((IObservable<IPropertyValueChanged<TClass>>) source, memberInfo.Name,
+            return new NotifyPropertyValueChangedObservable<TClass, TMember>((IObservable<IPropertyValueChanged<TClass>>) source, memberInfo.Name,
                 (Func<TClass, TMember>) getter);
         }
 

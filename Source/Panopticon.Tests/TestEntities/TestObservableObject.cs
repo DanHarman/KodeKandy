@@ -13,12 +13,14 @@
 
 namespace KodeKandy.Panopticon.Tests.TestEntities
 {
-    internal class TestObservableObject : ObservableObject
+    internal class TestObservableObject : ObservableObject, ITestObject
     {
         private string _name;
         private TestObservableObject _observableChild;
         private TestPoco _pocoChild;
         private int age;
+
+        #region ITestObject Members
 
         public int Age
         {
@@ -43,5 +45,7 @@ namespace KodeKandy.Panopticon.Tests.TestEntities
             get { return _pocoChild; }
             set { SetValue(ref _pocoChild, value); }
         }
+
+        #endregion
     }
 }

@@ -1,4 +1,4 @@
-// <copyright file="Given_WhenValue_And_Final_Node_Implements_INotifyPropertyChanged.cs" company="million miles per hour ltd">
+// <copyright file="Given_WhenValue_And_Final_Node_INotifyPropertyChanged.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -19,7 +19,7 @@ using NUnit.Framework;
 namespace KodeKandy.Panopticon.Tests.Linq
 {
     [TestFixture]
-    public class Given_WhenValue_And_Final_Node_Implements_INotifyPropertyChanged : ReactiveTest
+    public class Given_WhenValue_And_Final_Node_INotifyPropertyChanged : ReactiveTest
     {
         [Test]
         public void When_Path_Has_Null_Intermediary_Node_Then_Skips_When_Invalid_Path()

@@ -23,7 +23,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\MemberObservableFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\NotifyPropertyChangedObservable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\NotifyPropertyValueChangedObservable.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\PocoValueObservable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Linq\Opticon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObservableCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObservableList.cs" />

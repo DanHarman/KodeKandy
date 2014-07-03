@@ -1,4 +1,4 @@
-// <copyright file="TestPoco.cs" company="million miles per hour ltd">
+// <copyright file="ITestObject.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -13,15 +13,14 @@
 
 namespace KodeKandy.Panopticon.Tests.TestEntities
 {
-    internal class TestPoco : ITestObject
+    internal interface ITestObject
     {
-        #region ITestObject Members
+        int Age { get; set; }
 
-        public int Age { get; set; }
-        public string Name { get; set; }
-        public TestObservableObject ObservableChild { get; set; }
-        public TestPoco PocoChild { get; set; }
+        string Name { get; set; }
 
-        #endregion
+        TestObservableObject ObservableChild { get; set; }
+
+        TestPoco PocoChild { get; set; }
     }
 }

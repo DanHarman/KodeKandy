@@ -122,5 +122,11 @@ namespace KodeKandy.Panopticon
                 return (base.GetHashCode() * 397) ^ EqualityComparer<TProperty>.Default.GetHashCode(_value);
             }
         }
+
+        public override string ToString()
+        {
+            return string.Format("PropertyValueChanged<{0}>: HasValue='{1}', Value='{2}', PropertyChangedEventArgs='{3}'", typeof(TProperty).Name,
+                HasValue, Value, PropertyChangedEventArgs);
+        }
     }
 }

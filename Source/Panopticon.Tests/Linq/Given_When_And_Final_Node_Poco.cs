@@ -48,6 +48,29 @@ namespace KodeKandy.Panopticon.Tests.Linq
         }
 
         [Test]
+        public void When_Subscribe_Via_Interface_To_Poco_Source_Then_OnNext_Initial_Value_Only()
+        {
+            // Arrange
+            var obj = new TestPoco {Age = 3} as ITestObject;
+            var scheduler = new TestScheduler();
+            var observer = scheduler.CreateObserver<IPropertyValueChanged<int>>();
+            var expected = new[]
+            {
+                OnNext(000, PropertyValueChanged.CreateWithValue(obj, "Age", 3)),
+            };
+
+            var sut = obj.When(x => x.Age);
+
+            // Act
+            sut.Subscribe(observer);
+            scheduler.AdvanceTo(10);
+            obj.Age = 5;
+
+            // Assert
+            Assert.AreEqual(expected, observer.Messages);
+        }
+
+        [Test]
         public void When_Subscribe_With_One_Node_Path_To_Property_Then_OnNext_Changes()
         {
             // Arrange

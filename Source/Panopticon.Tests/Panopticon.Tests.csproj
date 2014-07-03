@@ -87,20 +87,21 @@
     <Compile Include="Linq\Given_Forever.cs" />
     <Compile Include="Linq\Given_UserDataOrDefault.cs" />
     <Compile Include="Linq\Given_WhenAny.cs" />
-    <Compile Include="Linq\Given_WhenValue_And_Final_Node_Implements_INotifyPropertyChanged.cs" />
+    <Compile Include="Linq\Given_WhenValue_And_Final_Node_INotifyPropertyChanged.cs" />
     <Compile Include="Linq\ObservableImpl\Given_Forever.cs" />
     <Compile Include="Linq\ObservableImpl\Given_NotifyPropertyChangedObservable.cs" />
     <Compile Include="Linq\ObservableImpl\Given_NotifyPropertyValueChangedObservable.cs" />
-    <Compile Include="Linq\ObservableImpl\Given_PocoValueObservable.cs" />
+    <Compile Include="Linq\ObservableImpl\Given_NotifyPropertyValueChangedObservable_On_Poco_Source.cs" />
     <Compile Include="Linq\When_ForProperty.cs" />
     <Compile Include="ObservableListTests\Given_Observing_CollectionChanged_Events.cs" />
     <Compile Include="ObservableObjectTests\Given_ObservableObject.cs" />
     <Compile Include="PropertyChangeHelperTests\Given_PropertyChangeHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Linq\Given_When_And_Final_Node_Implements_INotifyPropertyChanged.cs" />
+    <Compile Include="Linq\Given_When_And_Final_Node_INotifyPropertyChanged.cs" />
     <Compile Include="Linq\Given_When_And_Final_Node_Poco.cs" />
     <Compile Include="TestEntities\DerivedTestObservableObject.cs" />
     <Compile Include="TestEntities\DerivedTestPoco.cs" />
+    <Compile Include="TestEntities\ITestObject.cs" />
     <Compile Include="TestEntities\TestObservableObject.cs" />
     <Compile Include="TestEntities\TestPoco.cs" />
   </ItemGroup>

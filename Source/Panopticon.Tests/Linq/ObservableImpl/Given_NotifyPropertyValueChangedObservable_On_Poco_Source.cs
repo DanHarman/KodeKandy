@@ -1,4 +1,4 @@
-// <copyright file="Given_PocoValueObservable.cs" company="million miles per hour ltd">
+// <copyright file="Given_NotifyPropertyValueChangedObservable_On_Poco_Source.cs" company="million miles per hour ltd">
 // Copyright (c) 2013-2014 All Right Reserved
 // 
 // This source is subject to the MIT License.
@@ -21,7 +21,7 @@ using NUnit.Framework;
 namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
 {
     [TestFixture]
-    public class Given_PocoValueObservable : ReactiveTest
+    public class Given_NotifyPropertyValueChangedObservable_On_Poco_Source : ReactiveTest
     {
         [Test]
         public void When_Source_Has_Null_Node_Then_Propagates_ProvertyValueChanged_With_HasValue_False()
@@ -45,7 +45,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
                 OnCompleted<IPropertyValueChanged<int>>(400),
             };
 
-            var sut = new PocoValueObservable<TestPoco, int>(sourceObs, "Age", x => x.Age);
+            var sut = new NotifyPropertyValueChangedObservable<TestPoco, int>(sourceObs, "Age", x => x.Age);
 
             // Act
             sut.Subscribe(observer);
@@ -70,7 +70,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
                 OnCompleted<IPropertyValueChanged<int>>(400),
             };
 
-            var sut = new PocoValueObservable<TestPoco, int>(sourceObs, "Age", x => x.Age);
+            var sut = new NotifyPropertyValueChangedObservable<TestPoco, int>(sourceObs, "Age", x => x.Age);
 
             // Act
             sut.Subscribe(observer);
@@ -95,7 +95,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
                 OnError<IPropertyValueChanged<int>>(400, expectedException),
             };
 
-            var sut = new PocoValueObservable<TestPoco, int>(sourceObs, "Age", x => x.Age);
+            var sut = new NotifyPropertyValueChangedObservable<TestPoco, int>(sourceObs, "Age", x => x.Age);
 
             // Act
             sut.Subscribe(observer);
@@ -117,7 +117,7 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
                 OnNext(20, PropertyValueChanged.CreateWithValue(obj, "Age", 5)),
             };
 
-            var sut = new PocoValueObservable<TestPoco, int>(obj.ToPropertyValueChangedObservable(), "Age", x => x.Age);
+            var sut = new NotifyPropertyValueChangedObservable<TestPoco, int>(obj.ToPropertyValueChangedObservable(), "Age", x => x.Age);
 
             // Act
             scheduler.AdvanceTo(10);
@@ -126,6 +126,35 @@ namespace KodeKandy.Panopticon.Tests.Linq.ObservableImpl
             sut.Subscribe(observer);
             scheduler.AdvanceTo(30);
             obj.Age = 3; // This should not fire through.
+
+            // Assert
+            Assert.AreEqual(expected, observer.Messages);
+        }
+
+        [Test]
+        public void When_Subscribe_Via_Interface_Not_Implementing_INotifyPropertyChanged_Then_Returns_Value_At_Time_Of_Subscribe()
+        {
+            // Arrange
+            var sourceObj = new TestPoco() {Age = 2} as ITestObject;
+            var scheduler = new TestScheduler();
+            var observer = scheduler.CreateObserver<IPropertyValueChanged<int>>();
+            var expected = new[]
+            {
+                OnNext(20, PropertyValueChanged.CreateWithValue(sourceObj, "Age", 5)),
+            };
+
+            var sut = new NotifyPropertyValueChangedObservable<ITestObject, int>(sourceObj.ToPropertyValueChangedObservable(), "Age",
+                x => x.Age);
+
+            scheduler.AdvanceTo(10);
+            sourceObj.Age = 5;
+            scheduler.AdvanceTo(20);
+
+            // Act
+
+            sut.Subscribe(observer);
+            scheduler.AdvanceTo(30);
+            sourceObj.Age = 3;
 
             // Assert
             Assert.AreEqual(expected, observer.Messages);
