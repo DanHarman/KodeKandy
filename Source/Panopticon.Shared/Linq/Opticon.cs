@@ -73,6 +73,13 @@ namespace KodeKandy.Panopticon.Linq
             Func<TClass, TProperty> outValueGetter)
             where TClass : class, INotifyPropertyChanged
         {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (propertyName == null)
+                throw new ArgumentNullException("propertyName");
+            if (outValueGetter == null)
+                throw new ArgumentNullException("outValueGetter");
+
             return source.When(propertyName, outValueGetter).ToValues();
         }
 
@@ -81,6 +88,13 @@ namespace KodeKandy.Panopticon.Linq
             Func<TClass, TProperty> outValueGetter)
             where TClass : class, INotifyPropertyChanged
         {
+            if (sourceObservable == null)
+                throw new ArgumentNullException("sourceObservable");
+            if (propertyName == null)
+                throw new ArgumentNullException("propertyName");
+            if (outValueGetter == null)
+                throw new ArgumentNullException("outValueGetter");
+
             return sourceObservable.When(propertyName, outValueGetter).ToValues();
         }
 
@@ -88,7 +102,199 @@ namespace KodeKandy.Panopticon.Linq
             Expression<Func<TClass, TMember>> memberPath)
             where TClass : class
         {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (memberPath == null)
+                throw new ArgumentNullException("memberPath");
+
             return source.When(memberPath).ToValues();
+        }
+
+        public static IObservable<TResult> WhenValue<TClass, TMember1, TMember2, TResult>(this TClass source,
+            Expression<Func<TClass, TMember1>> memberPath1,
+            Expression<Func<TClass, TMember2>> memberPath2,
+            Func<TMember1, TMember2, TResult> resultSelector)
+            where TClass : class
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (memberPath1 == null)
+                throw new ArgumentNullException("memberPath1");
+            if (memberPath2 == null)
+                throw new ArgumentNullException("memberPath2");
+            if (resultSelector == null)
+                throw new ArgumentNullException("resultSelector");
+
+            return Observable.CombineLatest(
+                source.When(memberPath1).ToValues(),
+                source.When(memberPath2).ToValues(),
+                resultSelector);
+        }
+
+        public static IObservable<TResult> WhenValue<TClass, TMember1, TMember2, TMember3, TResult>(this TClass source,
+            Expression<Func<TClass, TMember1>> memberPath1,
+            Expression<Func<TClass, TMember2>> memberPath2,
+            Expression<Func<TClass, TMember3>> memberPath3,
+            Func<TMember1, TMember2, TMember3, TResult> resultSelector)
+            where TClass : class
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (memberPath1 == null)
+                throw new ArgumentNullException("memberPath1");
+            if (memberPath2 == null)
+                throw new ArgumentNullException("memberPath2");
+            if (memberPath3 == null)
+                throw new ArgumentNullException("memberPath3");
+            if (resultSelector == null)
+                throw new ArgumentNullException("resultSelector");
+
+            return Observable.CombineLatest(
+                source.When(memberPath1).ToValues(),
+                source.When(memberPath2).ToValues(),
+                source.When(memberPath3).ToValues(),
+                resultSelector);
+        }
+
+        public static IObservable<TResult> WhenValue<TClass, TMember1, TMember2, TMember3, TMember4, TResult>(this TClass source,
+            Expression<Func<TClass, TMember1>> memberPath1,
+            Expression<Func<TClass, TMember2>> memberPath2,
+            Expression<Func<TClass, TMember3>> memberPath3,
+            Expression<Func<TClass, TMember4>> memberPath4,
+            Func<TMember1, TMember2, TMember3, TMember4, TResult> resultSelector)
+            where TClass : class
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (memberPath1 == null)
+                throw new ArgumentNullException("memberPath1");
+            if (memberPath2 == null)
+                throw new ArgumentNullException("memberPath2");
+            if (memberPath3 == null)
+                throw new ArgumentNullException("memberPath3");
+            if (memberPath4 == null)
+                throw new ArgumentNullException("memberPath4");
+            if (resultSelector == null)
+                throw new ArgumentNullException("resultSelector");
+
+            return Observable.CombineLatest(
+                source.When(memberPath1).ToValues(),
+                source.When(memberPath2).ToValues(),
+                source.When(memberPath3).ToValues(),
+                source.When(memberPath4).ToValues(),
+                resultSelector);
+        }
+
+        public static IObservable<TResult> WhenValue<TClass, TMember1, TMember2, TMember3, TMember4, TMember5, TResult>(this TClass source,
+            Expression<Func<TClass, TMember1>> memberPath1,
+            Expression<Func<TClass, TMember2>> memberPath2,
+            Expression<Func<TClass, TMember3>> memberPath3,
+            Expression<Func<TClass, TMember4>> memberPath4,
+            Expression<Func<TClass, TMember5>> memberPath5,
+            Func<TMember1, TMember2, TMember3, TMember4, TMember5, TResult> resultSelector)
+            where TClass : class
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (memberPath1 == null)
+                throw new ArgumentNullException("memberPath1");
+            if (memberPath2 == null)
+                throw new ArgumentNullException("memberPath2");
+            if (memberPath3 == null)
+                throw new ArgumentNullException("memberPath3");
+            if (memberPath4 == null)
+                throw new ArgumentNullException("memberPath4");
+            if (memberPath5 == null)
+                throw new ArgumentNullException("memberPath5");
+            if (resultSelector == null)
+                throw new ArgumentNullException("resultSelector");
+
+            return Observable.CombineLatest(
+                source.When(memberPath1).ToValues(),
+                source.When(memberPath2).ToValues(),
+                source.When(memberPath3).ToValues(),
+                source.When(memberPath4).ToValues(),
+                source.When(memberPath5).ToValues(),
+                resultSelector);
+        }
+
+        public static IObservable<TResult> WhenValue<TClass, TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TResult>(this TClass source,
+            Expression<Func<TClass, TMember1>> memberPath1,
+            Expression<Func<TClass, TMember2>> memberPath2,
+            Expression<Func<TClass, TMember3>> memberPath3,
+            Expression<Func<TClass, TMember4>> memberPath4,
+            Expression<Func<TClass, TMember5>> memberPath5,
+            Expression<Func<TClass, TMember6>> memberPath6,
+            Func<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TResult> resultSelector)
+            where TClass : class
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (memberPath1 == null)
+                throw new ArgumentNullException("memberPath1");
+            if (memberPath2 == null)
+                throw new ArgumentNullException("memberPath2");
+            if (memberPath3 == null)
+                throw new ArgumentNullException("memberPath3");
+            if (memberPath4 == null)
+                throw new ArgumentNullException("memberPath4");
+            if (memberPath5 == null)
+                throw new ArgumentNullException("memberPath5");
+            if (memberPath6 == null)
+                throw new ArgumentNullException("memberPath6");
+            if (resultSelector == null)
+                throw new ArgumentNullException("resultSelector");
+
+            return Observable.CombineLatest(
+                source.When(memberPath1).ToValues(),
+                source.When(memberPath2).ToValues(),
+                source.When(memberPath3).ToValues(),
+                source.When(memberPath4).ToValues(),
+                source.When(memberPath5).ToValues(),
+                source.When(memberPath6).ToValues(),
+                resultSelector);
+        }
+
+        public static IObservable<TResult> WhenValue<TClass, TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TResult>(
+            this TClass source,
+            Expression<Func<TClass, TMember1>> memberPath1,
+            Expression<Func<TClass, TMember2>> memberPath2,
+            Expression<Func<TClass, TMember3>> memberPath3,
+            Expression<Func<TClass, TMember4>> memberPath4,
+            Expression<Func<TClass, TMember5>> memberPath5,
+            Expression<Func<TClass, TMember6>> memberPath6,
+            Expression<Func<TClass, TMember7>> memberPath7,
+            Func<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TResult> resultSelector)
+            where TClass : class
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (memberPath1 == null)
+                throw new ArgumentNullException("memberPath1");
+            if (memberPath2 == null)
+                throw new ArgumentNullException("memberPath2");
+            if (memberPath3 == null)
+                throw new ArgumentNullException("memberPath3");
+            if (memberPath4 == null)
+                throw new ArgumentNullException("memberPath4");
+            if (memberPath5 == null)
+                throw new ArgumentNullException("memberPath5");
+            if (memberPath6 == null)
+                throw new ArgumentNullException("memberPath6");
+            if (memberPath7 == null)
+                throw new ArgumentNullException("memberPath7");
+            if (resultSelector == null)
+                throw new ArgumentNullException("resultSelector");
+
+            return Observable.CombineLatest(
+                source.When(memberPath1).ToValues(),
+                source.When(memberPath2).ToValues(),
+                source.When(memberPath3).ToValues(),
+                source.When(memberPath4).ToValues(),
+                source.When(memberPath5).ToValues(),
+                source.When(memberPath6).ToValues(),
+                source.When(memberPath7).ToValues(),
+                resultSelector);
         }
 
         #endregion
