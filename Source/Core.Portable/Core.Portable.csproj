@@ -36,14 +36,9 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExpressionHelpers.cs" />
-    <Compile Include="MemberAccessor.cs" />
-    <Compile Include="MemberInfoExtensions.cs" />
-    <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="ReflectionHelpers.cs" />
-    <Compile Include="Require.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <Import Project="..\Core.Shared\Core.Shared.projitems" Label="Shared" Condition="Exists('..\Core.Shared\Core.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

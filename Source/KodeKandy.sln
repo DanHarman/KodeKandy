@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panopticon.Tests", "Panopti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Async.Tests", "Core.Async.Tests\Core.Async.Tests.csproj", "{E4272BDD-5F91-4EA0-9F7B-4AE65061BA1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{8C39CCA4-F76C-4EE8-B27D-A0A1CCB91300}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Portable", "Core.Portable\Core.Portable.csproj", "{8C39CCA4-F76C-4EE8-B27D-A0A1CCB91300}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{3303366A-ED3E-476C-811F-89C4C7D7BD11}"
 EndProject
@@ -37,10 +37,17 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Panopticon.Shared", "Panopt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panopticon.Portable", "Panopticon.Portable\Panopticon.Portable.csproj", "{CF86E617-096F-472B-80EA-525B7ABD21B2}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Core.Shared", "Core.Shared\Core.Shared.shproj", "{4D7A4878-91F6-483E-8A7E-D476C9D24BB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Net40", "Core.Net40\Core.Net40.csproj", "{623DE9B0-B6C2-4824-8D18-5F805009F8F7}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Core.Shared\Core.Shared.projitems*{623de9b0-b6c2-4824-8d18-5f805009f8f7}*SharedItemsImports = 4
 		Panopticon.Shared\Panopticon.Shared.projitems*{cf86e617-096f-472b-80ea-525b7abd21b2}*SharedItemsImports = 4
 		Panopticon.Shared\Panopticon.Shared.projitems*{2ff35776-71d2-4096-9cfd-fa78bc992e8d}*SharedItemsImports = 13
+		Core.Shared\Core.Shared.projitems*{8c39cca4-f76c-4ee8-b27d-a0a1ccb91300}*SharedItemsImports = 4
+		Core.Shared\Core.Shared.projitems*{4d7a4878-91f6-483e-8a7e-d476c9d24bb9}*SharedItemsImports = 13
 		Panopticon.Shared\Panopticon.Shared.projitems*{04347349-b09f-4c2a-be2e-f6f3cbcb3928}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -100,6 +107,10 @@ Global
 		{CF86E617-096F-472B-80EA-525B7ABD21B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF86E617-096F-472B-80EA-525B7ABD21B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF86E617-096F-472B-80EA-525B7ABD21B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{623DE9B0-B6C2-4824-8D18-5F805009F8F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{623DE9B0-B6C2-4824-8D18-5F805009F8F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{623DE9B0-B6C2-4824-8D18-5F805009F8F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{623DE9B0-B6C2-4824-8D18-5F805009F8F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,5 +129,7 @@ Global
 		{04347349-B09F-4C2A-BE2E-F6F3CBCB3928} = {92C0849D-9B22-43EF-95D2-FBEBA8CE20FA}
 		{2FF35776-71D2-4096-9CFD-FA78BC992E8D} = {92C0849D-9B22-43EF-95D2-FBEBA8CE20FA}
 		{CF86E617-096F-472B-80EA-525B7ABD21B2} = {92C0849D-9B22-43EF-95D2-FBEBA8CE20FA}
+		{4D7A4878-91F6-483E-8A7E-D476C9D24BB9} = {053C759B-E324-4CBC-A8CC-9DBAE10AC375}
+		{623DE9B0-B6C2-4824-8D18-5F805009F8F7} = {053C759B-E324-4CBC-A8CC-9DBAE10AC375}
 	EndGlobalSection
 EndGlobal

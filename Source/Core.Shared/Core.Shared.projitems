@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>4d7a4878-91f6-483e-8a7e-d476c9d24bb9</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>KodeKandy.Core</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ExpressionHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MemberAccessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MemberInfoExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Properties\Annotations.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Properties\SharedAssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReflectionHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Require.cs" />
+  </ItemGroup>
+</Project>
