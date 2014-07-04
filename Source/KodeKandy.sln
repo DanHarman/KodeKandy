@@ -29,7 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KodeKandy.Panopticon", "Kod
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KodeKandy.Mapnificent", "KodeKandy.Mapnificent", "{05245FAF-0374-4BF2-9CAD-CBB5C43AC713}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KodeKandy.Kore", "KodeKandy.Kore", "{053C759B-E324-4CBC-A8CC-9DBAE10AC375}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KodeKandy.Core", "KodeKandy.Core", "{053C759B-E324-4CBC-A8CC-9DBAE10AC375}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panopticon.Net40", "Panopticon.net40\Panopticon.Net40.csproj", "{04347349-B09F-4C2A-BE2E-F6F3CBCB3928}"
 EndProject
