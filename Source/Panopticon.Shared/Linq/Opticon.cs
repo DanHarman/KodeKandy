@@ -94,7 +94,7 @@ namespace KodeKandy.Panopticon.Linq
         }
 
         /// <summary>
-        ///     Create an PropertyValueChanged Observable for a, potentially nested, property on a stream of class instances.
+        ///     Create an PropertyValueChanged Observable for a, potentially nested, property on a class instances.
         /// 
         ///     When the observable is subscribed to, it will OnNext the initial value of the property, and if the class implements
         ///     INotifyPropertyChanged the observable will continue to OnNext the property's values as they change. If a new
@@ -121,7 +121,39 @@ namespace KodeKandy.Panopticon.Linq
             if (memberPath == null)
                 throw new ArgumentNullException("memberPath");
 
-            return MemberObservableFactory.CreateValueObserver(source, memberPath);
+            return MemberObservableFactory.CreateValueObserver(source.ToPropertyValueChangedObservable(), memberPath);
+        }
+
+        /// <summary>
+        ///     Create an PropertyValueChanged Observable for a, potentially nested, property on a stream of class instances.
+        /// 
+        ///     When the observable is subscribed to, it will OnNext the initial value of the property, and if the class implements
+        ///     INotifyPropertyChanged the observable will continue to OnNext the property's values as they change. If a new
+        ///     class instance is emitted on the source stream, then the initial value for the new instance will be OnNexted.
+        /// 
+        ///     This overload supports nested property paths and will continue to update regardless of which node in the path the
+        ///     change occurs at.
+        /// 
+        ///     n.b. If the path becomes broken, this overload will notify with a PropertyValueChanged where HasValue=false.
+        /// 
+        ///     Usage: instObservable.When(x => x.Child.AnotherChild.Name);
+        /// </summary>
+        /// <typeparam name="TClass">Class type.</typeparam>
+        /// <typeparam name="TMember">Member type.</typeparam>
+        /// <param name="sourceObservable">The stream of class instances.</param>
+        /// <param name="memberPath">Path to the target property.</param>
+        /// <returns>An PropertyValueChanged Observable for the property</returns>
+        public static IObservable<IPropertyValueChanged<TMember>> When<TClass, TMember>(
+            this IObservable<IPropertyValueChanged<TClass>> sourceObservable,
+            Expression<Func<TClass, TMember>> memberPath)
+            where TClass : class
+        {
+            if (sourceObservable == null)
+                throw new ArgumentNullException("sourceObservable");
+            if (memberPath == null)
+                throw new ArgumentNullException("memberPath");
+
+            return MemberObservableFactory.CreateValueObserver(sourceObservable, memberPath);
         }
 
         #endregion

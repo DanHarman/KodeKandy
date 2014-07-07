@@ -46,16 +46,19 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         /// </summary>
         /// <typeparam name="TClass">The type of the root class being observed.</typeparam>
         /// <typeparam name="TMember">The type of the final member</typeparam>
-        /// <param name="source">The source instance.</param>
+        /// <param name="sourceObservable">The stream of class instances.</param>
         /// <param name="memberPath">The path to the final member.</param>
         /// <returns>An <see cref="IObservable{TMember}" /></returns>
-        public static IObservable<IPropertyValueChanged<TMember>> CreateValueObserver<TClass, TMember>(TClass source,
+        public static IObservable<IPropertyValueChanged<TMember>> CreateValueObserver<TClass, TMember>(IObservable<IPropertyValueChanged<TClass>> sourceObservable,
             Expression<Func<TClass, TMember>> memberPath)
             where TClass : class
         {
+            if (sourceObservable == null)
+                throw new ArgumentNullException("sourceObservable");
+
             var memberInfos = ExpressionHelpers.GetMemberInfos(memberPath);
 
-            object currObserver = source.ToPropertyValueChangedObservable();
+            object currObserver = sourceObservable;
             foreach (var memberInfo in memberInfos)
             {
                 var create = (Func<object, MemberInfo, object>) CreateObservableMemberValueChangedDelegate(memberInfo);
