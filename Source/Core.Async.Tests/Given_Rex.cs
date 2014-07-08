@@ -83,7 +83,8 @@ namespace KodeKandy
             // Assert
             observer.Messages.AssertEqual(
                 OnNext(10, Rex.Result(10)),
-                OnNext(30, Rex.Error<int>(expectedException))
+                OnNext(30, Rex.Error<int>(expectedException)),
+                OnCompleted<Rex<int>>(30)
                 );
         }
 

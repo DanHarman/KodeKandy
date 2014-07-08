@@ -81,21 +81,17 @@ namespace KodeKandy
             return Observable.Create<Rex<T>>(obs =>
                 source.Subscribe(
                     x => obs.OnNext(Rex.Result(x)),
-                    ex => obs.OnNext(Rex.Error<T>(ex)),
-                    obs.OnCompleted));
-        }
-
-        public static IObservable<Rex<T>> ToRex<T>(this Task<T> task)
-        {
-            return Observable.Create<Rex<T>>(obs =>
-                task.ToObservable().Subscribe(
-                    x => obs.OnNext(Rex.Result(x)),
                     ex =>
                     {
                         obs.OnNext(Rex.Error<T>(ex));
                         obs.OnCompleted();
                     },
                     obs.OnCompleted));
+        }
+
+        public static IObservable<Rex<T>> ToRex<T>(this Task<T> task)
+        {
+            return task.ToObservable().ToRex();
         }
 
         public static IDisposable SubscribeRex<T>(this IObservable<Rex<T>> source, Action<T> onNextResult, Action<Exception> onNextError)
