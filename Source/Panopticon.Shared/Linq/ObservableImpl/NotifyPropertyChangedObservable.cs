@@ -13,8 +13,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Reactive.Disposables;
-using KodeKandy.Panopticon.Internal;
 
 namespace KodeKandy.Panopticon.Linq.ObservableImpl
 {
@@ -25,8 +23,7 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
     ///     unlike <see cref="NotifyPropertyValueChangedObservable{TClass,TProperty}" />
     /// </summary>
     /// <typeparam name="TClass">The class whose PropertyChanged event is being projected.</typeparam>
-    internal class NotifyPropertyChangedObservable<TClass> : NotifyPropertyChangedObservableBase<TClass, IPropertyChanged<TClass>>,
-        IObserver<IPropertyValueChanged<TClass>>, IObservable<IPropertyChanged<TClass>>
+    internal class NotifyPropertyChangedObservable<TClass> : AdaptingObservableBase<IPropertyValueChanged<TClass>, IPropertyChanged<TClass>>
         where TClass : class, INotifyPropertyChanged
     {
         public NotifyPropertyChangedObservable(IObservable<IPropertyValueChanged<TClass>> sourceObservable)
@@ -34,124 +31,89 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
         {
         }
 
-        #region IObservable<IPropertyChanged<TClass>> Members
-
-        public IDisposable Subscribe(IObserver<IPropertyChanged<TClass>> observer)
+        protected override IAdaptor<IPropertyValueChanged<TClass>, IPropertyChanged<TClass>> CreateAdaptor()
         {
-            if (observer == null)
-                throw new ArgumentNullException("observer");
+            return new PropertyChangedAdaptor(this);
+        }
 
-            CompletedObserver<IPropertyChanged<TClass>> completedObserver;
+        #region Nested type: PropertyChangedAdaptor
 
-            lock (Gate)
+        private class PropertyChangedAdaptor : IAdaptor<IPropertyValueChanged<TClass>, IPropertyChanged<TClass>>
+        {
+            private readonly NotifyPropertyChangedObservable<TClass> _observable;
+            /// <summary>
+            ///     The current instance of the source.
+            /// </summary>
+            private TClass _source;
+
+            public PropertyChangedAdaptor(NotifyPropertyChangedObservable<TClass> observable)
             {
-                completedObserver = Observer as CompletedObserver<IPropertyChanged<TClass>>;
+                _observable = observable;
+            }
 
-                if (completedObserver == null)
+            #region IAdaptor<IPropertyValueChanged<TClass>,IPropertyChanged<TClass>> Members
+
+            void IObserver<IPropertyValueChanged<TClass>>.OnNext(IPropertyValueChanged<TClass> newSource)
+            {
+                TClass oldSource;
+                lock (_observable.Gate)
                 {
-                    if (Observer == NopObserver<IPropertyChanged<TClass>>.Instance)
-                    {
-                        // If we have no _observer then make it our _observer and subscribe to _sourceObservable.
-                        Observer = observer;
-                        SourceSubscriptionDisposable = SourceObservable.Subscribe(this);
-                    }
-                    else
-                    {
-                        var multiObserver = Observer as ImmutableMultiObserver<IPropertyChanged<TClass>>;
-                        if (multiObserver != null)
-                        {
-                            // If we already have a ImmutableMultiObserver then add the new _observer to it.
-                            Observer = multiObserver.Add(observer);
-                        }
-                        else
-                        {
-                            // We didn't have a multiobserver, so we must have just had a single observer, so replace it with a multiobserver containing
-                            // both the old and new observer.
-                            Observer = new ImmutableMultiObserver<IPropertyChanged<TClass>>(
-                                new ImmutableList<IObserver<IPropertyChanged<TClass>>>(new[] {Observer, observer}));
-                        }
-
-                        observer.OnNext(PropertyChanged.Create(Source));
-                    }
-
-                    return new Subscription(this, observer);
+                    oldSource = _source;
+                    _source = newSource.Value;
+                    _observable.Observer.OnNext(PropertyChanged.Create(_source));
                 }
+
+                if (newSource.HasValue)
+                    newSource.Value.PropertyChanged += OnPropertyChanged;
+
+                if (oldSource != null)
+                    oldSource.PropertyChanged -= OnPropertyChanged;
             }
 
-            if (completedObserver == CompletedObserver<IPropertyChanged<TClass>>.Instance)
-                observer.OnCompleted();
-            else
-                observer.OnError(completedObserver.Error);
+            void IObserver<IPropertyValueChanged<TClass>>.OnError(Exception error)
+            {
+                _observable.OnError(error);
+            }
 
-            return Disposable.Empty;
+            void IObserver<IPropertyValueChanged<TClass>>.OnCompleted()
+            {
+                _observable.OnCompleted();
+            }
+
+            public void NotifyInitialValue(IObserver<IPropertyChanged<TClass>> observer)
+            {
+                observer.OnNext(PropertyChanged.Create(_source));
+            }
+
+            public void Dispose()
+            {
+                var sourceAsNotifyPropertyChanged = _source as INotifyPropertyChanged;
+                if (sourceAsNotifyPropertyChanged != null)
+                {
+                    sourceAsNotifyPropertyChanged.PropertyChanged -= OnPropertyChanged;
+                }
+
+                _source = null;
+            }
+
+            #endregion
+
+            private void OnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+            {
+                IObserver<IPropertyChanged<TClass>> currObserver;
+
+                lock (_observable.Gate)
+                {
+                    if (_source != sender)
+                        return;
+
+                    currObserver = _observable.Observer;
+                }
+
+                currObserver.OnNext(PropertyChanged.Create((TClass) sender, propertyChangedEventArgs));
+            }
         }
 
         #endregion
-
-        #region IObserver<IPropertyValueChanged<TClass>> Members
-
-        void IObserver<IPropertyValueChanged<TClass>>.OnNext(IPropertyValueChanged<TClass> newSource)
-        {
-            TClass oldSource;
-            lock (Gate)
-            {
-                oldSource = Source;
-                Source = newSource.Value;
-                Observer.OnNext(PropertyChanged.Create(Source));
-            }
-
-            if (newSource.HasValue)
-                newSource.Value.PropertyChanged += OnPropertyChanged;
-
-            if (oldSource != null)
-                oldSource.PropertyChanged -= OnPropertyChanged;
-        }
-
-        void IObserver<IPropertyValueChanged<TClass>>.OnError(Exception error)
-        {
-            base.OnError(error);
-        }
-
-        void IObserver<IPropertyValueChanged<TClass>>.OnCompleted()
-        {
-            base.OnCompleted();
-        }
-
-        #endregion
-
-        /// <summary>
-        ///     Cleans up by unsubscribing to the sourceObservable, release references & etc.
-        /// </summary>
-        /// <remarks>Must be called inside the lock.</remarks>
-        protected override void CleanUp()
-        {
-            if (Source != null)
-            {
-                Source.PropertyChanged -= OnPropertyChanged;
-                Source = null;
-            }
-
-            if (SourceSubscriptionDisposable != null)
-            {
-                SourceSubscriptionDisposable.Dispose();
-                SourceSubscriptionDisposable = null;
-            }
-        }
-
-
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
-        {
-            IObserver<IPropertyChanged<TClass>> currObserver;
-
-            lock (Gate)
-            {
-                if (Source != sender)
-                    return;
-
-                currObserver = Observer;
-            }
-
-            currObserver.OnNext(PropertyChanged.Create((TClass) sender, propertyChangedEventArgs));
-        }
     }
 }

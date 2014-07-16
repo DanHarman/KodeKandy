@@ -13,16 +13,10 @@
 
 using System;
 using System.ComponentModel;
-using System.Reactive.Disposables;
 using KodeKandy.Panopticon.Internal;
 
 namespace KodeKandy.Panopticon.Linq.ObservableImpl
 {
-    interface IAdaptor<in TFrom, out TTo> : IObserver<TFrom>, IDisposable
-    {
-        void NotifyInitialValue(IObserver<TTo> observer);
-    }
-
     /// <summary>
     ///     An observable that watches a class and provides an observable for a property on that class, if the class implement
     ///     <see cref="INotifyPropertyChanged" />. If the class does not implement that interface, then only the initial value
@@ -38,13 +32,11 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
     /// <typeparam name="TClass">The type of the observered clas.</typeparam>
     /// <typeparam name="TProperty">The type of the observered property.</typeparam>
     internal class NotifyPropertyValueChangedObservable<TClass, TProperty> :
-        NotifyPropertyChangedObservableBase<TClass, IPropertyValueChanged<TProperty>>,
-        IObservable<IPropertyValueChanged<TProperty>>
+        AdaptingObservableBase<IPropertyValueChanged<TClass>, IPropertyValueChanged<TProperty>>
         where TClass : class
     {
         private readonly string _propertyName;
         private readonly Func<TClass, TProperty> _propertyValueGetter;
-        private IAdaptor<IPropertyValueChanged<TClass>, IPropertyValueChanged<TProperty>> _adaptor;
 
         public NotifyPropertyValueChangedObservable(IObservable<IPropertyValueChanged<TClass>> sourceObservable, string propertyName,
             Func<TClass, TProperty> propertyValueGetter) : base(sourceObservable)
@@ -58,77 +50,31 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
             _propertyValueGetter = propertyValueGetter;
         }
 
-        #region IObservable<IPropertyValueChanged<TProperty>> Members
-
-        public IDisposable Subscribe(IObserver<IPropertyValueChanged<TProperty>> observer)
+        protected override IAdaptor<IPropertyValueChanged<TClass>, IPropertyValueChanged<TProperty>> CreateAdaptor()
         {
-            if (observer == null)
-                throw new ArgumentNullException("observer");
-
-            CompletedObserver<IPropertyValueChanged<TProperty>> completedObserver;
-
-            lock (Gate)
-            {
-                completedObserver = Observer as CompletedObserver<IPropertyValueChanged<TProperty>>;
-
-                if (completedObserver == null)
-                {
-                    if (Observer == NopObserver<IPropertyValueChanged<TProperty>>.Instance)
-                    {
-                        // If we have no _observer then make it our _observer and subscribe to _sourceObservable.
-                        Observer = observer;
-                        _adaptor = new NotifyPropertyValueChangedAdaptor(this);
-                        SourceSubscriptionDisposable = SourceObservable.Subscribe(_adaptor);
-                    }
-                    else
-                    {
-                        var multiObserver = Observer as ImmutableMultiObserver<IPropertyValueChanged<TProperty>>;
-                        if (multiObserver != null)
-                        {
-                            // If we already have a ImmutableMultiObserver then add the new _observer to it.
-                            Observer = multiObserver.Add(observer);
-                        }
-                        else
-                        {
-                            // We didn't have a multiobserver, so we must have just had a single observer, so replace it with a multiobserver containing
-                            // both the old and new observer.
-                            Observer =
-                                new ImmutableMultiObserver<IPropertyValueChanged<TProperty>>(
-                                    new ImmutableList<IObserver<IPropertyValueChanged<TProperty>>>(new[] {Observer, observer}));
-                        }
-
-                        // Send the new observer the current property value. This is done inside the lock to prevent race conditions around the initial
-                        // value. Behaviour subject does similar, although I'm not sure we need to make this guarantee as it is stronger than the
-                        // guarantee for the property changing once already subscribed (whereby ordering is not guaranteed).
-                        _adaptor.NotifyInitialValue(observer);
-                    }
-
-                    return new Subscription(this, observer);
-                }
-            }
-
-            if (completedObserver == CompletedObserver<IPropertyValueChanged<TProperty>>.Instance)
-                observer.OnCompleted();
-            else
-                observer.OnError(completedObserver.Error);
-
-            return Disposable.Empty;
+            return new NotifyPropertyValueChangedAdaptor(this);
         }
 
-        #endregion
+        #region Nested type: NotifyPropertyValueChangedAdaptor
 
-        #region IObserver<IPropertyValueChanged<TClass>> Members
-
-        class NotifyPropertyValueChangedAdaptor : IAdaptor<IPropertyValueChanged<TClass>, IPropertyValueChanged<TProperty>>
+        /// <summary>
+        /// Takes a stream of TClass instances and projects into a flat mapped stream of property changes for a defined property.
+        /// </summary>
+        private class NotifyPropertyValueChangedAdaptor : IAdaptor<IPropertyValueChanged<TClass>, IPropertyValueChanged<TProperty>>
         {
             private readonly NotifyPropertyValueChangedObservable<TClass, TProperty> _observable;
-            private TClass _source;
             private IPropertyValueChanged<TProperty> _currentPropertyValueChanged;
+            /// <summary>
+            ///     The current instance of the source.
+            /// </summary>
+            private TClass _source;
 
             public NotifyPropertyValueChangedAdaptor(NotifyPropertyValueChangedObservable<TClass, TProperty> observable)
             {
                 _observable = observable;
             }
+
+            #region IAdaptor<IPropertyValueChanged<TClass>,IPropertyValueChanged<TProperty>> Members
 
             public void OnNext(IPropertyValueChanged<TClass> newSourcePropertyValueChanged)
             {
@@ -180,8 +126,22 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
 
             public void NotifyInitialValue(IObserver<IPropertyValueChanged<TProperty>> observer)
             {
-                observer.OnNext(_currentPropertyValueChanged); 
+                observer.OnNext(_currentPropertyValueChanged);
             }
+
+            public void Dispose()
+            {
+                var sourceAsNotifyPropertyChanged = _source as INotifyPropertyChanged;
+                if (sourceAsNotifyPropertyChanged != null)
+                {
+                    sourceAsNotifyPropertyChanged.PropertyChanged -= OnPropertyChanged;
+                }
+
+                _source = null;
+                _currentPropertyValueChanged = null;
+            }
+
+            #endregion
 
             /// <summary>
             ///     Internal <see cref="PropertyChangedEventHandler" /> to bind to the targets PropertyChanged event.
@@ -204,45 +164,15 @@ namespace KodeKandy.Panopticon.Linq.ObservableImpl
                         return;
 
                     currObserver = _observable.Observer;
-                    propertyValueChanged = PropertyValueChanged.CreateWithValue(_source, propertyChangedEventArgs, _observable._propertyValueGetter(_source));
+                    propertyValueChanged = PropertyValueChanged.CreateWithValue(_source, propertyChangedEventArgs,
+                        _observable._propertyValueGetter(_source));
                     _currentPropertyValueChanged = propertyValueChanged;
                 }
 
                 currObserver.OnNext(propertyValueChanged);
             }
-
-            public void Dispose()
-            {
-                var sourceAsNotifyPropertyChanged = _source as INotifyPropertyChanged;
-                if (sourceAsNotifyPropertyChanged != null)
-                {
-                    sourceAsNotifyPropertyChanged.PropertyChanged -= OnPropertyChanged;
-                }
-
-                _source = null;
-                _currentPropertyValueChanged = null;
-            }
         }
 
         #endregion
-        
-        /// <summary>
-        ///     Cleans up by unsubscribing to the sourceObservable, release references & etc.
-        /// </summary>
-        /// <remarks>Must be called inside the lock.</remarks>
-        protected override void CleanUp()
-        {
-            if (SourceSubscriptionDisposable != null)
-            {
-                SourceSubscriptionDisposable.Dispose();
-                SourceSubscriptionDisposable = null;
-            }
-
-            if (_adaptor != null)
-            {
-                _adaptor.Dispose();
-                _adaptor = null;
-            }
-        }
     }
 }

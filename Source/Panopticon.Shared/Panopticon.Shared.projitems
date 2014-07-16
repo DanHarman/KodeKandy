@@ -18,11 +18,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Internal\ImmutableMultiObserver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Internal\NopObserver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IObservableObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\AdaptingObservableBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\DerivedCollectionAdaptor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\Forever.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\IAdaptor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\MemberObservableFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\NotifyPropertyChangedObservable.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\NotifyPropertyChangedObservableBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Linq\ObservableImpl\NotifyPropertyValueChangedObservable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Linq\Opticon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObservableCommand.cs" />
