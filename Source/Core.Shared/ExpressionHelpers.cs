@@ -29,14 +29,8 @@ namespace KodeKandy
         /// <returns></returns>
         public static string GetMemberName<TClass, TMember>(Expression<Func<TClass, TMember>> memberExpression)
         {
-            Require.NotNull(memberExpression, "memberExpression");
 
-            var body = memberExpression.Body as MemberExpression;
-
-            if (body == null)
-                throw new ArgumentException("The specified expression is not simple.", "memberExpression");
-
-            return body.Member.Name;
+            return GetMemberInfo(memberExpression).Name;            
         }
 
         /// <summary>
@@ -47,12 +41,18 @@ namespace KodeKandy
         {
             Require.NotNull(memberExpression, "memberExpression");
 
-            var body = memberExpression.Body as MemberExpression;
+            var body = memberExpression.Body;
 
-            if (body == null)
+            while (body.NodeType == ExpressionType.Convert || body.NodeType == ExpressionType.ConvertChecked)
+            {
+                body = ((UnaryExpression)body).Operand;
+            }
+
+            var memberBody = body as MemberExpression;
+            if (memberBody == null)
                 throw new ArgumentException("The specified expression is not a simple member expression.", "memberExpression");
 
-            return body.Member;
+            return memberBody.Member;
         }
 
         public static ReadOnlyCollection<string> GetMemberNames(this IEnumerable<MemberInfo> memberInfos)
