@@ -14,7 +14,7 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using KodeKandy.Panopticon.Properties;
+using KodeKandy.Properties;
 
 namespace KodeKandy.Panopticon
 {

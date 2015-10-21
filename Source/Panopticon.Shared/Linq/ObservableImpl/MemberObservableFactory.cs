@@ -17,7 +17,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using KodeKandy.Panopticon.Properties;
+using KodeKandy.Properties;
 
 namespace KodeKandy.Panopticon.Linq.ObservableImpl
 {

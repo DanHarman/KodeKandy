@@ -14,7 +14,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using KodeKandy.Panopticon.Properties;
+using KodeKandy.Properties;
 
 namespace KodeKandy.Panopticon
 {
