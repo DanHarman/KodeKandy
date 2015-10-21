@@ -50,12 +50,18 @@ namespace KodeKandy.Panopticon
         [NotifyPropertyChangedInvocator("propertyName")]
         protected void SetValue<T>(ref T property, T value, [CallerMemberName] string propertyName = null)
         {
+            // CallerMemberNameAttribute is not supported on all platforms so we have to check for null here to avoid build errors
+            Require.NotNull(propertyName, nameof(propertyName));
+
             propertyChangeHelper.SetPropertyValue(ref property, value, propertyName);
         }
 
         [NotifyPropertyChangedInvocator("propertyName")]
         protected void SetValue<TVal>(ref TVal property, TVal value, object userData, [CallerMemberName] string propertyName = null)
         {
+            // CallerMemberNameAttribute is not supported on all platforms so we have to check for null here to avoid build errors
+            Require.NotNull(propertyName, nameof(propertyName));
+
             propertyChangeHelper.SetPropertyValue(ref property, value, propertyName, userData);
         }
     }
